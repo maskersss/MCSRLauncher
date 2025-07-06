@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.redlimerl.mcsrlauncher.gui.MainForm">
+  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="931" height="459"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="8ed4a" binding="launcherMenu" layout-manager="FlowLayout" hgap="3" vgap="0" flow-align="0">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="1" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="37a47" class="javax.swing.JButton" binding="accountButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <icon value="icons/steve.png"/>
+              <iconTextGap value="8"/>
+              <margin top="5" left="10" bottom="5" right="10"/>
+              <opaque value="false"/>
+              <requestFocusEnabled value="false"/>
+              <text resource-bundle="lang/I18n" key="account"/>
+              <verticalAlignment value="0"/>
+              <verticalTextPosition value="0"/>
+            </properties>
+            <clientProperties>
+              <html.disable class="java.lang.Boolean" value="false"/>
+            </clientProperties>
+          </component>
+          <component id="6f1f6" class="javax.swing.JButton" binding="createInstanceButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <doubleBuffered value="false"/>
+              <enabled value="true"/>
+              <focusPainted value="true"/>
+              <horizontalTextPosition value="11"/>
+              <icon value="icons/instance.png"/>
+              <iconTextGap value="6"/>
+              <margin top="5" left="10" bottom="5" right="10"/>
+              <opaque value="false"/>
+              <requestFocusEnabled value="false"/>
+              <text resource-bundle="lang/I18n" key="new_instance"/>
+              <verticalAlignment value="0"/>
+              <verticalTextPosition value="0"/>
+            </properties>
+          </component>
+          <component id="bd0c2" class="javax.swing.JButton" binding="settingsButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <doubleBuffered value="false"/>
+              <enabled value="true"/>
+              <focusPainted value="true"/>
+              <horizontalTextPosition value="11"/>
+              <icon value="icons/settings.png"/>
+              <iconTextGap value="6"/>
+              <margin top="5" left="10" bottom="5" right="10"/>
+              <opaque value="false"/>
+              <requestFocusEnabled value="false"/>
+              <text resource-bundle="lang/I18n" key="settings"/>
+              <verticalAlignment value="0"/>
+              <verticalTextPosition value="0"/>
+            </properties>
+          </component>
+          <component id="4216d" class="javax.swing.JButton" binding="discordButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <doubleBuffered value="false"/>
+              <enabled value="true"/>
+              <focusPainted value="true"/>
+              <horizontalTextPosition value="11"/>
+              <icon value="icons/discord.png"/>
+              <iconTextGap value="6"/>
+              <margin top="5" left="10" bottom="5" right="10"/>
+              <opaque value="false"/>
+              <requestFocusEnabled value="false"/>
+              <text resource-bundle="lang/I18n" key="join_discord"/>
+              <verticalAlignment value="0"/>
+              <verticalTextPosition value="0"/>
+            </properties>
+          </component>
+          <component id="4e68e" class="javax.swing.JButton" binding="patreonButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <doubleBuffered value="false"/>
+              <enabled value="true"/>
+              <focusPainted value="true"/>
+              <horizontalTextPosition value="11"/>
+              <icon value="icons/patreon.png"/>
+              <iconTextGap value="6"/>
+              <margin top="5" left="10" bottom="5" right="10"/>
+              <opaque value="false"/>
+              <requestFocusEnabled value="false"/>
+              <text resource-bundle="lang/I18n" key="support_us"/>
+              <verticalAlignment value="0"/>
+              <verticalTextPosition value="0"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="e927f" binding="bottomField" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="2" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="33120" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false">
+                <preferred-size width="-1" height="20"/>
+              </grid>
+            </constraints>
+            <properties>
+              <font size="12"/>
+              <text resource-bundle="lang/I18n" key="instance_list_guide"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <scrollpane id="f8437" binding="instanceScrollPane">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <horizontalScrollBarPolicy value="31"/>
+          <verticalScrollBarPolicy value="20"/>
+        </properties>
+        <border type="none"/>
+        <children/>
+      </scrollpane>
+      <component id="7dbbe" class="javax.swing.JSeparator" binding="topSeparator">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+    </children>
+  </grid>
+</form>

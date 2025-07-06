@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ResourceBundleManager">
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/I18n.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/I18n_ko_KR.properties" />
+    <custom-resource-bundle>
+      <file value="file://$PROJECT_DIR$/src/main/resources/lang/I18n.properties" />
+      <file value="file://$PROJECT_DIR$/src/main/resources/lang/I18n_ko_KR.properties" />
+      <base-name>I18n</base-name>
+    </custom-resource-bundle>
+  </component>
+</project>

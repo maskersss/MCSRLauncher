@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="layoutPattern">[%d{HH:mm:ss}] %highlight{[%p]}{FATAL=bg_red, ERROR=red, INFO=green, DEBUG=blue} %logger[%t]: %msg%n</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${layoutPattern}"/>
+        </Console>
+        <RollingFile name="File_Appender" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}_%i.log.gz">
+            <PatternLayout pattern="${layoutPattern}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="200KB"/>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10" fileIndex="min"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="com.redlimerl.mcsrlauncher" level="debug" additivity="false" >
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File_Appender"/>
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File_Appender"/>
+        </Root>
+    </Loggers>
+</Configuration>
