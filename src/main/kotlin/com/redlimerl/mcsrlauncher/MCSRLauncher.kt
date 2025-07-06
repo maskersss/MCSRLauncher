@@ -11,7 +11,6 @@ import com.redlimerl.mcsrlauncher.network.JsonResponseResult
 import com.redlimerl.mcsrlauncher.network.JsonSha256HttpClientResponseHandler
 import com.redlimerl.mcsrlauncher.network.JsonSha256ResponseResult
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.serialization.json.Json
 import org.apache.commons.io.FileUtils
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
@@ -28,7 +27,6 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
 import kotlin.system.exitProcess
 
-@OptIn(DelicateCoroutinesApi::class)
 object MCSRLauncher {
 
     val APP_NAME: String = javaClass.simpleName
