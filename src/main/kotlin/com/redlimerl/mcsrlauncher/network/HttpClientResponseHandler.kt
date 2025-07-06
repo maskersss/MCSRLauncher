@@ -1,7 +1,6 @@
 package com.redlimerl.mcsrlauncher.network
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
-import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import org.apache.hc.core5.http.ClassicHttpResponse
 import org.apache.hc.core5.http.io.HttpClientResponseHandler

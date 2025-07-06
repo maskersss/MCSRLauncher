@@ -3,7 +3,6 @@ package com.redlimerl.mcsrlauncher.launcher
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.MCSRLauncher.JSON
 import com.redlimerl.mcsrlauncher.data.MicrosoftAccount
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.apache.commons.io.FileUtils
 import java.nio.file.Path

@@ -1,6 +1,5 @@
 package com.redlimerl.mcsrlauncher.data.meta.file
 
-import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.meta.MetaDependency
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.library.MetaLibrary

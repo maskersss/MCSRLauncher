@@ -2,7 +2,6 @@ package com.redlimerl.mcsrlauncher.network
 
 import java.io.File
 import java.net.URL
-import kotlin.Exception
 
 object FileDownloader {
     fun download(url: String, file: File) {

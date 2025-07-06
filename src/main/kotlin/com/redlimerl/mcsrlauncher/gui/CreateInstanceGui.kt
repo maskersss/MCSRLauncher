@@ -8,7 +8,10 @@ import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SpeedrunUtils
 import java.awt.Dimension
-import javax.swing.*
+import javax.swing.DefaultComboBoxModel
+import javax.swing.JDialog
+import javax.swing.JFrame
+import javax.swing.ListSelectionModel
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.table.DefaultTableModel

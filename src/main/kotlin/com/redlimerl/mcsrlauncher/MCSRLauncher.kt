@@ -6,7 +6,10 @@ import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont
 import com.redlimerl.mcsrlauncher.gui.MainMenuGui
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
 import com.redlimerl.mcsrlauncher.launcher.*
-import com.redlimerl.mcsrlauncher.network.*
+import com.redlimerl.mcsrlauncher.network.JsonHttpClientResponseHandler
+import com.redlimerl.mcsrlauncher.network.JsonResponseResult
+import com.redlimerl.mcsrlauncher.network.JsonSha256HttpClientResponseHandler
+import com.redlimerl.mcsrlauncher.network.JsonSha256ResponseResult
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.serialization.json.Json
@@ -20,7 +23,6 @@ import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.JDialog
-import javax.swing.JOptionPane
 import kotlin.io.path.absolute
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.name

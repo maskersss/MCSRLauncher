@@ -1,7 +1,6 @@
 package com.redlimerl.mcsrlauncher.network
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
-import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 import java.security.MessageDigest

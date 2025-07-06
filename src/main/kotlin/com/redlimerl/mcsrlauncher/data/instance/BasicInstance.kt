@@ -5,7 +5,6 @@ import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.file.*
 import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
 import com.redlimerl.mcsrlauncher.exception.InvalidAccessTokenException
-import com.redlimerl.mcsrlauncher.gui.UncloseableDialog
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
 import com.redlimerl.mcsrlauncher.launcher.AccountManager
 import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
@@ -15,16 +14,15 @@ import com.redlimerl.mcsrlauncher.util.AssetUtils
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.OSUtils
-import kotlinx.coroutines.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.net.URL
 import java.nio.file.Path
 import javax.swing.JDialog
-import javax.swing.JOptionPane
-import javax.swing.SwingUtilities
-import javax.swing.SwingWorker
 import kotlin.io.path.absolutePathString
 
 @OptIn(DelicateCoroutinesApi::class)

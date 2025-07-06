@@ -11,7 +11,7 @@ import com.redlimerl.mcsrlauncher.data.serializer.ISO8601Serializer
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.util.Date
+import java.util.*
 
 @Serializable
 data class MinecraftMetaFile(
