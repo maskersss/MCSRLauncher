@@ -18,4 +18,4 @@ The detailed roadmap will be posted on our Discord server.
 ## Development
 This project has been written with IntelliJ IDEA, so we would recommend to use same IDE.
 If you are using IntelliJ IDEA, do not forget change these settings:
-- `Settings` -> `Editor` -> `GUI Designer` -> `Generate GUI into` -> Set: `Java code soruce`
+- `Settings` -> `Editor` -> `GUI Designer` -> `Generate GUI into` -> Set: `Java code source`
