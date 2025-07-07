@@ -34,7 +34,7 @@ class AccountListComponent(private val parent: Window) : JPanel() {
 
             grid.gridx = 2
             grid.weightx = 0.0
-            val selectAccountButton = JButton(I18n.translate("select_account"))
+            val selectAccountButton = JButton(I18n.translate("account.select"))
             selectAccountButton.addActionListener {
                 AccountManager.setActiveAccount(account)
                 updateAccountStatus()
@@ -42,10 +42,10 @@ class AccountListComponent(private val parent: Window) : JPanel() {
             add(selectAccountButton, grid)
             grid.gridx++
 
-            val refreshTokenButton = JButton(I18n.translate("refresh_account"))
+            val refreshTokenButton = JButton(I18n.translate("account.refresh"))
             refreshTokenButton.addActionListener {
                 if (System.currentTimeMillis() - account.getLastRefreshTime() < 60 * 1000) {
-                    JOptionPane.showMessageDialog(parent, I18n.translate("refresh_cooldown_warning", 60), I18n.translate("error"), JOptionPane.OK_OPTION)
+                    JOptionPane.showMessageDialog(parent, I18n.translate("message.refresh_cooldown_warning", 60), I18n.translate("text.error"), JOptionPane.OK_OPTION)
                     return@addActionListener
                 }
 
@@ -65,7 +65,7 @@ class AccountListComponent(private val parent: Window) : JPanel() {
             add(refreshTokenButton, grid)
             grid.gridx++
 
-            val removeAccountButton = JButton(I18n.translate("remove_account"))
+            val removeAccountButton = JButton(I18n.translate("account.remove"))
             removeAccountButton.addActionListener {
                 AccountManager.removeAccount(account)
                 SwingUtilities.invokeLater { loadAll() }

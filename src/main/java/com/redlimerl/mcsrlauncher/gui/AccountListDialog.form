@@ -19,14 +19,14 @@
             <constraints border-constraint="West"/>
             <properties>
               <font size="14" style="1"/>
-              <text resource-bundle="lang/I18n" key="add_account"/>
+              <text value="account.add"/>
             </properties>
           </component>
           <component id="5723f" class="javax.swing.JButton" binding="closeButton">
             <constraints border-constraint="Center"/>
             <properties>
               <font size="14"/>
-              <text resource-bundle="lang/I18n" key="close"/>
+              <text value="text.close"/>
             </properties>
           </component>
         </children>
@@ -41,4 +41,8 @@
       </scrollpane>
     </children>
   </grid>
+  <inspectionSuppressions>
+    <suppress inspection="MissingMnemonic"/>
+    <suppress inspection="I18nForm"/>
+  </inspectionSuppressions>
 </form>

@@ -8,9 +8,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
-import java.lang.reflect.Method;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 public class AccountListDialog extends JDialog {
     private JPanel contentPane;
@@ -47,12 +45,12 @@ public class AccountListDialog extends JDialog {
         addAccountButton = new JButton();
         Font addAccountButtonFont = this.$$$getFont$$$(null, Font.BOLD, 14, addAccountButton.getFont());
         if (addAccountButtonFont != null) addAccountButton.setFont(addAccountButtonFont);
-        this.$$$loadButtonText$$$(addAccountButton, this.$$$getMessageFromBundle$$$("lang/I18n", "add_account"));
+        addAccountButton.setText("account.add");
         panel1.add(addAccountButton, BorderLayout.WEST);
         closeButton = new JButton();
         Font closeButtonFont = this.$$$getFont$$$(null, -1, 14, closeButton.getFont());
         if (closeButtonFont != null) closeButton.setFont(closeButtonFont);
-        this.$$$loadButtonText$$$(closeButton, this.$$$getMessageFromBundle$$$("lang/I18n", "close"));
+        closeButton.setText("text.close");
         panel1.add(closeButton, BorderLayout.CENTER);
         accountListPane = new JScrollPane();
         contentPane.add(accountListPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
@@ -79,50 +77,6 @@ public class AccountListDialog extends JDialog {
         boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
         Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
         return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
-    }
-
-    private static Method $$$cachedGetBundleMethod$$$ = null;
-
-    private String $$$getMessageFromBundle$$$(String path, String key) {
-        ResourceBundle bundle;
-        try {
-            Class<?> thisClass = this.getClass();
-            if ($$$cachedGetBundleMethod$$$ == null) {
-                Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
-                $$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
-            }
-            bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
-        } catch (Exception e) {
-            bundle = ResourceBundle.getBundle(path);
-        }
-        return bundle.getString(key);
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    private void $$$loadButtonText$$$(AbstractButton component, String text) {
-        StringBuffer result = new StringBuffer();
-        boolean haveMnemonic = false;
-        char mnemonic = '\0';
-        int mnemonicIndex = -1;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '&') {
-                i++;
-                if (i == text.length()) break;
-                if (!haveMnemonic && text.charAt(i) != '&') {
-                    haveMnemonic = true;
-                    mnemonic = text.charAt(i);
-                    mnemonicIndex = result.length();
-                }
-            }
-            result.append(text.charAt(i));
-        }
-        component.setText(result.toString());
-        if (haveMnemonic) {
-            component.setMnemonic(mnemonic);
-            component.setDisplayedMnemonicIndex(mnemonicIndex);
-        }
     }
 
     /**

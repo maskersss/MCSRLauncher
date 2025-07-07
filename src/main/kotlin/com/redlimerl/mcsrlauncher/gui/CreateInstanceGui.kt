@@ -16,14 +16,14 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.table.DefaultTableModel
 
-class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog() {
+class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
 
     init {
-        title = I18n.translate("new_instance")
+        title = I18n.translate("instance.new")
         minimumSize = Dimension(700, 500)
         setLocationRelativeTo(parent)
 
-        instanceNameField.text = I18n.translate("new_instance")
+        instanceNameField.text = I18n.translate("instance.new")
 
         cancelButton.addActionListener { this.dispose() }
         createInstanceButton.addActionListener { this.createInstance() }
@@ -34,6 +34,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog() {
         initFabricComponents()
         updateFabricVersions()
 
+        I18n.translateGui(this)
         isVisible = true
     }
 
@@ -58,7 +59,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog() {
     }
 
     private fun updateVanillaVersions() {
-        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("type"), I18n.translate("version"), I18n.translate("date")))
+        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type"), I18n.translate("text.version.title"), I18n.translate("text.date")))
         MetaManager.getVersions(MetaUniqueID.MINECRAFT).filter {
             if (it.type == MetaVersionType.RELEASE && !vanillaReleaseCheckBox.isSelected
                 && (!vanillaSpeedrunCheckbox.isSelected || !SpeedrunUtils.MAJOR_SPEEDRUN_VERSIONS.contains(it.version))) return@filter false
@@ -81,7 +82,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog() {
 
     private fun initFabricComponents() {
         fabricRefreshButton.addActionListener {
-            object : LauncherWorker(this@CreateInstanceGui, I18n.translate("loading"), "Updating Fabric Loader/Minecraft Versions...") {
+            object : LauncherWorker(this@CreateInstanceGui, I18n.translate("message.loading"), I18n.translate("message.updating.versions")) {
                 override fun work(dialog: JDialog) {
                     MetaManager.load(this, true)
                     updateFabricVersions()
@@ -114,7 +115,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog() {
         fabricLoaderVersionComboBox.model = loaderModel
         fabricLoaderVersionComboBox.selectedIndex = fabricLoaderVersions.indexOfFirst { it.recommended }
 
-        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("type"), I18n.translate("version"), I18n.translate("date")))
+        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type"), I18n.translate("text.version.title"), I18n.translate("text.date")))
         MetaManager.getVersions(MetaUniqueID.MINECRAFT).filter {
             if (!MetaManager.containsVersion(MetaUniqueID.FABRIC_INTERMEDIARY, it.version)) return@filter false
             if (it.type == MetaVersionType.RELEASE && !fabricReleaseCheckBox.isSelected
@@ -154,7 +155,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog() {
     }
 
     private fun refreshMeta() {
-        object : LauncherWorker(this@CreateInstanceGui, I18n.translate("loading"), "Updating Meta...") {
+        object : LauncherWorker(this@CreateInstanceGui, I18n.translate("message.loading"), I18n.translate("message.updating.meta")) {
             override fun work(dialog: JDialog) {
                 MetaManager.load(this, true)
                 updateVanillaVersions()

@@ -7,9 +7,7 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
-import java.lang.reflect.Method;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 @SuppressWarnings("SameParameterValue")
 public class CreateInstanceDialog extends JDialog {
@@ -41,7 +39,8 @@ public class CreateInstanceDialog extends JDialog {
     public JCheckBox fabricAlphaCheckBox;
     public JCheckBox fabricBetaCheckBox;
 
-    public CreateInstanceDialog() {
+    public CreateInstanceDialog(JFrame parent) {
+        super(parent);
         setContentPane(contentPane);
         setModal(true);
     }
@@ -69,23 +68,23 @@ public class CreateInstanceDialog extends JDialog {
         createInstanceButton = new JButton();
         Font createInstanceButtonFont = this.$$$getFont$$$(null, Font.BOLD, 14, createInstanceButton.getFont());
         if (createInstanceButtonFont != null) createInstanceButton.setFont(createInstanceButtonFont);
-        this.$$$loadButtonText$$$(createInstanceButton, this.$$$getMessageFromBundle$$$("lang/I18n", "create_instance"));
+        createInstanceButton.setText("instance.create");
         panel1.add(createInstanceButton);
         cancelButton = new JButton();
         Font cancelButtonFont = this.$$$getFont$$$(null, -1, 14, cancelButton.getFont());
         if (cancelButtonFont != null) cancelButton.setFont(cancelButtonFont);
-        this.$$$loadButtonText$$$(cancelButton, this.$$$getMessageFromBundle$$$("lang/I18n", "cancel"));
+        cancelButton.setText("text.cancel");
         panel1.add(cancelButton);
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, 1, null, null, null, 0, false));
         final JLabel label1 = new JLabel();
-        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("lang/I18n", "instance_name"));
+        label1.setText("instance.name");
         panel2.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         instanceNameField = new JTextField();
         panel2.add(instanceNameField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         final JLabel label2 = new JLabel();
-        this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("lang/I18n", "group"));
+        label2.setText("text.group");
         panel2.add(label2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         instanceGroupBox = new JComboBox();
         instanceGroupBox.setEditable(true);
@@ -99,40 +98,40 @@ public class CreateInstanceDialog extends JDialog {
         panel3.setLayout(new GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), -1, -1));
         Fabric.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, 1, null, null, null, 0, false));
         final JLabel label3 = new JLabel();
-        this.$$$loadLabelText$$$(label3, this.$$$getMessageFromBundle$$$("lang/I18n", "loader_version"));
+        label3.setText("text.version.loader");
         panel3.add(label3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         fabricLoaderVersionComboBox = new JComboBox();
         panel3.add(fabricLoaderVersionComboBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         fabricRefreshButton = new JButton();
-        this.$$$loadButtonText$$$(fabricRefreshButton, this.$$$getMessageFromBundle$$$("lang/I18n", "refresh"));
+        fabricRefreshButton.setText("text.refresh");
         panel3.add(fabricRefreshButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         fabricVersionSearchField = new JTextField();
         panel3.add(fabricVersionSearchField, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(100, -1), null, 0, false));
         final JLabel label4 = new JLabel();
-        this.$$$loadLabelText$$$(label4, this.$$$getMessageFromBundle$$$("lang/I18n", "search_version"));
+        label4.setText("text.search.version");
         panel3.add(label4, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new GridLayoutManager(1, 6, new Insets(0, 0, 0, 0), 20, -1));
         Fabric.add(panel4, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         fabricReleaseCheckBox = new JCheckBox();
         fabricReleaseCheckBox.setSelected(true);
-        this.$$$loadButtonText$$$(fabricReleaseCheckBox, this.$$$getMessageFromBundle$$$("lang/I18n", "release"));
+        fabricReleaseCheckBox.setText("version.release");
         panel4.add(fabricReleaseCheckBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         fabricSnapshotCheckBox = new JCheckBox();
-        this.$$$loadButtonText$$$(fabricSnapshotCheckBox, this.$$$getMessageFromBundle$$$("lang/I18n", "snapshot"));
+        fabricSnapshotCheckBox.setText("version.snapshot");
         panel4.add(fabricSnapshotCheckBox, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         fabricSpeedrunCheckBox = new JCheckBox();
         fabricSpeedrunCheckBox.setSelected(true);
-        this.$$$loadButtonText$$$(fabricSpeedrunCheckBox, this.$$$getMessageFromBundle$$$("lang/I18n", "popular"));
+        fabricSpeedrunCheckBox.setText("version.popular");
         panel4.add(fabricSpeedrunCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         fabricExperimentCheckBox = new JCheckBox();
-        this.$$$loadButtonText$$$(fabricExperimentCheckBox, this.$$$getMessageFromBundle$$$("lang/I18n", "experiment"));
+        fabricExperimentCheckBox.setText("version.experiment");
         panel4.add(fabricExperimentCheckBox, new GridConstraints(0, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         fabricBetaCheckBox = new JCheckBox();
-        this.$$$loadButtonText$$$(fabricBetaCheckBox, this.$$$getMessageFromBundle$$$("lang/I18n", "beta"));
+        fabricBetaCheckBox.setText("version.beta");
         panel4.add(fabricBetaCheckBox, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         fabricAlphaCheckBox = new JCheckBox();
-        this.$$$loadButtonText$$$(fabricAlphaCheckBox, this.$$$getMessageFromBundle$$$("lang/I18n", "alpha"));
+        fabricAlphaCheckBox.setText("version.alpha");
         panel4.add(fabricAlphaCheckBox, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayoutManager(1, 1, new Insets(0, 60, 0, 60), -1, -1));
@@ -156,30 +155,30 @@ public class CreateInstanceDialog extends JDialog {
         Vanilla.setLayout(new GridLayoutManager(4, 1, new Insets(20, 30, 20, 30), -1, -1));
         gameTabPane.addTab("Vanilla", Vanilla);
         vanillaRefreshButton = new JButton();
-        this.$$$loadButtonText$$$(vanillaRefreshButton, this.$$$getMessageFromBundle$$$("lang/I18n", "refresh"));
+        vanillaRefreshButton.setText("text.refresh");
         Vanilla.add(vanillaRefreshButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel7 = new JPanel();
         panel7.setLayout(new GridLayoutManager(1, 6, new Insets(0, 0, 0, 0), 20, -1));
         Vanilla.add(panel7, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         vanillaReleaseCheckBox = new JCheckBox();
         vanillaReleaseCheckBox.setSelected(true);
-        this.$$$loadButtonText$$$(vanillaReleaseCheckBox, this.$$$getMessageFromBundle$$$("lang/I18n", "release"));
+        vanillaReleaseCheckBox.setText("version.release");
         panel7.add(vanillaReleaseCheckBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         vanillaSnapshotCheckBox = new JCheckBox();
-        this.$$$loadButtonText$$$(vanillaSnapshotCheckBox, this.$$$getMessageFromBundle$$$("lang/I18n", "snapshot"));
+        vanillaSnapshotCheckBox.setText("version.snapshot");
         panel7.add(vanillaSnapshotCheckBox, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         vanillaBetaCheckBox = new JCheckBox();
-        this.$$$loadButtonText$$$(vanillaBetaCheckBox, this.$$$getMessageFromBundle$$$("lang/I18n", "beta"));
+        vanillaBetaCheckBox.setText("version.beta");
         panel7.add(vanillaBetaCheckBox, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         vanillaAlphaCheckBox = new JCheckBox();
-        this.$$$loadButtonText$$$(vanillaAlphaCheckBox, this.$$$getMessageFromBundle$$$("lang/I18n", "alpha"));
+        vanillaAlphaCheckBox.setText("version.alpha");
         panel7.add(vanillaAlphaCheckBox, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         vanillaSpeedrunCheckbox = new JCheckBox();
         vanillaSpeedrunCheckbox.setSelected(true);
-        this.$$$loadButtonText$$$(vanillaSpeedrunCheckbox, this.$$$getMessageFromBundle$$$("lang/I18n", "popular"));
+        vanillaSpeedrunCheckbox.setText("version.popular");
         panel7.add(vanillaSpeedrunCheckbox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         vanillaExperimentCheckBox = new JCheckBox();
-        this.$$$loadButtonText$$$(vanillaExperimentCheckBox, this.$$$getMessageFromBundle$$$("lang/I18n", "experiment"));
+        vanillaExperimentCheckBox.setText("version.experiment");
         panel7.add(vanillaExperimentCheckBox, new GridConstraints(0, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel8 = new JPanel();
         panel8.setLayout(new GridLayoutManager(1, 1, new Insets(0, 60, 0, 60), -1, -1));
@@ -200,7 +199,7 @@ public class CreateInstanceDialog extends JDialog {
         panel9.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
         Vanilla.add(panel9, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JLabel label5 = new JLabel();
-        this.$$$loadLabelText$$$(label5, this.$$$getMessageFromBundle$$$("lang/I18n", "search_version"));
+        label5.setText("text.search.version");
         panel9.add(label5, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         vanillaVersionSearchField = new JTextField();
         panel9.add(vanillaVersionSearchField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
@@ -230,77 +229,6 @@ public class CreateInstanceDialog extends JDialog {
         boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
         Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
         return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
-    }
-
-    private static Method $$$cachedGetBundleMethod$$$ = null;
-
-    private String $$$getMessageFromBundle$$$(String path, String key) {
-        ResourceBundle bundle;
-        try {
-            Class<?> thisClass = this.getClass();
-            if ($$$cachedGetBundleMethod$$$ == null) {
-                Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
-                $$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
-            }
-            bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
-        } catch (Exception e) {
-            bundle = ResourceBundle.getBundle(path);
-        }
-        return bundle.getString(key);
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    private void $$$loadLabelText$$$(JLabel component, String text) {
-        StringBuffer result = new StringBuffer();
-        boolean haveMnemonic = false;
-        char mnemonic = '\0';
-        int mnemonicIndex = -1;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '&') {
-                i++;
-                if (i == text.length()) break;
-                if (!haveMnemonic && text.charAt(i) != '&') {
-                    haveMnemonic = true;
-                    mnemonic = text.charAt(i);
-                    mnemonicIndex = result.length();
-                }
-            }
-            result.append(text.charAt(i));
-        }
-        component.setText(result.toString());
-        if (haveMnemonic) {
-            component.setDisplayedMnemonic(mnemonic);
-            component.setDisplayedMnemonicIndex(mnemonicIndex);
-        }
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    private void $$$loadButtonText$$$(AbstractButton component, String text) {
-        StringBuffer result = new StringBuffer();
-        boolean haveMnemonic = false;
-        char mnemonic = '\0';
-        int mnemonicIndex = -1;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '&') {
-                i++;
-                if (i == text.length()) break;
-                if (!haveMnemonic && text.charAt(i) != '&') {
-                    haveMnemonic = true;
-                    mnemonic = text.charAt(i);
-                    mnemonicIndex = result.length();
-                }
-            }
-            result.append(text.charAt(i));
-        }
-        component.setText(result.toString());
-        if (haveMnemonic) {
-            component.setMnemonic(mnemonic);
-            component.setDisplayedMnemonicIndex(mnemonicIndex);
-        }
     }
 
     /**

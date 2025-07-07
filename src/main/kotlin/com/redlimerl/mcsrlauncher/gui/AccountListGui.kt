@@ -26,7 +26,7 @@ class AccountListGui(parent: JFrame) : AccountListDialog() {
     private val accountList = AccountListComponent(this)
 
     init {
-        title = I18n.translate("account")
+        title = I18n.translate("account.accounts")
         minimumSize = Dimension(600, 400)
         setLocationRelativeTo(parent)
 
@@ -37,17 +37,18 @@ class AccountListGui(parent: JFrame) : AccountListDialog() {
 
         closeButton.addActionListener { this.dispose() }
 
+        I18n.translateGui(this)
         isVisible = true
     }
 
     private fun addNewAccount() {
-        object : LauncherWorker(this@AccountListGui, I18n.translate("account_authentication"), I18n.translate("loading") + "...") {
+        object : LauncherWorker(this@AccountListGui, I18n.translate("account.authentication"), I18n.translate("loading") + "...") {
             override fun work(dialog: JDialog) {
                 val deviceCode = MSDeviceCodeAuth.create(this)
-                this.setState("<html>${I18n.translate("login_device_code", deviceCode.userCode)}</html>", false)
+                this.setState("<html>${I18n.translate("message.login_device_code", deviceCode.userCode)}</html>", false)
 
-                val openPageButton = JButton(I18n.translate("copy_code_and_open_page"))
-                val cancelButton = JButton(I18n.translate("cancel"))
+                val openPageButton = JButton(I18n.translate("text.copy.code_and_open_page"))
+                val cancelButton = JButton(I18n.translate("text.cancel"))
 
                 openPageButton.addActionListener {
                     Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(deviceCode.userCode), null)
@@ -93,36 +94,6 @@ class AccountListGui(parent: JFrame) : AccountListDialog() {
                 MCSRLauncher.LOGGER.info("Added Microsoft account: {}", account.profile.nickname)
             }
         }.indeterminate().start().showDialog()
-    }
-
-    fun startLoginDialog(deviceCode: MSDeviceCodeAuth) {
-        val openPageButton = JButton(I18n.translate("copy_code_and_open_page"))
-        val cancelButton = JButton(I18n.translate("cancel"))
-
-        val worker = object : LauncherWorker(this@AccountListGui, I18n.translate("account_authentication"), "") {
-            override fun work(dialog: JDialog) {
-
-            }
-        }
-
-        openPageButton.addActionListener {
-            Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(deviceCode.userCode), null)
-            Desktop.getDesktop().browse(URI.create(deviceCode.verificationUrl))
-        }
-        cancelButton.addActionListener { worker.dialog.dispose() }
-
-        val buttons = JPanel()
-        buttons.add(openPageButton, BorderLayout.EAST)
-        buttons.add(cancelButton, BorderLayout.WEST)
-
-        worker.dialog.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-        worker.dialog.add(buttons, BorderLayout.SOUTH)
-        worker.dialog.addWindowListener(object : WindowAdapter() {
-            override fun windowClosed(e: WindowEvent?) {
-                worker.cancelWork()
-            }
-        })
-        worker.indeterminate().start().showDialog()
     }
 
 }

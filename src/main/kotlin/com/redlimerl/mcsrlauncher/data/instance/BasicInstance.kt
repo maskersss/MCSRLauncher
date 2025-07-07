@@ -171,13 +171,13 @@ data class BasicInstance(
 
     fun launchWithDialog() {
         if (this.isRunning()) return
-        object : LauncherWorker(MCSRLauncher.MAIN_FRAME, I18n.translate("launching_instance"), I18n.translate("loading") + "...") {
+        object : LauncherWorker(MCSRLauncher.MAIN_FRAME, I18n.translate("instance.launching"), I18n.translate("message.loading") + "...") {
             override fun work(dialog: JDialog) {
-                this.setState(I18n.translate("download_assets") + "...")
+                this.setState(I18n.translate("text.download_assets") + "...")
                 install(this)
                 this.setProgress(null)
 
-                this.setState(I18n.translate("launching_instance") + "...")
+                this.setState(I18n.translate("instance.launching") + "...")
                 launchInstance(this)
             }
         }.start().showDialog()

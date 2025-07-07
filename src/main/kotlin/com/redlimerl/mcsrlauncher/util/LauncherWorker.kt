@@ -69,7 +69,7 @@ abstract class LauncherWorker(
     protected abstract fun work(dialog: JDialog)
 
     open fun onError(e: Throwable) {
-        val arrayOption = arrayOf(I18n.translate("copy_stacktrace_close"), I18n.translate("close"))
+        val arrayOption = arrayOf(I18n.translate("text.copy.stacktrace_close"), I18n.translate("text.close"))
         val result = JOptionPane.showOptionDialog(parent, e.message, "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, arrayOption, arrayOption[1])
         if (result == 0) {
             val selection = StringSelection(e.stackTraceToString())

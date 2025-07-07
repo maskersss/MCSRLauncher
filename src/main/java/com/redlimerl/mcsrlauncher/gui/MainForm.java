@@ -7,9 +7,7 @@ import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
-import java.lang.reflect.Method;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 @SuppressWarnings("SameParameterValue")
 public class MainForm extends JFrame {
@@ -52,7 +50,7 @@ public class MainForm extends JFrame {
         accountButton.setMargin(new Insets(5, 10, 5, 10));
         accountButton.setOpaque(false);
         accountButton.setRequestFocusEnabled(false);
-        this.$$$loadButtonText$$$(accountButton, this.$$$getMessageFromBundle$$$("lang/I18n", "account"));
+        accountButton.setText("account.accounts");
         accountButton.setVerticalAlignment(0);
         accountButton.setVerticalTextPosition(0);
         accountButton.putClientProperty("html.disable", Boolean.FALSE);
@@ -69,7 +67,7 @@ public class MainForm extends JFrame {
         createInstanceButton.setMargin(new Insets(5, 10, 5, 10));
         createInstanceButton.setOpaque(false);
         createInstanceButton.setRequestFocusEnabled(false);
-        this.$$$loadButtonText$$$(createInstanceButton, this.$$$getMessageFromBundle$$$("lang/I18n", "new_instance"));
+        createInstanceButton.setText("instance.new");
         createInstanceButton.setVerticalAlignment(0);
         createInstanceButton.setVerticalTextPosition(0);
         launcherMenu.add(createInstanceButton);
@@ -85,7 +83,7 @@ public class MainForm extends JFrame {
         settingsButton.setMargin(new Insets(5, 10, 5, 10));
         settingsButton.setOpaque(false);
         settingsButton.setRequestFocusEnabled(false);
-        this.$$$loadButtonText$$$(settingsButton, this.$$$getMessageFromBundle$$$("lang/I18n", "settings"));
+        settingsButton.setText("text.settings");
         settingsButton.setVerticalAlignment(0);
         settingsButton.setVerticalTextPosition(0);
         launcherMenu.add(settingsButton);
@@ -101,7 +99,7 @@ public class MainForm extends JFrame {
         discordButton.setMargin(new Insets(5, 10, 5, 10));
         discordButton.setOpaque(false);
         discordButton.setRequestFocusEnabled(false);
-        this.$$$loadButtonText$$$(discordButton, this.$$$getMessageFromBundle$$$("lang/I18n", "join_discord"));
+        discordButton.setText("text.join_discord_server");
         discordButton.setVerticalAlignment(0);
         discordButton.setVerticalTextPosition(0);
         launcherMenu.add(discordButton);
@@ -117,7 +115,7 @@ public class MainForm extends JFrame {
         patreonButton.setMargin(new Insets(5, 10, 5, 10));
         patreonButton.setOpaque(false);
         patreonButton.setRequestFocusEnabled(false);
-        this.$$$loadButtonText$$$(patreonButton, this.$$$getMessageFromBundle$$$("lang/I18n", "support_us"));
+        patreonButton.setText("text.support_us");
         patreonButton.setVerticalAlignment(0);
         patreonButton.setVerticalTextPosition(0);
         launcherMenu.add(patreonButton);
@@ -127,7 +125,7 @@ public class MainForm extends JFrame {
         final JLabel label1 = new JLabel();
         Font label1Font = this.$$$getFont$$$(null, -1, 12, label1.getFont());
         if (label1Font != null) label1.setFont(label1Font);
-        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("lang/I18n", "instance_list_guide"));
+        label1.setText("message.instance_list_guide");
         bottomField.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(-1, 20), null, 0, false));
         instanceScrollPane = new JScrollPane();
         instanceScrollPane.setHorizontalScrollBarPolicy(31);
@@ -157,77 +155,6 @@ public class MainForm extends JFrame {
         boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
         Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
         return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
-    }
-
-    private static Method $$$cachedGetBundleMethod$$$ = null;
-
-    private String $$$getMessageFromBundle$$$(String path, String key) {
-        ResourceBundle bundle;
-        try {
-            Class<?> thisClass = this.getClass();
-            if ($$$cachedGetBundleMethod$$$ == null) {
-                Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
-                $$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
-            }
-            bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
-        } catch (Exception e) {
-            bundle = ResourceBundle.getBundle(path);
-        }
-        return bundle.getString(key);
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    private void $$$loadLabelText$$$(JLabel component, String text) {
-        StringBuffer result = new StringBuffer();
-        boolean haveMnemonic = false;
-        char mnemonic = '\0';
-        int mnemonicIndex = -1;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '&') {
-                i++;
-                if (i == text.length()) break;
-                if (!haveMnemonic && text.charAt(i) != '&') {
-                    haveMnemonic = true;
-                    mnemonic = text.charAt(i);
-                    mnemonicIndex = result.length();
-                }
-            }
-            result.append(text.charAt(i));
-        }
-        component.setText(result.toString());
-        if (haveMnemonic) {
-            component.setDisplayedMnemonic(mnemonic);
-            component.setDisplayedMnemonicIndex(mnemonicIndex);
-        }
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    private void $$$loadButtonText$$$(AbstractButton component, String text) {
-        StringBuffer result = new StringBuffer();
-        boolean haveMnemonic = false;
-        char mnemonic = '\0';
-        int mnemonicIndex = -1;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '&') {
-                i++;
-                if (i == text.length()) break;
-                if (!haveMnemonic && text.charAt(i) != '&') {
-                    haveMnemonic = true;
-                    mnemonic = text.charAt(i);
-                    mnemonicIndex = result.length();
-                }
-            }
-            result.append(text.charAt(i));
-        }
-        component.setText(result.toString());
-        if (haveMnemonic) {
-            component.setMnemonic(mnemonic);
-            component.setDisplayedMnemonicIndex(mnemonicIndex);
-        }
     }
 
     /**

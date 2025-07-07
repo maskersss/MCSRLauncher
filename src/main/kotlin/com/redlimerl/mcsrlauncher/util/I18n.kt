@@ -1,10 +1,13 @@
 package com.redlimerl.mcsrlauncher.util
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
+import java.awt.Container
 import java.io.InputStream
 import java.net.URL
 import java.net.URLConnection
 import java.util.*
+import javax.swing.*
+import javax.swing.border.TitledBorder
 
 
 object I18n {
@@ -26,6 +29,40 @@ object I18n {
 
     fun translate(key: String, vararg args: Any): String {
         return String.format(if (resource.containsKey(key)) resource.getString(key) else key, *args)
+    }
+
+    fun translateGui(root: Container) {
+        for (component in root.components) {
+            when (component) {
+                is JLabel -> component.text = translate(component.text)
+                is JButton -> component.text = translate(component.text)
+                is JCheckBox -> component.text = translate(component.text)
+                is JRadioButton -> component.text = translate(component.text)
+                is JTabbedPane -> {
+                    for (i in 0 until component.tabCount) {
+                        val title = component.getTitleAt(i)
+                        if (title != null) {
+                            component.setTitleAt(i, translate(title))
+                        }
+                        val tooltip = component.getToolTipTextAt(i)
+                        if (tooltip != null) {
+                            component.setToolTipTextAt(i, translate(tooltip))
+                        }
+                    }
+                }
+            }
+
+            if (component is JComponent) {
+                val border = component.border
+                if (border is TitledBorder) {
+                    border.title = border.title?.let { translate(it) }
+                }
+            }
+
+            if (component is Container) {
+                translateGui(component)
+            }
+        }
     }
 
     class UTF8Control : ResourceBundle.Control() {

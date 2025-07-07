@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="931" height="459"/>
+      <xy x="20" y="20" width="1284" height="459"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -25,7 +25,7 @@
               <margin top="5" left="10" bottom="5" right="10"/>
               <opaque value="false"/>
               <requestFocusEnabled value="false"/>
-              <text resource-bundle="lang/I18n" key="account"/>
+              <text value="account.accounts"/>
               <verticalAlignment value="0"/>
               <verticalTextPosition value="0"/>
             </properties>
@@ -47,7 +47,7 @@
               <margin top="5" left="10" bottom="5" right="10"/>
               <opaque value="false"/>
               <requestFocusEnabled value="false"/>
-              <text resource-bundle="lang/I18n" key="new_instance"/>
+              <text value="instance.new"/>
               <verticalAlignment value="0"/>
               <verticalTextPosition value="0"/>
             </properties>
@@ -66,7 +66,7 @@
               <margin top="5" left="10" bottom="5" right="10"/>
               <opaque value="false"/>
               <requestFocusEnabled value="false"/>
-              <text resource-bundle="lang/I18n" key="settings"/>
+              <text value="text.settings"/>
               <verticalAlignment value="0"/>
               <verticalTextPosition value="0"/>
             </properties>
@@ -85,7 +85,7 @@
               <margin top="5" left="10" bottom="5" right="10"/>
               <opaque value="false"/>
               <requestFocusEnabled value="false"/>
-              <text resource-bundle="lang/I18n" key="join_discord"/>
+              <text value="text.join_discord_server"/>
               <verticalAlignment value="0"/>
               <verticalTextPosition value="0"/>
             </properties>
@@ -104,7 +104,7 @@
               <margin top="5" left="10" bottom="5" right="10"/>
               <opaque value="false"/>
               <requestFocusEnabled value="false"/>
-              <text resource-bundle="lang/I18n" key="support_us"/>
+              <text value="text.support_us"/>
               <verticalAlignment value="0"/>
               <verticalTextPosition value="0"/>
             </properties>
@@ -127,7 +127,7 @@
             </constraints>
             <properties>
               <font size="12"/>
-              <text resource-bundle="lang/I18n" key="instance_list_guide"/>
+              <text value="message.instance_list_guide"/>
             </properties>
           </component>
         </children>
@@ -151,4 +151,7 @@
       </component>
     </children>
   </grid>
+  <inspectionSuppressions>
+    <suppress inspection="I18nForm"/>
+  </inspectionSuppressions>
 </form>

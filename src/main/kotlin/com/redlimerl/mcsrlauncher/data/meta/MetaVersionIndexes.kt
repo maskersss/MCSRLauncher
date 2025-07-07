@@ -73,7 +73,7 @@ data class MetaVersion(
 
     fun dataArray(): Array<String> {
         return arrayOf(
-            I18n.translate(type.name.lowercase()).let { if (SpeedrunUtils.MAJOR_SPEEDRUN_VERSIONS.contains(this.version)) "$it ★" else it },
+            I18n.translate("version." + type.name.lowercase()).let { if (SpeedrunUtils.MAJOR_SPEEDRUN_VERSIONS.contains(this.version)) "$it ★" else it },
             this.version,
             SimpleDateFormat("MMMM dd, yyyy").format(this.releaseTime)
         )

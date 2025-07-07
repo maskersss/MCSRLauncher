@@ -30,33 +30,38 @@ class MainMenuGui : MainForm() {
         initInstanceOption()
 
         contentPane = mainPanel
+
+        I18n.translateGui(this)
         isVisible = true
     }
 
     private fun initLauncherMenu() {
         initHeaderButton(accountButton)
-        accountButton.text = I18n.translate("account")
+        accountButton.text = I18n.translate("account.accounts")
         accountButton.addActionListener {
             AccountListGui(this)
         }
 
         initHeaderButton(createInstanceButton)
-        createInstanceButton.text = I18n.translate("new_instance")
+        createInstanceButton.text = I18n.translate("instance.new")
         createInstanceButton.addActionListener {
             CreateInstanceGui(this)
         }
 
         initHeaderButton(settingsButton)
-        settingsButton.text = I18n.translate("settings")
+        settingsButton.text = I18n.translate("text.settings")
+        settingsButton.addActionListener {
+            LauncherOptionGui(this)
+        }
 
         initHeaderButton(discordButton)
-        discordButton.text = I18n.translate("join_discord")
+        discordButton.text = I18n.translate("text.join_discord_server")
         discordButton.addActionListener {
             Desktop.getDesktop().browse(URI.create("https://mcsrlauncher.github.io/discord"))
         }
 
         initHeaderButton(patreonButton)
-        patreonButton.text = I18n.translate("support_us")
+        patreonButton.text = I18n.translate("text.support_us")
         patreonButton.addActionListener {
             Desktop.getDesktop().browse(URI.create("https://mcsrlauncher.github.io/patreon"))
         }
@@ -149,29 +154,29 @@ class MainMenuGui : MainForm() {
         val popupMenu = JPopupMenu()
 
         if (!instance.isRunning()) {
-            val launchItem = JMenuItem(I18n.translate("launch_instance")).apply {
+            val launchItem = JMenuItem(I18n.translate("instance.launch")).apply {
                 addActionListener { instance.launchWithDialog() }
             }
             popupMenu.add(launchItem)
         } else {
-            popupMenu.add(JMenuItem(I18n.translate("kill_instance")).apply {
+            popupMenu.add(JMenuItem(I18n.translate("instance.kill_process")).apply {
                 addActionListener { instance.getProcess()?.exit() }
             })
         }
 
-        popupMenu.add(JMenuItem(I18n.translate("edit_instance")).apply {
+        popupMenu.add(JMenuItem(I18n.translate("instance.edit")).apply {
             addActionListener {
 
             }
         })
 
-        popupMenu.add(JMenuItem(I18n.translate("open_.minecraft")).apply {
+        popupMenu.add(JMenuItem(I18n.translate("text.open.dot_minecraft")).apply {
             addActionListener { Desktop.getDesktop().open(instance.getGamePath().toFile().apply { mkdirs() }) }
         })
 
-        popupMenu.add(JMenuItem(I18n.translate("delete_instance")).apply {
+        popupMenu.add(JMenuItem(I18n.translate("instance.delete")).apply {
             addActionListener {
-                val confirm = JOptionPane.showConfirmDialog(this@MainMenuGui, I18n.translate("delete_instance_confirm"), I18n.translate("edit_instance"), JOptionPane.OK_CANCEL_OPTION)
+                val confirm = JOptionPane.showConfirmDialog(this@MainMenuGui, I18n.translate("message.delete_instance_confirm"), I18n.translate("instance.delete"), JOptionPane.OK_CANCEL_OPTION)
                 if (confirm == JOptionPane.OK_OPTION) {
                     InstanceManager.deleteInstance(instance)
                 }

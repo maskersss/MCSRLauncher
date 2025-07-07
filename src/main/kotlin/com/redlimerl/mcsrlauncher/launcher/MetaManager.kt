@@ -35,8 +35,6 @@ object MetaManager {
         if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to get meta packages")
 
         META_PACKAGES = response.get<MetaPackageIndexes>()
-        MCSRLauncher.LOGGER.info("Package")
-        MCSRLauncher.LOGGER.info(META_PACKAGES)
         for (metaPackage in META_PACKAGES.packages) {
             metaPackage.updateVersions(worker)
         }
