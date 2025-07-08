@@ -12,18 +12,15 @@ import javax.swing.border.TitledBorder
 
 object I18n {
 
-    private val availableLanguages: Set<String> = setOfNotNull(
-        "ko_KR"
-    )
     private val resource = ResourceBundle.getBundle("lang/I18n", getLocale(), UTF8Control())
 
     init {
-        MCSRLauncher.LOGGER.info("Loading language - {}", translate("lang"))
+        MCSRLauncher.LOGGER.info("Loading languages - ${MCSRLauncher.options.language.languageCode}")
+        MCSRLauncher.LOGGER.info(translate("text.settings"))
     }
 
     private fun getLocale(): Locale {
-        if (!availableLanguages.contains(MCSRLauncher.options.language)) return Locale.ROOT
-        val localeSplit = MCSRLauncher.options.language.split("_")
+        val localeSplit = MCSRLauncher.options.language.languageCode.split("_")
         return Locale(localeSplit[0], localeSplit[1])
     }
 
@@ -66,7 +63,7 @@ object I18n {
     }
 
     class UTF8Control : ResourceBundle.Control() {
-        override fun newBundle(baseName: String, locale: Locale, format: String, loader: ClassLoader, reload: Boolean): ResourceBundle {
+        override fun newBundle(baseName: String, locale: Locale, format: String, loader: ClassLoader, reload: Boolean): ResourceBundle? {
             val bundleName = toBundleName(baseName, locale)
             val resourceName = toResourceName(bundleName, "properties")
             var bundle: ResourceBundle? = null
@@ -75,7 +72,7 @@ object I18n {
                 val url: URL? = loader.getResource(resourceName)
                 if (url != null) {
                     val connection: URLConnection = url.openConnection()
-                    connection.setUseCaches(false)
+                    connection.useCaches = false
                     stream = connection.getInputStream()
                 }
             } else {
@@ -83,13 +80,12 @@ object I18n {
             }
             if (stream != null) {
                 try {
-                    val string = String(stream.readBytes(), Charsets.UTF_8)
-                    bundle = PropertyResourceBundle(string.byteInputStream(Charsets.UTF_8))
+                    bundle = PropertyResourceBundle(stream.reader(Charsets.UTF_8))
                 } finally {
                     stream.close()
                 }
             }
-            return bundle!!
+            return bundle
         }
     }
 

@@ -3,9 +3,13 @@ package com.redlimerl.mcsrlauncher
 import com.formdev.flatlaf.FlatDarkLaf
 import com.formdev.flatlaf.FlatLaf
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont
+import com.redlimerl.mcsrlauncher.data.launcher.LauncherOptions
 import com.redlimerl.mcsrlauncher.gui.MainMenuGui
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
-import com.redlimerl.mcsrlauncher.launcher.*
+import com.redlimerl.mcsrlauncher.launcher.AccountManager
+import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
+import com.redlimerl.mcsrlauncher.launcher.InstanceManager
+import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.network.JsonHttpClientResponseHandler
 import com.redlimerl.mcsrlauncher.network.JsonResponseResult
 import com.redlimerl.mcsrlauncher.network.JsonSha256HttpClientResponseHandler

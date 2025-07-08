@@ -1,4 +1,4 @@
-package com.redlimerl.mcsrlauncher.launcher
+package com.redlimerl.mcsrlauncher.data.launcher
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import kotlinx.serialization.Serializable
@@ -9,8 +9,9 @@ import java.nio.file.Path
 @Serializable
 data class LauncherOptions(
     var debug: Boolean = false,
-    var language: String = "en_US",
-    var metaUrl: String = "https://mcsrlauncher.github.io/meta/"
+    var language: LauncherLanguage = LauncherLanguage.ENGLISH,
+    var metaUrl: String = "https://mcsrlauncher.github.io/meta/",
+    var javaPath: String = "java"
 ) {
     companion object {
         val path: Path = MCSRLauncher.BASE_PATH.resolve("options.json")
