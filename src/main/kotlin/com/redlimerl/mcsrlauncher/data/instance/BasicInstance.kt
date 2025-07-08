@@ -74,6 +74,9 @@ data class BasicInstance(
     fun launchInstance(worker: LauncherWorker) {
         if (this.isRunning()) return
 
+        val javaTarget = options.javaPath.ifEmpty { MCSRLauncher.options.javaPath }
+        if (javaTarget.isEmpty()) throw IllegalStateException("Invalid java detected")
+
         MCSRLauncher.LOGGER.info("Loading Authentication: $name")
         val activeAccount = AccountManager.getActiveAccount() ?: throw IllegalStateException("Active account is none")
         try {
@@ -151,7 +154,7 @@ data class BasicInstance(
         libraries.add(mainJar)
 
         val finalizeArgs = arrayListOf<String>()
-        finalizeArgs.add(options.javaPath.ifEmpty { "java" })
+        finalizeArgs.add(javaTarget)
         finalizeArgs.add("-Djava.library.path=${this.getNativePath().absolutePathString()}")
         finalizeArgs.addAll(arguments)
         finalizeArgs.addAll(listOf("-cp", libraries.joinToString(File.pathSeparator) { it.absolutePathString() }))
