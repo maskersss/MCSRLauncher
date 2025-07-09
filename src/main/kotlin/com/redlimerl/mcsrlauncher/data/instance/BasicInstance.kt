@@ -80,7 +80,7 @@ data class BasicInstance(
         MCSRLauncher.LOGGER.info("Loading Authentication: $name")
         val activeAccount = AccountManager.getActiveAccount() ?: throw IllegalStateException("Active account is none")
         try {
-            activeAccount.checkTokenValidForLaunch(worker)
+            if (activeAccount.profile.checkTokenValidForLaunch(worker, activeAccount)) AccountManager.save()
         } catch (e: IllegalRequestResponseException) {
             throw InvalidAccessTokenException("Authentication Failed. Try remove and add your Minecraft account again.")
         }
@@ -140,6 +140,7 @@ data class BasicInstance(
         }
 
         this.getNativePath().toFile().mkdirs()
+        FileUtils.deleteDirectory(this.getNativePath().toFile())
         val nativeLibs = arrayListOf<Path>()
         for (libraryPath in libraries) {
             val libFile = libraryPath.toFile()
@@ -166,7 +167,8 @@ data class BasicInstance(
         GlobalScope.launch {
             val process = ProcessBuilder(finalizeArgs)
                 .directory(this@BasicInstance.getGamePath().toFile())
-//                .inheritIO()
+//                .redirectOutput(OSUtils.getNullFile())
+                .inheritIO()
                 .start()
             InstanceProcess(this@BasicInstance, process)
         }

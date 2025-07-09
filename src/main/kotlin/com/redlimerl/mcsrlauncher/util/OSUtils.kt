@@ -2,6 +2,7 @@ package com.redlimerl.mcsrlauncher.util
 
 import com.redlimerl.mcsrlauncher.data.device.DeviceOSType
 import oshi.SystemInfo
+import java.io.File
 
 object OSUtils {
 
@@ -20,6 +21,14 @@ object OSUtils {
         return version.split(".").let {
             if (it[0] == "1") it[1].toInt()
             else it[0].toInt()
+        }
+    }
+
+    fun getNullFile(): File {
+        return if (getOSType() == DeviceOSType.WINDOWS) {
+            File("NUL")
+        } else {
+            File("/dev/null")
         }
     }
 

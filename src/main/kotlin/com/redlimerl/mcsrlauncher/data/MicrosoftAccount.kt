@@ -8,7 +8,6 @@ import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
-import org.apache.hc.client5.http.classic.methods.HttpGet
 import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity
 import org.apache.hc.core5.http.message.BasicNameValuePair
@@ -57,19 +56,6 @@ data class MicrosoftAccount(
         MCSRLauncher.LOGGER.info("Refreshed MSA token successfully")
 
         return true
-    }
-
-    private fun isAccessTokenValid(worker: LauncherWorker): Boolean {
-        val getRequest = HttpGet("https://api.minecraftservices.com/minecraft/profile")
-        getRequest.setHeader("Authorization", "Bearer ${profile.accessToken}")
-
-        val response = MCSRLauncher.makeJsonRequest(getRequest, worker)
-        return response.hasSuccess()
-    }
-
-    fun checkTokenValidForLaunch(worker: LauncherWorker): Boolean {
-        if (!this.shouldRefreshToken() && this.isAccessTokenValid(worker)) return true
-        return this.refreshToken(worker, true)
     }
 
 }
