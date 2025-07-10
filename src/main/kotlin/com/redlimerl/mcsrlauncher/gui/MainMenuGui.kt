@@ -2,7 +2,6 @@ package com.redlimerl.mcsrlauncher.gui
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
-import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.gui.layout.WrapLayout
 import com.redlimerl.mcsrlauncher.gui.listener.MouseFillListener
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
@@ -128,7 +127,7 @@ class MainMenuGui : MainForm() {
             text = """<html>
                 <div style='text-align:center;'>
                     <div style='font-size: 1.1em; font-weight: bold;'>${instance.displayName}</div>
-                    <div>v${instance.indexes[MetaUniqueID.MINECRAFT] ?: "Unknown"} (${instance.getInstanceType()})</div>
+                    <div>v${instance.minecraftVersion} (${instance.getInstanceType()})</div>
                 </div> 
             </html>"""
             if (instance.isRunning()) {

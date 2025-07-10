@@ -4,6 +4,9 @@ import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.MCSRLauncher.JSON
 import com.redlimerl.mcsrlauncher.MCSRLauncher.MAIN_FRAME
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
+import com.redlimerl.mcsrlauncher.data.instance.FabricVersionData
+import com.redlimerl.mcsrlauncher.data.instance.LWJGLVersionData
+import com.redlimerl.mcsrlauncher.data.meta.IntermediaryType
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.MetaVersion
 import org.apache.commons.io.FileUtils
@@ -35,23 +38,18 @@ object InstanceManager {
         }
     }
 
-    fun createInstance(text: String, vanillaVersion: MetaVersion, fabricVersion: MetaVersion?): BasicInstance {
+    fun createInstance(text: String, vanillaVersion: MetaVersion, fabricVersion: MetaVersion?, intermediaryType: IntermediaryType?): BasicInstance {
         return BasicInstance(
             getNewInstanceName(text.replace(" ", "_").replace(Regex("[^\\p{L}\\p{N}_.]"), "")),
             text,
-            hashMapOf<MetaUniqueID, String>().apply {
-                put(MetaUniqueID.MINECRAFT, vanillaVersion.version)
-                for (require in vanillaVersion.requires) {
-                    put(require.uid, require.equals ?: require.suggests ?: throw IllegalStateException("Not found version requirements for MC ${vanillaVersion.version}"))
-                }
-
-                if (fabricVersion != null) {
-                    put(MetaUniqueID.FABRIC_LOADER, fabricVersion.version)
-                    for (require in fabricVersion.requires) {
-                        put(require.uid, vanillaVersion.version)
-                    }
-                }
-            }
+            vanillaVersion.version,
+            vanillaVersion.requires.find { it.uid == MetaUniqueID.LWJGL3 || it.uid == MetaUniqueID.LWJGL2 }!!
+                .let { LWJGLVersionData(it.uid, it.equals ?: it.suggests ?: throw IllegalStateException("Not found version requirements for MC ${vanillaVersion.version}")) },
+            if (fabricVersion != null && intermediaryType != null) {
+                val loaderVersion = fabricVersion.version
+                val intermediaryVersion = vanillaVersion.version
+                FabricVersionData(loaderVersion, intermediaryType, intermediaryVersion)
+            } else null
         )
     }
 

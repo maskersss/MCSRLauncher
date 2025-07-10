@@ -42,7 +42,8 @@ data class MetaVersion(
     val requires: List<MetaDependency> = listOf(),
     val conflicts: List<MetaDependency> = listOf(),
     val recommended: Boolean = false,
-    val sha256: String
+    val sha256: String,
+    val compatibleIntermediaries: List<IntermediaryType> = listOf()
 ) {
     fun getURI(uid: MetaUniqueID): URI {
         return MetaManager.getMetaURI().resolve(uid.value + "/").resolve("$version.json")
@@ -57,12 +58,6 @@ data class MetaVersion(
         versionFile.write()
         GameAssetManager.updateChecksum(this.getURI(uid).path, this.sha256)
         return versionFile
-    }
-
-    inline fun <reified T : MetaVersionFile> getMetaVersionFile(uid: MetaUniqueID): T? {
-        val file = MetaVersionFile.getPath(uid, this.version).toFile()
-        if (!file.exists()) return null
-        return MCSRLauncher.JSON.decodeFromString<T>(FileUtils.readFileToString(file, Charsets.UTF_8))
     }
 
     inline fun <reified T : MetaVersionFile> getOrLoadMetaVersionFile(uid: MetaUniqueID, worker: LauncherWorker): T {

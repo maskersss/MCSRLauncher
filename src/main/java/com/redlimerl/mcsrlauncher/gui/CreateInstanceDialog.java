@@ -2,6 +2,7 @@ package com.redlimerl.mcsrlauncher.gui;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.redlimerl.mcsrlauncher.data.meta.IntermediaryType;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
@@ -38,6 +39,8 @@ public class CreateInstanceDialog extends JDialog {
     public JCheckBox vanillaExperimentCheckBox;
     public JCheckBox fabricAlphaCheckBox;
     public JCheckBox fabricBetaCheckBox;
+    public JButton intermediaryHelpButton;
+    public JComboBox<IntermediaryType> intermediaryComboBox;
 
     public CreateInstanceDialog(JFrame parent) {
         super(parent);
@@ -135,7 +138,7 @@ public class CreateInstanceDialog extends JDialog {
         panel4.add(fabricAlphaCheckBox, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayoutManager(1, 1, new Insets(0, 60, 0, 60), -1, -1));
-        Fabric.add(panel5, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        Fabric.add(panel5, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JScrollPane scrollPane1 = new JScrollPane();
         scrollPane1.setHorizontalScrollBarPolicy(31);
         scrollPane1.setVerticalScrollBarPolicy(22);
@@ -143,14 +146,24 @@ public class CreateInstanceDialog extends JDialog {
         fabricVersionTable = new JTable();
         fabricVersionTable.setAutoCreateColumnsFromModel(true);
         fabricVersionTable.setAutoCreateRowSorter(false);
+        fabricVersionTable.setAutoResizeMode(1);
         fabricVersionTable.setFillsViewportHeight(true);
         fabricVersionTable.setRowSelectionAllowed(true);
         fabricVersionTable.setShowVerticalLines(false);
         fabricVersionTable.setUpdateSelectionOnSort(false);
         scrollPane1.setViewportView(fabricVersionTable);
         final JPanel panel6 = new JPanel();
-        panel6.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        Fabric.add(panel6, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        panel6.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
+        Fabric.add(panel6, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JLabel label5 = new JLabel();
+        label5.setText("text.type.intermediary");
+        panel6.add(label5, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        intermediaryHelpButton = new JButton();
+        intermediaryHelpButton.setInheritsPopupMenu(false);
+        intermediaryHelpButton.setText("?");
+        panel6.add(intermediaryHelpButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        intermediaryComboBox = new JComboBox();
+        panel6.add(intermediaryComboBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         Vanilla = new JPanel();
         Vanilla.setLayout(new GridLayoutManager(4, 1, new Insets(20, 30, 20, 30), -1, -1));
         gameTabPane.addTab("Vanilla", Vanilla);
@@ -198,15 +211,15 @@ public class CreateInstanceDialog extends JDialog {
         final JPanel panel9 = new JPanel();
         panel9.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
         Vanilla.add(panel9, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        final JLabel label5 = new JLabel();
-        label5.setText("text.search.version");
-        panel9.add(label5, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JLabel label6 = new JLabel();
+        label6.setText("text.search.version");
+        panel9.add(label6, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         vanillaVersionSearchField = new JTextField();
         panel9.add(vanillaVersionSearchField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         label1.setLabelFor(instanceNameField);
         label2.setLabelFor(instanceGroupBox);
         label4.setLabelFor(fabricVersionSearchField);
-        label5.setLabelFor(vanillaVersionSearchField);
+        label6.setLabelFor(vanillaVersionSearchField);
     }
 
     /**

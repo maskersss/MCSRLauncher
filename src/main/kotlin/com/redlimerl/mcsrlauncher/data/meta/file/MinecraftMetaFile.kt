@@ -28,9 +28,9 @@ data class MinecraftMetaFile(
     val mainClass: String,
     val minecraftArguments: String,
     val mainJar: GameLibrary,
-    val logging: GameLogger,
+    val logging: GameLogger? = null,
     val assetIndex: GameAssetObject,
-    val libraries: List<GameLibrary>,
+    val libraries: List<GameLibrary> = listOf(),
 ) : MetaVersionFile() {
 
     override fun install(worker: LauncherWorker) {

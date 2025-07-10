@@ -94,7 +94,7 @@ object MCSRLauncher {
                 super.onError(e)
                 exitProcess(1)
             }
-        }.indeterminate().start().showDialog()
+        }.indeterminate().showDialog().start()
     }
 
     private val HTTP_CLIENT: CloseableHttpClient = HttpClientBuilder.create().build()

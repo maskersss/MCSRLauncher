@@ -8,7 +8,9 @@ class InstanceProcess(val instance: BasicInstance, val process: Process) {
     init {
         MCSRLauncher.GAME_PROCESSES.add(this)
         this.instance.onLaunch()
-        onExit(process.waitFor())
+        val exitCode = process.waitFor()
+        Thread.sleep(1000L)
+        onExit(exitCode)
     }
 
     fun onExit(code: Int) {
@@ -18,10 +20,6 @@ class InstanceProcess(val instance: BasicInstance, val process: Process) {
 
     fun exit() {
         process.destroy()
-    }
-
-    fun forceExit() {
-        process.destroyForcibly()
     }
 
 }

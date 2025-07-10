@@ -93,7 +93,7 @@ class AccountListGui(parent: JFrame) : AccountListDialog() {
                 SwingUtilities.invokeLater { accountList.loadAll() }
                 MCSRLauncher.LOGGER.info("Added Microsoft account: {}", account.profile.nickname)
             }
-        }.indeterminate().start().showDialog()
+        }.indeterminate().showDialog().start()
     }
 
 }

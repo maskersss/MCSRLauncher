@@ -64,7 +64,7 @@ object MetaManager {
     }
 
     inline fun <reified T : MetaVersionFile> getVersionMeta(uid: MetaUniqueID, version: String?, worker: LauncherWorker = LauncherWorker.empty()): T? {
-        return getVersions(uid, worker).find { it.version == version }?.getMetaVersionFile<T>(uid)
+        return getVersions(uid, worker).find { it.version == version }?.getOrLoadMetaVersionFile<T>(uid, worker)
     }
 
 }

@@ -1,5 +1,6 @@
 package com.redlimerl.mcsrlauncher.data.meta.file
 
+import com.redlimerl.mcsrlauncher.data.meta.IntermediaryType
 import com.redlimerl.mcsrlauncher.data.meta.MetaDependency
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.MetaVersionType
@@ -19,15 +20,22 @@ data class FabricIntermediaryMetaFile(
     val type: MetaVersionType = MetaVersionType.RELEASE,
     val requires: List<MetaDependency>,
     val volatile: Boolean,
-    val libraries: List<MetaLibrary>,
+    val compatibleIntermediaries: List<IntermediaryType>,
+    val intermediaryLibraries: Map<IntermediaryType, MetaLibrary>
 ) : MetaVersionFile() {
 
     override fun install(worker: LauncherWorker) {
         worker.setState("Downloading Fabric Intermediary libraries...")
-        for ((installed, library) in this.libraries.withIndex()) {
-            library.download(worker)
-            worker.setProgress((installed + 1) / this.libraries.size.toFloat())
-        }
+
+        if (!worker.properties.containsKey("intermediary-type")) throw IllegalStateException("Intermediary type isn't updated")
+
+        val intermediaryType = IntermediaryType.valueOf(worker.properties.getOrDefault("intermediary-type", ""))
+        this.getLibrary(intermediaryType).download(worker)
+    }
+
+    fun getLibrary(intermediaryType: IntermediaryType): MetaLibrary {
+        if (!this.intermediaryLibraries.containsKey(intermediaryType)) throw IllegalStateException("$intermediaryType is not supported intermediary type for $version version")
+        return this.intermediaryLibraries[intermediaryType]!!
     }
 
 }

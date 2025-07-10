@@ -1,5 +1,6 @@
 package com.redlimerl.mcsrlauncher.gui
 
+import com.redlimerl.mcsrlauncher.data.meta.IntermediaryType
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.MetaVersionType
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
@@ -8,13 +9,11 @@ import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SpeedrunUtils
 import java.awt.Dimension
-import javax.swing.DefaultComboBoxModel
-import javax.swing.JDialog
-import javax.swing.JFrame
-import javax.swing.ListSelectionModel
+import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.table.DefaultTableModel
+
 
 class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
 
@@ -59,7 +58,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
     }
 
     private fun updateVanillaVersions() {
-        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type"), I18n.translate("text.version.title"), I18n.translate("text.date")))
+        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type.title"), I18n.translate("text.version.title"), I18n.translate("text.date")))
         MetaManager.getVersions(MetaUniqueID.MINECRAFT).filter {
             if (it.type == MetaVersionType.RELEASE && !vanillaReleaseCheckBox.isSelected
                 && (!vanillaSpeedrunCheckbox.isSelected || !SpeedrunUtils.MAJOR_SPEEDRUN_VERSIONS.contains(it.version))) return@filter false
@@ -87,7 +86,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
                     MetaManager.load(this, true)
                     updateFabricVersions()
                 }
-            }.start().showDialog()
+            }.showDialog().start()
         }
 
         listOf(fabricSpeedrunCheckBox, fabricReleaseCheckBox, fabricSnapshotCheckBox, fabricBetaCheckBox, fabricAlphaCheckBox, fabricExperimentCheckBox).forEach { it.addActionListener { updateFabricVersions() } }
@@ -104,7 +103,10 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
             if (!it.valueIsAdjusting && fabricVersionTable.selectedRow == -1 && fabricVersionTable.rowCount > 0)
                 fabricVersionTable.setRowSelectionInterval(it.lastIndex, it.lastIndex)
         }
-//        fabricLoaderVersionComboBox.renderer = FabricLoaderVersion.VersionCellRenderer()
+
+        intermediaryHelpButton.addActionListener {
+            JOptionPane.showMessageDialog(this@CreateInstanceGui, I18n.translate("message.help.intermediary"))
+        }
     }
 
     private fun updateFabricVersions() {
@@ -115,7 +117,15 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
         fabricLoaderVersionComboBox.model = loaderModel
         fabricLoaderVersionComboBox.selectedIndex = fabricLoaderVersions.indexOfFirst { it.recommended }
 
-        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type"), I18n.translate("text.version.title"), I18n.translate("text.date")))
+        fabricVersionTable.selectionModel.addListSelectionListener {
+            if (!it.valueIsAdjusting) {
+                val selectedRow = fabricVersionTable.selectedRow
+                if (selectedRow >= 0) {
+                    this.onSelectFabricMinecraftVersion(fabricVersionTable.getValueAt(selectedRow, 1).toString())
+                }
+            }
+        }
+        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type.title"), I18n.translate("text.version.title"), I18n.translate("text.date")))
         MetaManager.getVersions(MetaUniqueID.MINECRAFT).filter {
             if (!MetaManager.containsVersion(MetaUniqueID.FABRIC_INTERMEDIARY, it.version)) return@filter false
             if (it.type == MetaVersionType.RELEASE && !fabricReleaseCheckBox.isSelected
@@ -136,6 +146,14 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
         if (fabricVersionTable.rowCount > 0) fabricVersionTable.setRowSelectionInterval(0, 0)
     }
 
+    private fun onSelectFabricMinecraftVersion(version: String) {
+        intermediaryComboBox.removeAllItems()
+        val intermediaryVersion = MetaManager.getVersions(MetaUniqueID.FABRIC_INTERMEDIARY).find { it.version == version }!!
+        for (compatibleIntermediary in intermediaryVersion.compatibleIntermediaries.sortedByDescending { it.recommendLevel }) {
+            intermediaryComboBox.addItem(compatibleIntermediary)
+        }
+    }
+
     private fun createInstance() {
         if (instanceNameField.text.isNullOrBlank()) return
 
@@ -148,7 +166,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
         val fabricVersion = (if (isFabric) fabricLoaderVersionComboBox.model.selectedItem?.toString() else null)
             ?.let { MetaManager.getVersions(MetaUniqueID.FABRIC_LOADER).find { loader -> loader.version == it } }
 
-        val instance = InstanceManager.createInstance(instanceNameField.text, vanillaVersion, fabricVersion)
+        val instance = InstanceManager.createInstance(instanceNameField.text, vanillaVersion, fabricVersion, intermediaryComboBox.selectedItem as IntermediaryType?)
 
         InstanceManager.addInstance(instance, instanceGroupBox.selectedItem?.toString()?.trimEnd())
         this.dispose()
@@ -161,7 +179,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
                 updateVanillaVersions()
                 updateFabricVersions()
             }
-        }.start().showDialog()
+        }.showDialog().start()
     }
 
 }

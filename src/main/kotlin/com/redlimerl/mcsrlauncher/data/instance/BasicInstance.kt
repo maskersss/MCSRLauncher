@@ -30,7 +30,9 @@ import kotlin.io.path.absolutePathString
 data class BasicInstance(
     var name: String,
     var displayName: String,
-    val indexes: HashMap<MetaUniqueID, String>,
+    val minecraftVersion: String,
+    val lwjglVersion: LWJGLVersionData,
+    val fabricVersion: FabricVersionData?,
     val options: InstanceOptions = InstanceOptions()
 ) {
 
@@ -63,11 +65,24 @@ data class BasicInstance(
 
     fun install(worker: LauncherWorker) {
         worker.setState("installing game files and libraries...")
-        for (index in indexes) {
-            val indexVersions = MetaManager.getVersions(index.key, worker)
-            val indexVersion = indexVersions.find { it.version == index.value }!!.getOrLoadMetaVersionFile<MetaVersionFile>(index.key, worker)
-            indexVersion.install(worker)
+
+        // Minecraft
+        MCSRLauncher.LOGGER.info(MetaManager.containsVersion(MetaUniqueID.MINECRAFT, this.minecraftVersion))
+        (MetaManager.getVersionMeta<MetaVersionFile>(MetaUniqueID.MINECRAFT, this.minecraftVersion, worker) ?: throw IllegalStateException("Minecraft version $minecraftVersion is not exist")) .install(worker)
+
+        // LWJGL
+        (MetaManager.getVersionMeta<MetaVersionFile>(this.lwjglVersion.type, this.lwjglVersion.version, worker)
+            ?: throw IllegalStateException("LWJGL version $minecraftVersion is not exist")).install(worker)
+
+        // Fabric Loader / Intermediary
+        if (this.fabricVersion != null) {
+            (MetaManager.getVersionMeta<MetaVersionFile>(MetaUniqueID.FABRIC_LOADER, this.fabricVersion.loaderVersion, worker)
+                ?: throw IllegalStateException("Fabric Loader version $minecraftVersion is not exist")).install(worker)
+            worker.properties["intermediary-type"] = this.fabricVersion.intermediaryType.name
+            (MetaManager.getVersionMeta<MetaVersionFile>(MetaUniqueID.FABRIC_INTERMEDIARY, this.fabricVersion.intermediaryVersion, worker)
+                ?: throw IllegalStateException("Fabric Intermediary version ${fabricVersion.intermediaryType} for ${fabricVersion.intermediaryVersion} is not exist")).install(worker)
         }
+
         MCSRLauncher.LOGGER.info("Installed every game files and libraries!")
     }
 
@@ -95,7 +110,7 @@ data class BasicInstance(
             "-Xmx${options.maxMemory}M"
         )
 
-        val minecraftMetaFile = MetaManager.getVersionMeta<MinecraftMetaFile>(MetaUniqueID.MINECRAFT, indexes[MetaUniqueID.MINECRAFT])
+        val minecraftMetaFile = MetaManager.getVersionMeta<MinecraftMetaFile>(MetaUniqueID.MINECRAFT, this.minecraftVersion)
             ?: throw IllegalStateException("${MetaUniqueID.MINECRAFT.value} version meta is not found")
         if (minecraftMetaFile.compatibleJavaMajors.min() > OSUtils.getJavaVersion()) {
             throw IllegalStateException("Required minimum Java version is ${minecraftMetaFile.compatibleJavaMajors.min()}, you are at ${OSUtils.getJavaVersion()}")
@@ -119,24 +134,20 @@ data class BasicInstance(
             .replace("\${user_properties}", "{}")
             .split(" ")
 
-        for (require in minecraftMetaFile.requires) {
-            val lwjglMetaFile = MetaManager.getVersionMeta<LWJGLMetaFile>(require.uid, indexes[require.uid])
-                ?: throw IllegalStateException("${require.uid.value} version meta is not found")
-            lwjglMetaFile.libraries.filter { it.shouldApply() }.forEach { libraries.addAll(it.getLibraryPaths()) }
-        }
+        val lwjglMetaFile = MetaManager.getVersionMeta<LWJGLMetaFile>(this.lwjglVersion.type, this.lwjglVersion.version, worker)
+            ?: throw IllegalStateException("LWJGL ${this.lwjglVersion.version} is not found")
+        lwjglMetaFile.libraries.filter { it.shouldApply() }.forEach { libraries.addAll(it.getLibraryPaths()) }
 
 
-        if (indexes.containsKey(MetaUniqueID.FABRIC_LOADER)) {
-            val fabricLoaderMetaFile = MetaManager.getVersionMeta<FabricLoaderMetaFile>(MetaUniqueID.FABRIC_LOADER, indexes[MetaUniqueID.FABRIC_LOADER])
-                ?: throw IllegalStateException("${MetaUniqueID.FABRIC_LOADER.value} version meta is not found")
+        if (this.fabricVersion != null) {
+            val fabricLoaderMetaFile = MetaManager.getVersionMeta<FabricLoaderMetaFile>(MetaUniqueID.FABRIC_LOADER, this.fabricVersion.loaderVersion)
+                ?: throw IllegalStateException("${MetaUniqueID.FABRIC_LOADER.value} fabric loader version is not found")
             mainClass = fabricLoaderMetaFile.mainClass
             fabricLoaderMetaFile.libraries.forEach { libraries.add(it.getPath()) }
 
-            for (require in fabricLoaderMetaFile.requires) {
-                val intermediaryMetaFile = MetaManager.getVersionMeta<FabricIntermediaryMetaFile>(require.uid, indexes[require.uid])
-                    ?: throw IllegalStateException("${require.uid.value} meta is not found")
-                intermediaryMetaFile.libraries.forEach { libraries.add(it.getPath()) }
-            }
+            val intermediaryMetaFile = MetaManager.getVersionMeta<FabricIntermediaryMetaFile>(MetaUniqueID.FABRIC_INTERMEDIARY, this.fabricVersion.intermediaryVersion)
+                ?: throw IllegalStateException("${this.fabricVersion.intermediaryVersion} intermediary version is not found")
+            libraries.add(intermediaryMetaFile.getLibrary(this.fabricVersion.intermediaryType).getPath())
         }
 
         this.getNativePath().toFile().mkdirs()
@@ -185,23 +196,18 @@ data class BasicInstance(
                 this.setState(I18n.translate("instance.launching") + "...")
                 launchInstance(this)
             }
-        }.start().showDialog()
+        }.showDialog().start()
     }
 
     fun getInstanceType(): String {
-        return if (this.indexes.containsKey(MetaUniqueID.FABRIC_LOADER)) {
-            "Fabric"
-        } else if (this.indexes.containsKey(MetaUniqueID.MINECRAFT)) {
-            "Vanilla"
-        } else "Unknown"
+        return if (this.fabricVersion != null) "Fabric" else "Vanilla"
     }
 
     fun getIconResource(): URL? {
-        return if (this.indexes.containsKey(MetaUniqueID.FABRIC_LOADER)) {
+        return if (this.fabricVersion != null)
             javaClass.getResource("/icons/fabric.png")
-        } else if (this.indexes.containsKey(MetaUniqueID.MINECRAFT)) {
+        else
             javaClass.getResource("/icons/minecraft.png")
-        } else javaClass.getResource("/icons/instance.png")
     }
 
     fun isRunning(): Boolean {
