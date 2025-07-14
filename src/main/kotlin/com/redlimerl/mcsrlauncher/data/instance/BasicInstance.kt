@@ -1,11 +1,13 @@
 package com.redlimerl.mcsrlauncher.data.instance
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
+import com.redlimerl.mcsrlauncher.data.meta.LauncherTrait
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.file.*
 import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
 import com.redlimerl.mcsrlauncher.exception.InvalidAccessTokenException
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
+import com.redlimerl.mcsrlauncher.instance.LegacyLaunchFixer
 import com.redlimerl.mcsrlauncher.launcher.AccountManager
 import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
@@ -67,8 +69,11 @@ data class BasicInstance(
         worker.setState("installing game files and libraries...")
 
         // Minecraft
-        MCSRLauncher.LOGGER.info(MetaManager.containsVersion(MetaUniqueID.MINECRAFT, this.minecraftVersion))
-        (MetaManager.getVersionMeta<MetaVersionFile>(MetaUniqueID.MINECRAFT, this.minecraftVersion, worker) ?: throw IllegalStateException("Minecraft version $minecraftVersion is not exist")) .install(worker)
+        val minecraftMeta = MetaManager.getVersionMeta<MinecraftMetaFile>(MetaUniqueID.MINECRAFT, this.minecraftVersion, worker) ?: throw IllegalStateException("Minecraft version $minecraftVersion is not exist")
+        minecraftMeta.install(worker)
+        if (minecraftMeta.traits.contains(LauncherTrait.LEGACY_LAUNCH)) {
+            LegacyLaunchFixer.assetFix(minecraftMeta.assetIndex, this.getGamePath().resolve("resources"), worker)
+        }
 
         // LWJGL
         (MetaManager.getVersionMeta<MetaVersionFile>(this.lwjglVersion.type, this.lwjglVersion.version, worker)
@@ -125,10 +130,11 @@ data class BasicInstance(
             .replace("\${version_name}", minecraftMetaFile.version)
             .replace("\${game_directory}", this.getGamePath().absolutePathString())
             .replace("\${assets_root}", GameAssetManager.ASSETS_PATH.absolutePathString())
+            .replace("\${game_assets}", this.getGamePath().resolve("resources").absolutePathString())
             .replace("\${assets_index_name}", minecraftMetaFile.assetIndex.id)
             .replace("\${auth_uuid}", activeAccount.profile.uuid.toString())
             .replace("\${auth_access_token}", activeAccount.profile.accessToken ?: "")
-            .replace("\${auto_session}", "")
+            .replace("\${auth_session}", activeAccount.profile.accessToken ?: "")
             .replace("\${user_type}", "msa")
             .replace("\${version_type}", minecraftMetaFile.type.toTypeId())
             .replace("\${user_properties}", "{}")

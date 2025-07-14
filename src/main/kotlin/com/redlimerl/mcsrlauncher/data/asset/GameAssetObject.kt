@@ -19,7 +19,7 @@ data class GameAssetObject(
     val totalSize: Long,
     private val url: String
 ) {
-    private fun getAssetIndexes(worker: LauncherWorker): GameAssetIndex {
+    fun getAssetIndexes(worker: LauncherWorker): GameAssetIndex {
         val assetIndexFile = GameAssetManager.INDEXES_PATH.resolve("${this.id}.json").toFile()
         if (!assetIndexFile.exists() || GameAssetManager.getChecksum(this.url) != this.sha1) {
             val assetIndexResponse = MCSRLauncher.makeJsonRequest(HttpGet(this.url), worker)

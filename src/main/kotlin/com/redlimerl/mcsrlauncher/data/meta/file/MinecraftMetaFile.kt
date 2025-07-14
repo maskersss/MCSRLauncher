@@ -4,6 +4,7 @@ import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.asset.GameAssetObject
 import com.redlimerl.mcsrlauncher.data.asset.game.GameLibrary
 import com.redlimerl.mcsrlauncher.data.asset.game.GameLogger
+import com.redlimerl.mcsrlauncher.data.meta.LauncherTrait
 import com.redlimerl.mcsrlauncher.data.meta.MetaDependency
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.MetaVersionType
@@ -22,7 +23,7 @@ data class MinecraftMetaFile(
     @Serializable(with = ISO8601Serializer::class) override val releaseTime: Date,
     val type: MetaVersionType,
     val requires: List<MetaDependency>,
-    @SerialName("+traits") val traits: List<String> = listOf(),
+    @SerialName("+traits") val traits: List<LauncherTrait> = listOf(),
     val compatibleJavaMajors: List<Int>,
     val compatibleJavaName: String? = null,
     val mainClass: String,

@@ -146,7 +146,6 @@ public class CreateInstanceDialog extends JDialog {
         fabricVersionTable = new JTable();
         fabricVersionTable.setAutoCreateColumnsFromModel(true);
         fabricVersionTable.setAutoCreateRowSorter(false);
-        fabricVersionTable.setAutoResizeMode(1);
         fabricVersionTable.setFillsViewportHeight(true);
         fabricVersionTable.setRowSelectionAllowed(true);
         fabricVersionTable.setShowVerticalLines(false);

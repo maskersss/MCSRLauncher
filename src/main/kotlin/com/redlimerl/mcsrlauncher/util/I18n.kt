@@ -12,16 +12,11 @@ import javax.swing.border.TitledBorder
 
 object I18n {
 
-    private val resource = ResourceBundle.getBundle("lang/I18n", getLocale(), UTF8Control())
+    private val resource = ResourceBundle.getBundle("lang/I18n", MCSRLauncher.options.language.getLocale(), UTF8Control())
 
     init {
         MCSRLauncher.LOGGER.info("Loading languages - ${MCSRLauncher.options.language.languageCode}")
-        MCSRLauncher.LOGGER.info(translate("text.settings"))
-    }
-
-    private fun getLocale(): Locale {
-        val localeSplit = MCSRLauncher.options.language.languageCode.split("_")
-        return Locale(localeSplit[0], localeSplit[1])
+        MCSRLauncher.LOGGER.info("text.settings: " + translate("text.settings"))
     }
 
     fun translate(key: String, vararg args: Any): String {
@@ -63,6 +58,8 @@ object I18n {
     }
 
     class UTF8Control : ResourceBundle.Control() {
+        override fun getFallbackLocale(baseName: String, locale: Locale): Locale? = null
+
         override fun newBundle(baseName: String, locale: Locale, format: String, loader: ClassLoader, reload: Boolean): ResourceBundle? {
             val bundleName = toBundleName(baseName, locale)
             val resourceName = toResourceName(bundleName, "properties")
