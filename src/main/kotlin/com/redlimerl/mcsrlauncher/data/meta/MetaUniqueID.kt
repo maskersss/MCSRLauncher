@@ -17,6 +17,12 @@ enum class MetaUniqueID(val value: String) {
     @SerialName("net.minecraft.java")
     MOJANG_JAVA("net.minecraft.java"),
 
+    @SerialName("com.azul.java")
+    AZUL_JAVA("com.azul.java"),
+
+    @SerialName("net.adoptium.java")
+    ADOPTIUM_JAVA("net.adoptium.java"),
+
     @SerialName("org.lwjgl")
     LWJGL2("org.lwjgl"),
 

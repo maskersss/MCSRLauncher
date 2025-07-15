@@ -8,13 +8,13 @@ import kotlinx.serialization.Serializable
 import java.util.*
 
 @Serializable
-data class MojangJavaMetaFile(
+data class JavaMetaFile(
     override val uid: MetaUniqueID,
     override val name: String,
     override val formatVersion: Int,
     override val version: String,
     @Serializable(with = ISO8601Serializer::class) override val releaseTime: Date,
-    val runtimes: List<MojangJavaRuntime>
+    val runtimes: List<JavaRuntime>
 ) : MetaVersionFile() {
     override fun install(worker: LauncherWorker) {
         TODO("Not yet implemented")
@@ -22,29 +22,37 @@ data class MojangJavaMetaFile(
 }
 
 @Serializable
-data class MojangJavaRuntime(
+data class JavaRuntime(
     val name: String,
     val runtimeOS: RuntimeOSType,
-    val version: MojangJavaRuntimeVersion,
+    val version: JavaRuntimeVersion,
     @Serializable(with = ISO8601Serializer::class) val releaseTime: Date,
     val vendor: String,
     val packageType: String,
     val downloadType: String,
-    val checksum: MojangJavaRuntimeChecksum,
+    val checksum: JavaRuntimeChecksum,
     val url: String
 )
 
 @Serializable
-data class MojangJavaRuntimeVersion(
-    val name: String,
+data class JavaRuntimeVersion(
     val major: Int,
     val minor: Int? = null,
     val security: Int? = null,
     val build: Int? = null
-)
+) {
+    fun getName(): String {
+        return buildString {
+            append(major)
+            append((if (minor != null) ".$minor" else ""))
+            append((if (security != null) ".$security" else ""))
+            append((if (build != null) "+$build" else ""))
+        }
+    }
+}
 
 @Serializable
-data class MojangJavaRuntimeChecksum(
+data class JavaRuntimeChecksum(
     val type: String,
     val hash: String
 )

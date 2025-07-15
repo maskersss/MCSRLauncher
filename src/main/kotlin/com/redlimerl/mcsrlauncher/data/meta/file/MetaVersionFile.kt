@@ -44,7 +44,9 @@ object MetaVersionFileSerializer : JsonContentPolymorphicSerializer<MetaVersionF
             MetaUniqueID.FABRIC_LOADER -> FabricLoaderMetaFile.serializer()
             MetaUniqueID.FABRIC_INTERMEDIARY -> FabricIntermediaryMetaFile.serializer()
             MetaUniqueID.MINECRAFT -> MinecraftMetaFile.serializer()
-            MetaUniqueID.MOJANG_JAVA -> MojangJavaMetaFile.serializer()
+            MetaUniqueID.MOJANG_JAVA -> JavaMetaFile.serializer()
+            MetaUniqueID.AZUL_JAVA -> JavaMetaFile.serializer()
+            MetaUniqueID.ADOPTIUM_JAVA -> JavaMetaFile.serializer()
             MetaUniqueID.LWJGL2 -> LWJGLMetaFile.serializer()
             MetaUniqueID.LWJGL3 -> LWJGLMetaFile.serializer()
         }
