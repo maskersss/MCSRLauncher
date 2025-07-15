@@ -5,6 +5,7 @@ import com.redlimerl.mcsrlauncher.data.asset.BasicAssetObject
 import com.redlimerl.mcsrlauncher.data.asset.rule.AssetRule
 import com.redlimerl.mcsrlauncher.data.device.DeviceArchitectureType
 import com.redlimerl.mcsrlauncher.data.device.RuntimeOSType
+import com.redlimerl.mcsrlauncher.instance.InstanceLibrary
 import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
 import com.redlimerl.mcsrlauncher.network.FileDownloader
 import com.redlimerl.mcsrlauncher.util.AssetUtils
@@ -66,6 +67,14 @@ data class GameLibrary(
             if (!rule.shouldAllow()) return false
         }
         return true
+    }
+
+    fun toInstanceLibrary(): InstanceLibrary {
+        return InstanceLibrary(
+            this.name.split(":").dropLast(1).joinToString(":"),
+            this.name.split(":").last(),
+            this.getLibraryPaths()
+        )
     }
 }
 

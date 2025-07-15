@@ -1,6 +1,7 @@
 package com.redlimerl.mcsrlauncher.data.meta.library
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
+import com.redlimerl.mcsrlauncher.instance.InstanceLibrary
 import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
 import com.redlimerl.mcsrlauncher.network.FileDownloader
 import com.redlimerl.mcsrlauncher.util.AssetUtils
@@ -24,5 +25,13 @@ data class MetaLibrary(
 
         MCSRLauncher.LOGGER.info("Downloading $name ...")
         FileDownloader.download("$url${AssetUtils.getLibraryMavenPath(this.name)}", jarFile)
+    }
+
+    fun toInstanceLibrary(): InstanceLibrary {
+        return InstanceLibrary(
+            this.name.split(":").dropLast(1).joinToString(":"),
+            this.name.split(":").last(),
+            listOf(this.getPath())
+        )
     }
 }
