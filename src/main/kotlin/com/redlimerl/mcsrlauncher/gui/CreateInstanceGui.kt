@@ -38,7 +38,14 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
     }
 
     private fun initVanillaComponents() {
-        vanillaRefreshButton.addActionListener { refreshMeta() }
+        vanillaRefreshButton.addActionListener {
+            object : LauncherWorker(this@CreateInstanceGui, I18n.translate("message.loading"), I18n.translate("message.updating.meta")) {
+                override fun work(dialog: JDialog) {
+                    MetaManager.load(this, true)
+                    updateVanillaVersions()
+                }
+            }.showDialog().start()
+        }
 
         listOf(vanillaSpeedrunCheckbox, vanillaReleaseCheckBox, vanillaSnapshotCheckBox, vanillaBetaCheckBox, vanillaAlphaCheckBox, vanillaExperimentCheckBox)
             .forEach { it.addActionListener { updateVanillaVersions() } }
@@ -84,6 +91,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
             object : LauncherWorker(this@CreateInstanceGui, I18n.translate("message.loading"), I18n.translate("message.updating.versions")) {
                 override fun work(dialog: JDialog) {
                     MetaManager.load(this, true)
+                    updateVanillaVersions()
                     updateFabricVersions()
                 }
             }.showDialog().start()
@@ -170,16 +178,6 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
 
         InstanceManager.addInstance(instance, instanceGroupBox.selectedItem?.toString()?.trimEnd())
         this.dispose()
-    }
-
-    private fun refreshMeta() {
-        object : LauncherWorker(this@CreateInstanceGui, I18n.translate("message.loading"), I18n.translate("message.updating.meta")) {
-            override fun work(dialog: JDialog) {
-                MetaManager.load(this, true)
-                updateVanillaVersions()
-                updateFabricVersions()
-            }
-        }.showDialog().start()
     }
 
 }

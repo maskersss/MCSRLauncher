@@ -2,8 +2,11 @@ package com.redlimerl.mcsrlauncher.gui
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.launcher.LauncherLanguage
+import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.I18n
+import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import java.awt.Dimension
+import javax.swing.JDialog
 import javax.swing.JFrame
 
 class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
@@ -35,6 +38,12 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
                 MCSRLauncher.options.language = language
                 MCSRLauncher.options.save()
             }
+        }
+
+        this.refreshMetaButton.addActionListener {
+            object : LauncherWorker(this@LauncherOptionGui, I18n.translate("message.loading"), I18n.translate("message.updating.meta")) {
+                override fun work(dialog: JDialog) = MetaManager.load(this, true)
+            }.showDialog().start()
         }
     }
 

@@ -23,9 +23,6 @@ object MetaManager {
         BASE_PATH.toFile().mkdirs()
         if (PACKAGES_PATH.toFile().exists()) {
             META_PACKAGES = MCSRLauncher.JSON.decodeFromString(FileUtils.readFileToString(PACKAGES_PATH.toFile(), Charsets.UTF_8))
-            for (metaPackage in META_PACKAGES.packages) {
-                metaPackage.getVersions(worker)
-            }
         }
 
         if (!force && System.currentTimeMillis() - META_PACKAGES.latestUpdate < 1000 * 60 * 60 * 24 * 6) return onLoad(worker)
@@ -35,16 +32,13 @@ object MetaManager {
         if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to get meta packages")
 
         META_PACKAGES = response.get<MetaPackageIndexes>()
-        for (metaPackage in META_PACKAGES.packages) {
-            metaPackage.getVersions(worker)
-        }
         META_PACKAGES.latestUpdate = System.currentTimeMillis()
 
         FileUtils.writeStringToFile(PACKAGES_PATH.toFile(), MCSRLauncher.JSON.encodeToString(META_PACKAGES), Charsets.UTF_8)
         onLoad(worker)
     }
 
-    fun onLoad(worker: LauncherWorker) {
+    private fun onLoad(worker: LauncherWorker) {
         VERSION_MAP.clear()
         for (metaPackage in META_PACKAGES.packages) {
             VERSION_MAP[metaPackage.uid] = metaPackage.getVersions(worker).versions.map { it.version }.toSet()
