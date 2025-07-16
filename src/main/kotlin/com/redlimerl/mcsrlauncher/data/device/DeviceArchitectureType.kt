@@ -16,7 +16,7 @@ enum class DeviceArchitectureType(val bit: Int) {
         val CURRENT_ARCHITECTURE = let {
             val isArm = System.getProperty("os.arch").lowercase().let { it.startsWith("arm") || it.equals("aarch64", true) }
             val is64Bit = OSUtils.systemInfo.operatingSystem.bitness == 64
-            if (isArm) {
+            if (!isArm) {
                 if (is64Bit) X64
                 else X86
             } else {

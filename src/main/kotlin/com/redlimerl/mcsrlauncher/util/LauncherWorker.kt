@@ -5,7 +5,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Component
+import java.awt.Dimension
+import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
@@ -38,10 +41,11 @@ abstract class LauncherWorker(
     }
     private val subLabel = JLabel("", SwingConstants.CENTER).apply { isVisible = false }
     private val southPanel = JPanel(BorderLayout())
-    val dialog = (if (parent is JFrame?) JDialog(parent, title, Dialog.ModalityType.MODELESS) else if (parent is JDialog) JDialog(parent, title, Dialog.ModalityType.MODELESS) else throw IllegalArgumentException("parent should be JFrame, JDialog or null")).apply {
+    val dialog = (if (parent is JFrame?) JDialog(parent, title) else if (parent is JDialog) JDialog(parent, title) else throw IllegalArgumentException("parent should be JFrame, JDialog or null")).apply {
         layout = BorderLayout()
         setSize(300, 150)
         setLocationRelativeTo(parent)
+
         MCSRLauncher.javaClass.classLoader?.getResource("icon.png")?.let {
             setIconImage(ImageIcon(it).image)
         }
@@ -79,10 +83,13 @@ abstract class LauncherWorker(
         }
     }
 
-    fun start() {
+    fun start(): LauncherWorker {
+        CoroutineScope(Dispatchers.IO).launch {
+            dialog.isModal = true
+            if (shouldShowDialog) dialog.isVisible = true
+        }
         currentJob = CoroutineScope(Dispatchers.Default).launch {
             try {
-                if (shouldShowDialog) dialog.isVisible = true
                 work(dialog)
                 if (dialog.isVisible) dialog.dispose()
             } catch (e: Throwable) {
@@ -92,6 +99,11 @@ abstract class LauncherWorker(
             }
         }
         started = true
+        return this
+    }
+
+    suspend fun join() {
+         currentJob?.join()
     }
 
     fun showDialog(): LauncherWorker {

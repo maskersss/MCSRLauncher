@@ -27,6 +27,12 @@ enum class MetaUniqueID(val value: String) {
     LWJGL2("org.lwjgl"),
 
     @SerialName("org.lwjgl3")
-    LWJGL3("org.lwjgl3")
+    LWJGL3("org.lwjgl3");
+
+    companion object {
+        val GAME_METAS = listOf(MINECRAFT, LWJGL2, LWJGL3)
+        val FABRIC_METAS = listOf(FABRIC_LOADER, FABRIC_INTERMEDIARY)
+        val JAVA_METAS = listOf(MOJANG_JAVA, ADOPTIUM_JAVA, AZUL_JAVA)
+    }
 
 }

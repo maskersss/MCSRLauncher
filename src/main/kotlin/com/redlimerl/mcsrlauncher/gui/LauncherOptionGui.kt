@@ -40,5 +40,7 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
 
     private fun initJavaTab() {
         this.javaPathLabel.text = "<html>" + I18n.translate("message.current_java_path", "<b>${MCSRLauncher.options.javaPath}</b>") + "</html>"
+
+        this.javaChangeButton.addActionListener { JavaManagerGui(this@LauncherOptionGui) }
     }
 }

@@ -17,8 +17,11 @@ data class MetaPackageIndexes(
 ) : MetaFormat() {
 
     fun getVersions(metaUniqueID: MetaUniqueID, worker: LauncherWorker): List<MetaVersion> {
-        return (packages.find { it.uid == metaUniqueID } ?: throw IllegalArgumentException("$metaUniqueID is missing in package indexes"))
-            .getVersions(worker).versions
+        return getPackage(metaUniqueID, worker).versions
+    }
+
+    fun getPackage(metaUniqueID: MetaUniqueID, worker: LauncherWorker): MetaVersionIndexes {
+        return (packages.find { it.uid == metaUniqueID } ?: throw IllegalArgumentException("$metaUniqueID is missing in package indexes")).getVersions(worker)
     }
 
 }

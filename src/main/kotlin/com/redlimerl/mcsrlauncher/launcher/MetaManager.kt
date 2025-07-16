@@ -36,7 +36,7 @@ object MetaManager {
 
         META_PACKAGES = response.get<MetaPackageIndexes>()
         for (metaPackage in META_PACKAGES.packages) {
-            metaPackage.updateVersions(worker)
+            metaPackage.getVersions(worker)
         }
         META_PACKAGES.latestUpdate = System.currentTimeMillis()
 
@@ -61,6 +61,10 @@ object MetaManager {
 
     fun containsVersion(uid: MetaUniqueID, version: String): Boolean {
         return VERSION_MAP.getOrDefault(uid, setOf()).contains(version)
+    }
+
+    fun getMetaName(uid: MetaUniqueID, worker: LauncherWorker = LauncherWorker.empty()): String {
+        return META_PACKAGES.getPackage(uid, worker).name
     }
 
     inline fun <reified T : MetaVersionFile> getVersionMeta(uid: MetaUniqueID, version: String?, worker: LauncherWorker = LauncherWorker.empty()): T? {

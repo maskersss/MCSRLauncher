@@ -21,7 +21,7 @@ public class LauncherOptionDialog extends JDialog {
     private JTextArea textArea1;
     private JSlider slider1;
     private JSpinner spinner1;
-    private JButton textChangeButton;
+    public JButton javaChangeButton;
     public JLabel javaPathLabel;
 
     public LauncherOptionDialog(JFrame parent) {
@@ -170,9 +170,9 @@ public class LauncherOptionDialog extends JDialog {
         panel10.add(javaPathLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer9 = new Spacer();
         panel10.add(spacer9, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
-        textChangeButton = new JButton();
-        textChangeButton.setText("text.change");
-        panel10.add(textChangeButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        javaChangeButton = new JButton();
+        javaChangeButton.setText("text.change");
+        panel10.add(javaChangeButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

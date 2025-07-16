@@ -17,7 +17,16 @@ data class JavaMetaFile(
     val runtimes: List<JavaRuntime>
 ) : MetaVersionFile() {
     override fun install(worker: LauncherWorker) {
-        TODO("Not yet implemented")
+        worker.setState("Downloading Java: $name - $version...")
+
+        if (!worker.properties.containsKey("download-java-version")) throw IllegalStateException("Intermediary type isn't updated")
+
+        val version = worker.properties["download-java-version"]
+        for (runtime in runtimes) {
+            if (runtime.runtimeOS.isOn() && version == runtime.version.getName()) {
+                TODO("THIS")
+            }
+        }
     }
 }
 

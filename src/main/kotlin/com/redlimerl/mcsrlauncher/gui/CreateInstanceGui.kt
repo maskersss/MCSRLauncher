@@ -58,7 +58,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
     }
 
     private fun updateVanillaVersions() {
-        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type.title"), I18n.translate("text.version.title"), I18n.translate("text.date")))
+        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type"), I18n.translate("text.version"), I18n.translate("text.date")))
         MetaManager.getVersions(MetaUniqueID.MINECRAFT).filter {
             if (it.type == MetaVersionType.RELEASE && !vanillaReleaseCheckBox.isSelected
                 && (!vanillaSpeedrunCheckbox.isSelected || !SpeedrunUtils.MAJOR_SPEEDRUN_VERSIONS.contains(it.version))) return@filter false
@@ -125,7 +125,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
                 }
             }
         }
-        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type.title"), I18n.translate("text.version.title"), I18n.translate("text.date")))
+        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type"), I18n.translate("text.version"), I18n.translate("text.date")))
         MetaManager.getVersions(MetaUniqueID.MINECRAFT).filter {
             if (!MetaManager.containsVersion(MetaUniqueID.FABRIC_INTERMEDIARY, it.version)) return@filter false
             if (it.type == MetaVersionType.RELEASE && !fabricReleaseCheckBox.isSelected

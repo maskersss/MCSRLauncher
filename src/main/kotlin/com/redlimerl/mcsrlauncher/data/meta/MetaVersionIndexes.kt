@@ -70,7 +70,7 @@ data class MetaVersion(
         return arrayOf(
             I18n.translate("version." + type.name.lowercase()).let { if (SpeedrunUtils.MAJOR_SPEEDRUN_VERSIONS.contains(this.version)) "$it ★" else it },
             this.version,
-            SimpleDateFormat("MMMM dd, yyyy").format(this.releaseTime)
+            SimpleDateFormat("MMMM dd, yyyy", MCSRLauncher.options.language.getLocale()).format(this.releaseTime)
         )
     }
 }

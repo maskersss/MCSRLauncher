@@ -70,15 +70,12 @@ object MCSRLauncher {
                     LauncherOptions()
                 }
 
-                LOGGER.warn("Loading {}", AccountManager.path.name)
                 this.setState("Loading Accounts...")
                 AccountManager.load()
 
-                LOGGER.warn("Loading {}", InstanceManager.path.name)
                 this.setState("Loading Instances...")
                 InstanceManager.load()
 
-                LOGGER.warn("Loading Meta")
                 this.setState("Loading Meta...")
                 GameAssetManager.init()
                 MetaManager.load(this)
