@@ -6,6 +6,8 @@ import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import java.awt.Dimension
+import java.awt.event.FocusEvent
+import java.awt.event.FocusListener
 import javax.swing.JDialog
 import javax.swing.JFrame
 
@@ -48,7 +50,18 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
     }
 
     private fun initJavaTab() {
-        this.javaPathLabel.text = "<html>" + I18n.translate("message.current_java_path", "<b>${MCSRLauncher.options.javaPath}</b>") + "</html>"
+        fun saveJavaPath() {
+            MCSRLauncher.options.javaPath = this.javaPathField.text
+            MCSRLauncher.options.save()
+        }
+        this.javaPathField.addActionListener { saveJavaPath() }
+        this.javaPathField.addFocusListener(object : FocusListener {
+            override fun focusGained(e: FocusEvent?) {}
+            override fun focusLost(e: FocusEvent?) {
+                saveJavaPath()
+            }
+        })
+        this.javaPathField.text = MCSRLauncher.options.javaPath
 
         this.javaChangeButton.addActionListener { JavaManagerGui(this@LauncherOptionGui) }
     }
