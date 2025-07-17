@@ -234,7 +234,7 @@
                               <text value="text.min_memory_allocation"/>
                             </properties>
                           </component>
-                          <component id="4bb03" class="javax.swing.JSlider" default-binding="true">
+                          <component id="4bb03" class="javax.swing.JSlider" binding="javaMinMemorySlider">
                             <constraints>
                               <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                             </constraints>
@@ -248,7 +248,7 @@
                               <value value="2048"/>
                             </properties>
                           </component>
-                          <component id="36326" class="javax.swing.JSpinner" default-binding="true">
+                          <component id="36326" class="javax.swing.JSpinner" binding="javaMinMemorySpinner">
                             <constraints>
                               <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                             </constraints>
@@ -270,13 +270,13 @@
                               <text value="text.max_memory_allocation"/>
                             </properties>
                           </component>
-                          <component id="7ffb9" class="javax.swing.JSpinner" default-binding="true">
+                          <component id="7ffb9" class="javax.swing.JSpinner" binding="javaMaxMemorySpinner">
                             <constraints>
                               <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                             </constraints>
                             <properties/>
                           </component>
-                          <component id="559da" class="javax.swing.JSlider" default-binding="true">
+                          <component id="559da" class="javax.swing.JSlider" binding="javaMaxMemorySlider">
                             <constraints>
                               <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                             </constraints>

@@ -15,7 +15,9 @@ data class LauncherOptions(
     var language: LauncherLanguage = LauncherLanguage.ENGLISH,
     var metaUrl: String = "https://mcsrlauncher.github.io/meta/",
     var javaPath: String = Paths.get(System.getProperty("java.home")).resolve("bin").resolve(JavaUtils.javaExecutableName()).absolutePathString(),
-    var jvmArguments: String = ""
+    var jvmArguments: String = "",
+    var minMemory: Int = 512,
+    var maxMemory: Int = 2048
 ) {
     companion object {
         val path: Path = MCSRLauncher.BASE_PATH.resolve("options.json")

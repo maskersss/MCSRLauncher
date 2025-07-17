@@ -100,7 +100,7 @@ data class BasicInstance(
         val noJavaException = IllegalStateException("Java has not selected. Try change your java path")
         if (javaTarget.isEmpty()) throw noJavaException
         try {
-            if (JavaContainer.getVersionLists(javaTarget).isNotEmpty()) throw noJavaException
+            if (JavaContainer.getVersionLists(javaTarget).isEmpty()) throw noJavaException
         } catch (e: Exception) {
             MCSRLauncher.LOGGER.error(e)
             throw noJavaException
