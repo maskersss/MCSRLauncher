@@ -48,7 +48,6 @@ class JavaContainer(val path: Path, version: String? = null, vendor: String? = n
 
         this.version = possibleVersion
         this.vendor = possibleVendor
-        MCSRLauncher.LOGGER.info(this.version + " / " + this.vendor)
     }
 
     fun getJavaRuntimePath(): String {
