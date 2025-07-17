@@ -1,10 +1,23 @@
 package com.redlimerl.mcsrlauncher.util
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
+import com.redlimerl.mcsrlauncher.data.asset.java.JavaRuntimeManifest
 import com.redlimerl.mcsrlauncher.data.device.DeviceOSType
+import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
 import com.redlimerl.mcsrlauncher.instance.JavaContainer
+import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
+import com.redlimerl.mcsrlauncher.network.FileDownloader
+import org.apache.commons.compress.archivers.ArchiveEntry
+import org.apache.commons.compress.archivers.ArchiveInputStream
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
+import org.apache.hc.client5.http.classic.methods.HttpGet
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.zip.GZIPInputStream
 
 object JavaUtils {
 
@@ -45,6 +58,12 @@ object JavaUtils {
             containers.addAll(findJavaInStandardDirs())
             containers.addAll(findJavaFromUpdateAlternatives())
         }
+
+        for (file in GameAssetManager.JAVA_PATH.toFile().listFiles()!!) {
+            val javaBin = file.resolve("bin").resolve(javaExecutableName())
+            if (javaBin.exists()) containers.add(JavaContainer(javaBin.toPath()))
+        }
+
         return containers
     }
 
@@ -147,4 +166,104 @@ object JavaUtils {
         }
         return result
     }
+
+    fun extractJavaManifest(url: String, name: String, worker: LauncherWorker) {
+        val targetDir = GameAssetManager.JAVA_PATH.resolve(name).toFile()
+        if (targetDir.exists()) throw IllegalStateException("Directory is already exist: ${targetDir.absolutePath}")
+        targetDir.mkdirs()
+
+        val jsonRequest = MCSRLauncher.makeJsonRequest(HttpGet(url), worker)
+        if (!jsonRequest.hasSuccess()) throw IllegalRequestResponseException("Failed to get java manifest: $url")
+
+        val manifest = jsonRequest.get<JavaRuntimeManifest>()
+        for ((relativePath, fileEntry) in manifest.files) {
+            if (fileEntry.type != "file") continue
+            val download = fileEntry.downloads["raw"] ?: continue
+            val targetFile = targetDir.resolve(relativePath)
+
+            worker.setState("Downloading $relativePath...")
+            targetFile.parentFile.mkdirs()
+            FileDownloader.download(download.url, targetFile)
+        }
+    }
+
+    fun extractJavaArchive(url: String, name: String, worker: LauncherWorker) {
+        val isZip = url.endsWith(".zip")
+        val isTarGz = url.endsWith(".tar.gz")
+        if (!isTarGz && !isZip) throw IllegalArgumentException("Unknown archive format: $url")
+
+        val targetDir = GameAssetManager.JAVA_PATH.resolve(name).toFile()
+        if (targetDir.exists()) throw IllegalStateException("Directory is already exist: ${targetDir.absolutePath}")
+        targetDir.mkdirs()
+
+        MCSRLauncher.LOGGER.info("Downloading: $url")
+        val tempFile = Files.createTempFile("java-download-", if (isZip) ".zip" else ".tar.gz").toFile()
+        FileDownloader.download(url, tempFile)
+        tempFile.deleteOnExit()
+
+        val rootDirs = getRootDirs(tempFile, isZip)
+
+        worker.setState("Extracting Java...", false)
+        MCSRLauncher.LOGGER.info("Extracting to: ${targetDir.absolutePath}")
+        extractArchive(tempFile, targetDir, isZip, rootDirs.size == 1)
+        MCSRLauncher.LOGGER.info("Extracted to: ${targetDir.absolutePath}")
+    }
+
+    private fun getRootDirs(file: File, isZip: Boolean): Set<String> {
+        val roots = mutableSetOf<String>()
+        fun <T : ArchiveEntry> checkEntry(archiveInput: ArchiveInputStream<T>) {
+            var entry = archiveInput.nextEntry
+            while (entry != null) {
+                val root = entry.name.substringBefore("/")
+                if (root.isNotEmpty()) roots.add(root)
+                entry = archiveInput.nextEntry
+            }
+        }
+
+        if (isZip) {
+            ZipArchiveInputStream(FileInputStream(file)).use { checkEntry(it) }
+        } else {
+            GZIPInputStream(FileInputStream(file)).use { gzipIn ->
+                TarArchiveInputStream(gzipIn).use { checkEntry(it) }
+            }
+        }
+        return roots
+    }
+
+    private fun extractArchive(archiveFile: File, toFile: File, isZip: Boolean, isSingleRoot: Boolean) {
+        fun <T : ArchiveEntry> checkEntry(archiveInput: ArchiveInputStream<T>) {
+            var entry = archiveInput.nextEntry
+            while (entry != null) {
+                val entryName = entry.name
+
+                val strippedName = if (isSingleRoot) {
+                    entryName.substringAfter("/", missingDelimiterValue = entryName)
+                } else entryName
+
+                if (strippedName.isBlank()) {
+                    entry = archiveInput.nextEntry
+                    continue
+                }
+
+                val outFile = File(toFile, strippedName)
+
+                if (entry.isDirectory) outFile.mkdirs()
+                else {
+                    outFile.parentFile.mkdirs()
+                    FileOutputStream(outFile).use { archiveInput.copyTo(it) }
+                }
+
+                entry = archiveInput.nextEntry
+            }
+        }
+
+        if (isZip) {
+            ZipArchiveInputStream(FileInputStream(archiveFile)).use { checkEntry(it) }
+        } else {
+            GZIPInputStream(FileInputStream(archiveFile)).use { gzipIn ->
+                TarArchiveInputStream(gzipIn).use { checkEntry(it) }
+            }
+        }
+    }
+
 }

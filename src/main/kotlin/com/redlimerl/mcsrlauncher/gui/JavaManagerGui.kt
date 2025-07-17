@@ -72,18 +72,21 @@ class JavaManagerGui(parent: JDialog) : JavaManagerDialog(parent) {
         columnModel.getColumn(0).preferredWidth = 70
         columnModel.getColumn(1).preferredWidth = 130
 
+        fun resizeTableColumns() {
+            val parent = javaListTable.parent ?: return
+            val viewportWidth = parent.width
+            val secondColWidth = (viewportWidth - 200).coerceAtLeast(100)
+            columnModel.getColumn(2).preferredWidth = secondColWidth
+            javaListTable.revalidate()
+            javaListTable.repaint()
+        }
+
         if (javaListTable.parent != null && javaListTable.parent !is ComponentListener) {
             javaListTable.parent.addComponentListener(object : ComponentAdapter() {
-                override fun componentResized(e: ComponentEvent?) {
-                    val parent = javaListTable.parent ?: return
-                    val viewportWidth = parent.width
-                    val secondColWidth = (viewportWidth - 200).coerceAtLeast(100)
-                    columnModel.getColumn(2).preferredWidth = secondColWidth
-                    javaListTable.revalidate()
-                    javaListTable.repaint()
-                }
+                override fun componentResized(e: ComponentEvent?) = resizeTableColumns()
             })
         }
+        javaTabPane.addChangeListener { resizeTableColumns() }
     }
 
     private fun initDownloadJavaTab() {
@@ -96,7 +99,6 @@ class JavaManagerGui(parent: JDialog) : JavaManagerDialog(parent) {
         javaVersionComboBox.addActionListener {
             if (javaVersionComboBox.selectedItem != null) updateDownloadJavaBuildList()
         }
-        installJavaButton.isEnabled = false
         javaBuildComboBox.addActionListener {
             installJavaButton.isEnabled = javaBuildComboBox.selectedItem != null
         }
@@ -109,6 +111,25 @@ class JavaManagerGui(parent: JDialog) : JavaManagerDialog(parent) {
                 }
                 return original
             }
+        }
+
+        installJavaButton.isEnabled = false
+        installJavaButton.addActionListener {
+            val metaUniqueID = MetaUniqueID.JAVA_METAS.find { MetaManager.getMetaName(it) == javaVendorComboBox.selectedItem!!.toString() }!!
+            val majorVersion = javaVersionComboBox.selectedItem as Int
+            val meta = MetaManager.getVersionMeta<JavaMetaFile>(metaUniqueID, "java$majorVersion") ?: throw IllegalStateException("${javaVendorComboBox.selectedItem} JDK $majorVersion is not exist in meta")
+            val buildVersion = javaBuildComboBox.selectedItem!!.toString()
+
+            object : LauncherWorker(this@JavaManagerGui, I18n.translate("text.java.download"), I18n.translate("message.loading") + "...") {
+                override fun work(dialog: JDialog) {
+                    this.properties["download-java-version"] = buildVersion
+                    meta.install(this)
+                    updateInstalledJavaVersions()
+                    dialog.dispose()
+                    JOptionPane.showMessageDialog(this@JavaManagerGui, I18n.translate("message.install_java.success"))
+                    javaTabPane.selectedIndex = 0
+                }
+            }.showDialog().start()
         }
     }
 

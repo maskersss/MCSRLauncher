@@ -3,7 +3,9 @@ package com.redlimerl.mcsrlauncher.data.meta.file
 import com.redlimerl.mcsrlauncher.data.device.RuntimeOSType
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.serializer.ISO8601Serializer
+import com.redlimerl.mcsrlauncher.util.JavaUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*
 
@@ -24,7 +26,14 @@ data class JavaMetaFile(
         val version = worker.properties["download-java-version"]
         for (runtime in runtimes) {
             if (runtime.runtimeOS.isOn() && version == runtime.version.getName()) {
-                TODO("THIS")
+                when(runtime.downloadType) {
+                    JavaRuntimeDownloadType.ARCHIVE -> {
+                        JavaUtils.extractJavaArchive(runtime.url, runtime.name, worker)
+                    }
+                    JavaRuntimeDownloadType.MANIFEST -> {
+                        JavaUtils.extractJavaManifest(runtime.url, runtime.name, worker)
+                    }
+                }
             }
         }
     }
@@ -38,7 +47,7 @@ data class JavaRuntime(
     @Serializable(with = ISO8601Serializer::class) val releaseTime: Date,
     val vendor: String,
     val packageType: String,
-    val downloadType: String,
+    val downloadType: JavaRuntimeDownloadType,
     val checksum: JavaRuntimeChecksum,
     val url: String
 )
@@ -65,3 +74,9 @@ data class JavaRuntimeChecksum(
     val type: String,
     val hash: String
 )
+
+@Serializable
+enum class JavaRuntimeDownloadType {
+    @SerialName("manifest") MANIFEST,
+    @SerialName("archive") ARCHIVE
+}

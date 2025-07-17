@@ -15,6 +15,7 @@ object GameAssetManager {
     val OBJECTS_PATH: Path = ASSETS_PATH.resolve("objects")
     val INDEXES_PATH: Path = ASSETS_PATH.resolve("indexes")
     val LIBRARIES_PATH: Path = MCSRLauncher.BASE_PATH.resolve("libraries")
+    val JAVA_PATH: Path = MCSRLauncher.BASE_PATH.resolve("java")
 
     fun init() {
         ASSETS_PATH.toFile().mkdirs()
@@ -22,6 +23,7 @@ object GameAssetManager {
         SKINS_PATH.toFile().mkdirs()
         INDEXES_PATH.toFile().mkdirs()
         LIBRARIES_PATH.toFile().mkdirs()
+        JAVA_PATH.toFile().mkdirs()
 
         if (CHECKSUM_PATH.toFile().exists()) {
             MCSRLauncher.JSON.parseToJsonElement(FileUtils.readFileToString(CHECKSUM_PATH.toFile(), Charsets.UTF_8)).jsonObject.forEach {
