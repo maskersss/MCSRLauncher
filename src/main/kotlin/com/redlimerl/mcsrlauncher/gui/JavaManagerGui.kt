@@ -59,7 +59,7 @@ class JavaManagerGui(parent: JDialog) : JavaManagerDialog(parent) {
         javaList.addAll(JavaUtils.javaHomeVersions())
 
         val tableModel =
-            DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.version"), I18n.translate("text.path")))
+            DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.version"), I18n.translate("text.vendor"), I18n.translate("text.path")))
         javaList.sortedByDescending { Version.parse(it.version.split("_").first()) }.forEach { tableModel.addRow(it.dataArray()) }
 
         javaListTable.model = tableModel
@@ -69,18 +69,16 @@ class JavaManagerGui(parent: JDialog) : JavaManagerDialog(parent) {
         javaListTable.autoResizeMode = JTable.AUTO_RESIZE_OFF
 
         val columnModel = javaListTable.columnModel
-        val fixedColWidth = 70
-        columnModel.getColumn(0).preferredWidth = fixedColWidth
+        columnModel.getColumn(0).preferredWidth = 70
+        columnModel.getColumn(1).preferredWidth = 130
 
         if (javaListTable.parent != null && javaListTable.parent !is ComponentListener) {
             javaListTable.parent.addComponentListener(object : ComponentAdapter() {
                 override fun componentResized(e: ComponentEvent?) {
                     val parent = javaListTable.parent ?: return
                     val viewportWidth = parent.width
-                    val secondColWidth = (viewportWidth - fixedColWidth).coerceAtLeast(100) // 최소 100px 보장
-                    if (columnModel.columnCount > 1) {
-                        columnModel.getColumn(1).preferredWidth = secondColWidth
-                    }
+                    val secondColWidth = (viewportWidth - 200).coerceAtLeast(100)
+                    columnModel.getColumn(2).preferredWidth = secondColWidth
                     javaListTable.revalidate()
                     javaListTable.repaint()
                 }

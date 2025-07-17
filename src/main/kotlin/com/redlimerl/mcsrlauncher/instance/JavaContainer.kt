@@ -1,7 +1,9 @@
 package com.redlimerl.mcsrlauncher.instance
 
+import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.util.JavaUtils
 import java.nio.file.Path
+import java.util.*
 import kotlin.io.path.absolutePathString
 
 class JavaContainer(val path: Path, version: String? = null, vendor: String? = null) {
@@ -10,6 +12,8 @@ class JavaContainer(val path: Path, version: String? = null, vendor: String? = n
     val version: String
 
     init {
+        var possibleVendor: String
+        var possibleVersion: String
         if (version == null || vendor == null) {
             val process = ProcessBuilder(this.getJavaRuntimePath(), "-version").redirectErrorStream(false).start()
             val stderrLines = process.errorStream.bufferedReader().readLines()
@@ -23,14 +27,28 @@ class JavaContainer(val path: Path, version: String? = null, vendor: String? = n
 
             val versionRegex = Regex("\"([^\"]+)\"")
             val versionMatch = versionRegex.find(versionLine) ?: throw IllegalStateException("Cannot parse Java version from: $versionLine")
-            this.version = versionMatch.groupValues[1]
+            possibleVersion = versionMatch.groupValues[1]
 
             val vendorLine = stderrLines.getOrNull(1) ?: "Unknown Vendor"
-            this.vendor = vendorLine.trim()
+            possibleVendor = vendorLine.trim()
         } else {
-            this.version = version
-            this.vendor = vendor
+            possibleVendor = vendor
+            possibleVersion = version
         }
+
+        try {
+            val properties = Properties()
+            path.parent.parent.resolve("release").toFile().bufferedReader().use { reader -> properties.load(reader) }
+
+            possibleVendor = properties.getProperty("IMPLEMENTOR")?.replace("\"", "") ?: possibleVendor
+            possibleVersion = properties.getProperty("JAVA_VERSION")?.replace("\"", "") ?: possibleVersion
+        } catch (e: Exception) {
+            MCSRLauncher.LOGGER.error(e)
+        }
+
+        this.version = possibleVersion
+        this.vendor = possibleVendor
+        MCSRLauncher.LOGGER.info(this.version + " / " + this.vendor)
     }
 
     fun getJavaRuntimePath(): String {
@@ -52,7 +70,7 @@ class JavaContainer(val path: Path, version: String? = null, vendor: String? = n
     }
 
     fun dataArray(): Array<String> {
-        return arrayOf(this.version, this.path.absolutePathString())
+        return arrayOf(this.version, this.vendor, this.path.absolutePathString())
     }
 
 }
