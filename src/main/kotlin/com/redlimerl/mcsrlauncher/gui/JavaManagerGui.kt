@@ -16,9 +16,11 @@ import java.awt.event.ComponentListener
 import javax.swing.*
 import javax.swing.table.DefaultTableModel
 
-class JavaManagerGui(parent: JDialog) : JavaManagerDialog(parent) {
+class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerDialog(parent) {
 
     private val javaList = arrayListOf<JavaContainer>()
+    var selectedJavaPath: String? = null
+        private set
 
     init {
         title = I18n.translate("text.settings.java")
@@ -37,7 +39,11 @@ class JavaManagerGui(parent: JDialog) : JavaManagerDialog(parent) {
                     MetaManager.getVersions(javaMeta, this).forEach { it.getOrLoadMetaVersionFile<JavaMetaFile>(javaMeta, this) }
                 }
                 updateDownloadJavaList()
+                dialog.dispose()
                 isVisible = true
+
+                val result = selectedJavaPath
+                if (result != null) onSelect(result)
             }
         }.showDialog().start()
 
@@ -51,6 +57,13 @@ class JavaManagerGui(parent: JDialog) : JavaManagerDialog(parent) {
         javaListTable.selectionModel.addListSelectionListener {
             if (!it.valueIsAdjusting && javaListTable.selectedRow == -1 && javaListTable.rowCount > 0)
                 javaListTable.setRowSelectionInterval(it.lastIndex, it.lastIndex)
+        }
+
+        selectJavaVersionButton.addActionListener {
+            if (javaListTable.selectedRow >= 0) {
+                selectedJavaPath = javaListTable.getValueAt(javaListTable.selectedRow, 2).toString()
+            }
+            this.dispose()
         }
     }
 

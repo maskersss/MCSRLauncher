@@ -61,8 +61,18 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
                 saveJavaPath()
             }
         })
-        this.javaPathField.text = MCSRLauncher.options.javaPath
 
-        this.javaChangeButton.addActionListener { JavaManagerGui(this@LauncherOptionGui) }
+        fun refreshJavaPath() {
+            this.javaPathField.text = MCSRLauncher.options.javaPath
+        }
+
+        refreshJavaPath()
+
+        this.javaChangeButton.addActionListener {
+            JavaManagerGui(this@LauncherOptionGui) {
+                MCSRLauncher.options.javaPath = it
+                refreshJavaPath()
+            }
+        }
     }
 }
