@@ -18,12 +18,12 @@ public class LauncherOptionDialog extends JDialog {
     private JTabbedPane settingsTabPane;
     public JComboBox<LauncherLanguage> languageComboBox;
     public JLabel launcherVersionLabel;
-    private JTextArea textArea1;
-    private JSlider slider1;
-    private JSpinner spinner1;
+    public JTextArea jvmArgumentArea;
     public JButton javaChangeButton;
     public JButton refreshMetaButton;
     public JTextField javaPathField;
+    public JScrollPane tabJavaScrollPane;
+    public JScrollPane tabLauncherScrollPane;
 
     public LauncherOptionDialog(JFrame parent) {
         super(parent);
@@ -67,13 +67,13 @@ public class LauncherOptionDialog extends JDialog {
         settingsTabPane = new JTabbedPane();
         settingsTabPane.setTabPlacement(2);
         panel3.add(settingsTabPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(663, 200), null, 0, false));
-        final JScrollPane scrollPane1 = new JScrollPane();
-        scrollPane1.setHorizontalScrollBarPolicy(31);
-        settingsTabPane.addTab("text.launcher", scrollPane1);
-        scrollPane1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+        tabLauncherScrollPane = new JScrollPane();
+        tabLauncherScrollPane.setHorizontalScrollBarPolicy(31);
+        settingsTabPane.addTab("text.launcher", tabLauncherScrollPane);
+        tabLauncherScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new GridLayoutManager(4, 1, new Insets(10, 10, 10, 10), -1, 15));
-        scrollPane1.setViewportView(panel4);
+        tabLauncherScrollPane.setViewportView(panel4);
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), -1, -1));
         panel4.add(panel5, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -102,13 +102,13 @@ public class LauncherOptionDialog extends JDialog {
         refreshMetaButton = new JButton();
         refreshMetaButton.setText("text.refresh.meta");
         panel6.add(refreshMetaButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JScrollPane scrollPane2 = new JScrollPane();
-        scrollPane2.setHorizontalScrollBarPolicy(31);
-        settingsTabPane.addTab("text.java", scrollPane2);
-        scrollPane2.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+        tabJavaScrollPane = new JScrollPane();
+        tabJavaScrollPane.setHorizontalScrollBarPolicy(31);
+        settingsTabPane.addTab("text.java", tabJavaScrollPane);
+        tabJavaScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         final JPanel panel7 = new JPanel();
         panel7.setLayout(new GridLayoutManager(6, 1, new Insets(10, 10, 10, 10), 5, 15));
-        scrollPane2.setViewportView(panel7);
+        tabJavaScrollPane.setViewportView(panel7);
         final JPanel panel8 = new JPanel();
         panel8.setLayout(new GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
         panel7.add(panel8, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -117,8 +117,8 @@ public class LauncherOptionDialog extends JDialog {
         panel8.add(label3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer5 = new Spacer();
         panel8.add(spacer5, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        textArea1 = new JTextArea();
-        panel8.add(textArea1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+        jvmArgumentArea = new JTextArea();
+        panel8.add(jvmArgumentArea, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
         final Spacer spacer6 = new Spacer();
         panel7.add(spacer6, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         final JSeparator separator2 = new JSeparator();
@@ -129,7 +129,7 @@ public class LauncherOptionDialog extends JDialog {
         final JLabel label4 = new JLabel();
         label4.setText("text.min_memory_allocation");
         panel9.add(label4, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        slider1 = new JSlider();
+        final JSlider slider1 = new JSlider();
         slider1.setMaximum(8096);
         slider1.setMinimum(512);
         slider1.setMinorTickSpacing(512);
@@ -138,7 +138,7 @@ public class LauncherOptionDialog extends JDialog {
         slider1.setSnapToTicks(true);
         slider1.setValue(2048);
         panel9.add(slider1, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        spinner1 = new JSpinner();
+        final JSpinner spinner1 = new JSpinner();
         panel9.add(spinner1, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label5 = new JLabel();
         label5.setText("MB");

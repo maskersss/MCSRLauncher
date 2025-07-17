@@ -10,6 +10,7 @@ import com.redlimerl.mcsrlauncher.gui.component.AccountListComponent
 import com.redlimerl.mcsrlauncher.launcher.AccountManager
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
+import com.redlimerl.mcsrlauncher.util.SwingUtils
 import java.awt.BorderLayout
 import java.awt.Desktop
 import java.awt.Dimension
@@ -32,7 +33,7 @@ class AccountListGui(parent: JFrame) : AccountListDialog() {
 
         addAccountButton.addActionListener { addNewAccount() }
 
-        accountListPane.verticalScrollBar.unitIncrement *= 5
+        SwingUtils.fasterScroll(accountListPane)
         accountListPane.setViewportView(accountList)
 
         closeButton.addActionListener { this.dispose() }

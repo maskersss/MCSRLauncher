@@ -118,6 +118,9 @@ data class BasicInstance(
             "-Xmx${options.maxMemory}M"
         )
 
+        arguments.addAll(MCSRLauncher.options.jvmArguments.split(" ").flatMap { it.split("\n") }.filter { it.isNotBlank() })
+        arguments.addAll(options.jvmArguments.split(" ").flatMap { it.split("\n") }.filter { it.isNotBlank() })
+
         val minecraftMetaFile = MetaManager.getVersionMeta<MinecraftMetaFile>(MetaUniqueID.MINECRAFT, this.minecraftVersion)
             ?: throw IllegalStateException("${MetaUniqueID.MINECRAFT.value} version meta is not found")
         if (minecraftMetaFile.compatibleJavaMajors.min() > OSUtils.getJavaVersion()) {

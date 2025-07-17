@@ -6,6 +6,7 @@ import com.redlimerl.mcsrlauncher.gui.layout.WrapLayout
 import com.redlimerl.mcsrlauncher.gui.listener.MouseFillListener
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
 import com.redlimerl.mcsrlauncher.util.I18n
+import com.redlimerl.mcsrlauncher.util.SwingUtils
 import net.miginfocom.swing.MigLayout
 import java.awt.*
 import java.awt.event.ComponentAdapter
@@ -73,7 +74,7 @@ class MainMenuGui : MainForm() {
 
     private fun initInstanceList() {
         instanceScrollPane.border = BorderFactory.createEmptyBorder()
-        instanceScrollPane.verticalScrollBar.unitIncrement *= 15
+        SwingUtils.fasterScroll(instanceScrollPane)
         loadInstanceList()
         this.addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent?) {

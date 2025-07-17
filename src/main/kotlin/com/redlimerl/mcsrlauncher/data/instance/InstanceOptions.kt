@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class InstanceOptions(
     var minMemory: Int = 512,
     var maxMemory: Int = 2048,
-    var javaPath: String = ""
+    var javaPath: String = "",
+    var jvmArguments: String = ""
 )

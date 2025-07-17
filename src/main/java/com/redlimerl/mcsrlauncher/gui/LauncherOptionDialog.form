@@ -63,7 +63,7 @@
             </properties>
             <border type="none"/>
             <children>
-              <scrollpane id="f3320">
+              <scrollpane id="f3320" binding="tabLauncherScrollPane">
                 <constraints>
                   <tabbedpane title="text.launcher"/>
                 </constraints>
@@ -161,7 +161,7 @@
                   </grid>
                 </children>
               </scrollpane>
-              <scrollpane id="97dd5">
+              <scrollpane id="97dd5" binding="tabJavaScrollPane">
                 <constraints>
                   <tabbedpane title="text.java"/>
                 </constraints>
@@ -197,7 +197,7 @@
                               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                             </constraints>
                           </vspacer>
-                          <component id="61938" class="javax.swing.JTextArea" binding="textArea1" default-binding="true">
+                          <component id="61938" class="javax.swing.JTextArea" binding="jvmArgumentArea">
                             <constraints>
                               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
                                 <preferred-size width="150" height="50"/>
@@ -234,7 +234,7 @@
                               <text value="text.min_memory_allocation"/>
                             </properties>
                           </component>
-                          <component id="4bb03" class="javax.swing.JSlider" binding="slider1" default-binding="true">
+                          <component id="4bb03" class="javax.swing.JSlider" default-binding="true">
                             <constraints>
                               <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                             </constraints>
@@ -248,7 +248,7 @@
                               <value value="2048"/>
                             </properties>
                           </component>
-                          <component id="36326" class="javax.swing.JSpinner" binding="spinner1" default-binding="true">
+                          <component id="36326" class="javax.swing.JSpinner" default-binding="true">
                             <constraints>
                               <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                             </constraints>

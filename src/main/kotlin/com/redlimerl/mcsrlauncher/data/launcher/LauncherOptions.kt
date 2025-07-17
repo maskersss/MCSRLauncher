@@ -14,7 +14,8 @@ data class LauncherOptions(
     var debug: Boolean = false,
     var language: LauncherLanguage = LauncherLanguage.ENGLISH,
     var metaUrl: String = "https://mcsrlauncher.github.io/meta/",
-    var javaPath: String = Paths.get(System.getProperty("java.home")).resolve("bin").resolve(JavaUtils.javaExecutableName()).absolutePathString()
+    var javaPath: String = Paths.get(System.getProperty("java.home")).resolve("bin").resolve(JavaUtils.javaExecutableName()).absolutePathString(),
+    var jvmArguments: String = ""
 ) {
     companion object {
         val path: Path = MCSRLauncher.BASE_PATH.resolve("options.json")

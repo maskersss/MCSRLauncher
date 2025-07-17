@@ -5,6 +5,7 @@ import com.redlimerl.mcsrlauncher.data.launcher.LauncherLanguage
 import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
+import com.redlimerl.mcsrlauncher.util.SwingUtils
 import java.awt.Dimension
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
@@ -47,6 +48,8 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
                 override fun work(dialog: JDialog) = MetaManager.load(this, true)
             }.showDialog().start()
         }
+
+        SwingUtils.fasterScroll(this.tabLauncherScrollPane)
     }
 
     private fun initJavaTab() {
@@ -74,5 +77,16 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
                 refreshJavaPath()
             }
         }
+
+
+        this.jvmArgumentArea.text = MCSRLauncher.options.jvmArguments
+        this.jvmArgumentArea.addFocusListener(object : FocusListener {
+            override fun focusGained(e: FocusEvent?) {}
+            override fun focusLost(e: FocusEvent?) {
+                MCSRLauncher.options.jvmArguments = jvmArgumentArea.text
+            }
+        })
+
+        SwingUtils.fasterScroll(this.tabJavaScrollPane)
     }
 }
