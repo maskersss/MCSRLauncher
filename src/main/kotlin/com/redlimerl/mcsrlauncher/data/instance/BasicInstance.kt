@@ -97,11 +97,13 @@ data class BasicInstance(
         if (this.isRunning()) return
 
         val javaTarget = options.javaPath.ifEmpty { MCSRLauncher.options.javaPath }
-        if (javaTarget.isEmpty()) throw IllegalStateException("Invalid java detected")
+        val noJavaException = IllegalStateException("Java has not selected. Try change your java path")
+        if (javaTarget.isEmpty()) throw noJavaException
         try {
-            if (JavaContainer.getVersionLists(javaTarget).isNotEmpty()) throw IllegalStateException("Java has not selected. Try change your java path")
+            if (JavaContainer.getVersionLists(javaTarget).isNotEmpty()) throw noJavaException
         } catch (e: Exception) {
-            throw IllegalStateException("Java has not selected. Try change your java path")
+            MCSRLauncher.LOGGER.error(e)
+            throw noJavaException
         }
 
         MCSRLauncher.LOGGER.info("Loading Authentication: $name")
