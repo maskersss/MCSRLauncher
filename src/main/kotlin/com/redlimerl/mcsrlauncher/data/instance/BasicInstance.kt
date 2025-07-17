@@ -8,6 +8,7 @@ import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
 import com.redlimerl.mcsrlauncher.exception.InvalidAccessTokenException
 import com.redlimerl.mcsrlauncher.instance.InstanceLibrary
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
+import com.redlimerl.mcsrlauncher.instance.JavaContainer
 import com.redlimerl.mcsrlauncher.instance.LegacyLaunchFixer
 import com.redlimerl.mcsrlauncher.launcher.AccountManager
 import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
@@ -97,6 +98,11 @@ data class BasicInstance(
 
         val javaTarget = options.javaPath.ifEmpty { MCSRLauncher.options.javaPath }
         if (javaTarget.isEmpty()) throw IllegalStateException("Invalid java detected")
+        try {
+            if (JavaContainer.getVersionLists(javaTarget).isNotEmpty()) throw IllegalStateException("Java has not selected. Try change your java path")
+        } catch (e: Exception) {
+            throw IllegalStateException("Java has not selected. Try change your java path")
+        }
 
         MCSRLauncher.LOGGER.info("Loading Authentication: $name")
         val activeAccount = AccountManager.getActiveAccount() ?: throw IllegalStateException("Active account is none")

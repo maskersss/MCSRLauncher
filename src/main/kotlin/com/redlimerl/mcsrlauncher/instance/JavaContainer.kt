@@ -11,15 +11,27 @@ class JavaContainer(val path: Path, version: String? = null, vendor: String? = n
     val vendor: String
     val version: String
 
-    init {
-        var possibleVendor: String
-        var possibleVersion: String
-        if (version == null || vendor == null) {
-            val process = ProcessBuilder(this.getJavaRuntimePath(), "-version").redirectErrorStream(false).start()
+    companion object {
+        fun getVersionLists(javaPath: String): List<String> {
+            val process = ProcessBuilder(javaPath, "-version").redirectErrorStream(false).start()
             val stderrLines = process.errorStream.bufferedReader().readLines()
             process.waitFor()
 
             if (stderrLines.isEmpty()) throw IllegalStateException("No output from java -version")
+
+            stderrLines.firstOrNull {
+                it.contains("version") || it.contains("openjdk version")
+            } ?: throw IllegalStateException("Cannot detect Java version")
+
+            return stderrLines
+        }
+    }
+
+    init {
+        var possibleVendor: String
+        var possibleVersion: String
+        if (version == null || vendor == null) {
+            val stderrLines = getVersionLists(this.getJavaRuntimePath())
 
             val versionLine = stderrLines.firstOrNull {
                 it.contains("version") || it.contains("openjdk version")
