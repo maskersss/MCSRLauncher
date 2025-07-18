@@ -10,6 +10,7 @@ class JavaContainer(val path: Path, version: String? = null, vendor: String? = n
 
     val vendor: String
     val version: String
+    val majorVersion: Int
 
     companion object {
         fun getVersionLists(javaPath: String): List<String> {
@@ -60,6 +61,7 @@ class JavaContainer(val path: Path, version: String? = null, vendor: String? = n
 
         this.version = possibleVersion
         this.vendor = possibleVendor
+        this.majorVersion = this.version.split(".").first().toInt().let { if (it == 1) this.version.split(".")[1].toInt() else it }
     }
 
     fun getJavaRuntimePath(): String {

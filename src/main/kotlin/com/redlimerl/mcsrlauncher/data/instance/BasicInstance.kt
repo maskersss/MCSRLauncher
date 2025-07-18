@@ -17,7 +17,6 @@ import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.AssetUtils
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
-import com.redlimerl.mcsrlauncher.util.OSUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -26,6 +25,7 @@ import org.apache.commons.io.FileUtils
 import java.io.File
 import java.net.URL
 import java.nio.file.Path
+import java.nio.file.Paths
 import javax.swing.JDialog
 import kotlin.io.path.absolutePathString
 
@@ -99,8 +99,9 @@ data class BasicInstance(
         val javaTarget = options.javaPath.ifEmpty { MCSRLauncher.options.javaPath }
         val noJavaException = IllegalStateException("Java has not selected. Try change your java path")
         if (javaTarget.isEmpty()) throw noJavaException
+        val javaContainer: JavaContainer
         try {
-            if (JavaContainer.getVersionLists(javaTarget).isEmpty()) throw noJavaException
+            javaContainer = JavaContainer(Paths.get(javaTarget))
         } catch (e: Exception) {
             MCSRLauncher.LOGGER.error(e)
             throw noJavaException
@@ -119,7 +120,7 @@ data class BasicInstance(
 
         var mainClass: String
         val libraries = linkedSetOf<Path>()
-        val libraryMap = linkedMapOf<String, InstanceLibrary>()
+        val libraryMap = arrayListOf<InstanceLibrary>()
 
         val arguments = arrayListOf(
             "-Xms${options.minMemory}M",
@@ -131,11 +132,12 @@ data class BasicInstance(
 
         val minecraftMetaFile = MetaManager.getVersionMeta<MinecraftMetaFile>(MetaUniqueID.MINECRAFT, this.minecraftVersion)
             ?: throw IllegalStateException("${MetaUniqueID.MINECRAFT.value} version meta is not found")
-        if (minecraftMetaFile.compatibleJavaMajors.min() > OSUtils.getJavaVersion()) {
-            throw IllegalStateException("Required minimum Java version is ${minecraftMetaFile.compatibleJavaMajors.min()}, you are at ${OSUtils.getJavaVersion()}")
+        val minCompatibleVersion = minecraftMetaFile.compatibleJavaMajors.min()
+        if (minCompatibleVersion > javaContainer.majorVersion) {
+            throw IllegalStateException("Required minimum Java version is ${minCompatibleVersion}, you are at ${javaContainer.majorVersion}")
         }
 
-        minecraftMetaFile.libraries.filter { it.shouldApply() }.forEach { cleanupLibraryPaths(libraryMap, it.toInstanceLibrary()) }
+        minecraftMetaFile.libraries.filter { it.shouldApply() }.forEach { libraryMap.add(it.toInstanceLibrary()) }
 
         val mainJar = minecraftMetaFile.mainJar.getPath()
         mainClass = minecraftMetaFile.mainClass
@@ -157,21 +159,22 @@ data class BasicInstance(
 
         val lwjglMetaFile = MetaManager.getVersionMeta<LWJGLMetaFile>(this.lwjglVersion.type, this.lwjglVersion.version, worker)
             ?: throw IllegalStateException("LWJGL ${this.lwjglVersion.version} is not found")
-        lwjglMetaFile.libraries.filter { it.shouldApply() }.forEach { cleanupLibraryPaths(libraryMap, it.toInstanceLibrary()) }
+        lwjglMetaFile.libraries.filter { it.shouldApply() }.forEach { libraryMap.add(it.toInstanceLibrary()) }
 
 
         if (this.fabricVersion != null) {
             val fabricLoaderMetaFile = MetaManager.getVersionMeta<FabricLoaderMetaFile>(MetaUniqueID.FABRIC_LOADER, this.fabricVersion.loaderVersion)
                 ?: throw IllegalStateException("${MetaUniqueID.FABRIC_LOADER.value} fabric loader version is not found")
             mainClass = fabricLoaderMetaFile.mainClass
-            fabricLoaderMetaFile.libraries.forEach { cleanupLibraryPaths(libraryMap, it.toInstanceLibrary()) }
+            fabricLoaderMetaFile.libraries.forEach { libraryMap.add(it.toInstanceLibrary()) }
 
             val intermediaryMetaFile = MetaManager.getVersionMeta<FabricIntermediaryMetaFile>(MetaUniqueID.FABRIC_INTERMEDIARY, this.fabricVersion.intermediaryVersion)
                 ?: throw IllegalStateException("${this.fabricVersion.intermediaryVersion} intermediary version is not found")
-            cleanupLibraryPaths(libraryMap, intermediaryMetaFile.getLibrary(this.fabricVersion.intermediaryType).toInstanceLibrary())
+            libraryMap.add(intermediaryMetaFile.getLibrary(this.fabricVersion.intermediaryType).toInstanceLibrary())
         }
 
-        libraries.addAll(libraryMap.values.flatMap { it.paths })
+        InstanceLibrary.fixLibraries(libraryMap)
+        libraries.addAll(libraryMap.flatMap { it.paths })
 
         this.getNativePath().toFile().mkdirs()
         FileUtils.deleteDirectory(this.getNativePath().toFile())
@@ -180,6 +183,7 @@ data class BasicInstance(
             val libFile = libraryPath.toFile()
             if (!libFile.exists()) throw IllegalStateException("Library: ${libFile.name} is not exist!")
             if (libFile.name.endsWith(".jar") && libFile.name.contains("natives")) {
+                if (MCSRLauncher.options.debug) MCSRLauncher.LOGGER.info("Native extracting: ${libFile.name}")
                 AssetUtils.extractZip(libFile, this.getNativePath().toFile())
                 nativeLibs.add(libraryPath)
             }
@@ -239,10 +243,5 @@ data class BasicInstance(
 
     fun getProcess(): InstanceProcess? {
         return MCSRLauncher.GAME_PROCESSES.find { it.instance == this }
-    }
-
-    private fun cleanupLibraryPaths(libraryMap: HashMap<String, InstanceLibrary>, library: InstanceLibrary) {
-        if (!libraryMap.containsKey(library.getArtifactId()) || library.shouldReplaceFrom(libraryMap[library.getArtifactId()]!!))
-            libraryMap[library.getArtifactId()] = library
     }
 }

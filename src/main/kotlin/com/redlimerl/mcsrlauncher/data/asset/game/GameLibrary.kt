@@ -33,6 +33,7 @@ data class GameLibrary(
         if (mainJarAsset != null) {
             if (!mainJarFile.exists() || mainJarFile.length() != mainJarAsset.size || !AssetUtils.compareHash(mainJarFile, mainJarAsset.sha1)) {
                 MCSRLauncher.LOGGER.info("Downloading ${this.name} ...")
+                worker.setSubText("Downloading ${this.name} ...")
                 FileDownloader.download(mainJarAsset.url, mainJarFile)
             }
         }
@@ -43,9 +44,11 @@ data class GameLibrary(
             val nativeLibFile = nativeLibrary.getPathFrom(this).toFile()
             if (!nativeLibFile.exists() || nativeLibFile.length() != nativeLibrary.size || !AssetUtils.compareHash(nativeLibFile, nativeLibrary.sha1)) {
                 MCSRLauncher.LOGGER.info("Downloading ${this.name}-native-${classifierKey} ...")
+                worker.setSubText("Downloading ${this.name}-native-${classifierKey} ...")
                 FileDownloader.download(nativeLibrary.url, nativeLibFile)
             }
         }
+        worker.setSubText(null)
     }
 
     fun getLibraryPaths(): List<Path> {
