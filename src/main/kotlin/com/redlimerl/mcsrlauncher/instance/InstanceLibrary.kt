@@ -1,7 +1,6 @@
 package com.redlimerl.mcsrlauncher.instance
 
 import com.github.zafarkhaja.semver.Version
-import com.redlimerl.mcsrlauncher.MCSRLauncher
 import java.nio.file.Path
 
 data class InstanceLibrary(
@@ -13,8 +12,7 @@ data class InstanceLibrary(
     companion object {
         fun fixLibraries(list: ArrayList<InstanceLibrary>) {
             // Remove `asm-all` for legacy versions with fabric loader
-            if (list.any { it.artifact == "org.ow2.asm:asm" })
-                list.find { it.artifact == "org.ow2.asm:asm-all" }?.let { list.remove(it) }
+            if (list.any { it.artifact == "org.ow2.asm:asm" }) list.removeIf { it.artifact == "org.ow2.asm:asm-all" }
 
             val result = ArrayList<InstanceLibrary>()
 
@@ -26,7 +24,6 @@ data class InstanceLibrary(
 
                 val versioned = group.mapNotNull { Version.tryParse(it.version, false).map { v -> it to v }.orElse(null) }
 
-                MCSRLauncher.LOGGER.info("$versioned")
                 if (versioned.isEmpty()) {
                     result.addAll(group)
                     return@forEach
