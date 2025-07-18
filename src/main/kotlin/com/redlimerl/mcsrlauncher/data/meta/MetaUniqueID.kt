@@ -30,7 +30,10 @@ enum class MetaUniqueID(val value: String) {
     LWJGL2("org.lwjgl"),
 
     @SerialName("org.lwjgl3")
-    LWJGL3("org.lwjgl3");
+    LWJGL3("org.lwjgl3"),
+
+    @SerialName("org.mcsr.mods")
+    SPEEDRUN_MODS("org.mcsr.mods");
 
     companion object {
         val GAME_METAS = listOf(MINECRAFT, LWJGL2, LWJGL3)
