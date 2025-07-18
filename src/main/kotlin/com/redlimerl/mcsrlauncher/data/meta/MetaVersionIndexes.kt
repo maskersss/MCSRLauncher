@@ -30,7 +30,9 @@ data class MetaVersionIndexes(
     }
 
     fun write() {
-        FileUtils.writeStringToFile(getPath(this.uid).toFile(), MCSRLauncher.JSON.encodeToString(this), Charsets.UTF_8)
+        val file = getPath(this.uid).toFile()
+        FileUtils.cleanDirectory(file.parentFile)
+        FileUtils.writeStringToFile(file, MCSRLauncher.JSON.encodeToString(this), Charsets.UTF_8)
     }
 }
 
