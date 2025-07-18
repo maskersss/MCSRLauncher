@@ -31,7 +31,9 @@ data class MetaVersionIndexes(
 
     fun write() {
         val file = getPath(this.uid).toFile()
-        FileUtils.cleanDirectory(file.parentFile)
+        for (metaFile in file.parentFile.listFiles()!!) {
+            if (this.versions.none { "${it.version}.json" == metaFile.name }) FileUtils.delete(metaFile)
+        }
         FileUtils.writeStringToFile(file, MCSRLauncher.JSON.encodeToString(this), Charsets.UTF_8)
     }
 }
