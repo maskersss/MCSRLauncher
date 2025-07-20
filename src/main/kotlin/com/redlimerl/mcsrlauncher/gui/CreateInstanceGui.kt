@@ -3,6 +3,7 @@ package com.redlimerl.mcsrlauncher.gui
 import com.redlimerl.mcsrlauncher.data.meta.IntermediaryType
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.MetaVersionType
+import com.redlimerl.mcsrlauncher.gui.component.InstanceGroupComboBox
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
 import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.I18n
@@ -23,6 +24,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
         setLocationRelativeTo(parent)
 
         instanceNameField.text = I18n.translate("instance.new")
+        InstanceGroupComboBox.init(instanceGroupBox)
 
         cancelButton.addActionListener { this.dispose() }
         createInstanceButton.addActionListener { this.createInstance() }

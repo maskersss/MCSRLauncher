@@ -166,7 +166,7 @@ class MainMenuGui : MainForm() {
 
         popupMenu.add(JMenuItem(I18n.translate("instance.edit")).apply {
             addActionListener {
-
+                InstanceOptionGui(this@MainMenuGui, instance)
             }
         })
 

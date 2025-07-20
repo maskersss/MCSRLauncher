@@ -22,11 +22,11 @@ object InstanceManager {
         instances.putAll(JSON.decodeFromString<Map<String, ArrayList<BasicInstance>>>(FileUtils.readFileToString(path.toFile(), Charsets.UTF_8)))
     }
 
-    private fun save() {
+    fun save() {
         FileUtils.writeStringToFile(path.toFile(), JSON.encodeToString(instances), Charsets.UTF_8)
     }
 
-    private fun getNewInstanceName(string: String): String {
+    fun getNewInstanceName(string: String): String {
         val allInstances = instances.values.flatten()
         if (allInstances.find { it.name == string } == null) return string
 
@@ -51,6 +51,38 @@ object InstanceManager {
                 FabricVersionData(loaderVersion, intermediaryType, intermediaryVersion)
             } else null
         )
+    }
+
+    fun renameInstance(instance: BasicInstance, name: String) {
+        instance.setInstanceName(name)
+        save()
+        refreshInstanceList()
+    }
+
+    fun moveInstanceGroup(instance: BasicInstance, group: String?) {
+        for (key in instances.keys) {
+            instanceLoop@ for (basicInstance in instances[key]!!) {
+                if (instance == basicInstance) {
+                    instances[key]?.remove(instance)
+                    break@instanceLoop
+                }
+            }
+            if (instances[key].isNullOrEmpty()) instances.remove(key)
+        }
+        instances.getOrPut(group ?: "Default") { arrayListOf() }.add(instance)
+        save()
+        refreshInstanceList()
+    }
+
+    fun getInstanceGroup(instance: BasicInstance): String {
+        for (key in instances.keys) {
+            instanceLoop@ for (basicInstance in instances[key]!!) {
+                if (instance == basicInstance) {
+                    return key
+                }
+            }
+        }
+        throw IllegalArgumentException("instance is not exist in InstanceManager")
     }
 
     fun addInstance(instance: BasicInstance, group: String?) {

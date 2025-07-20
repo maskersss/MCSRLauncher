@@ -96,7 +96,7 @@ data class BasicInstance(
     fun launchInstance(worker: LauncherWorker) {
         if (this.isRunning()) return
 
-        val javaTarget = options.javaPath.ifEmpty { MCSRLauncher.options.javaPath }
+        val javaTarget = options.getSharedValue { it.javaPath }
         val noJavaException = IllegalStateException("Java has not selected. Try change your java path")
         if (javaTarget.isEmpty()) throw noJavaException
         val javaContainer: JavaContainer
@@ -123,12 +123,11 @@ data class BasicInstance(
         val libraryMap = arrayListOf<InstanceLibrary>()
 
         val arguments = arrayListOf(
-            "-Xms${options.minMemory}M",
-            "-Xmx${options.maxMemory}M"
+            "-Xms${options.getSharedValue { it.minMemory }}M",
+            "-Xmx${options.getSharedValue { it.maxMemory }}M"
         )
 
-        arguments.addAll(MCSRLauncher.options.jvmArguments.split(" ").flatMap { it.split("\n") }.filter { it.isNotBlank() })
-        arguments.addAll(options.jvmArguments.split(" ").flatMap { it.split("\n") }.filter { it.isNotBlank() })
+        arguments.addAll(options.getSharedValue { it.jvmArguments }.split(" ").flatMap { it.split("\n") }.filter { it.isNotBlank() })
 
         val minecraftMetaFile = MetaManager.getVersionMeta<MinecraftMetaFile>(MetaUniqueID.MINECRAFT, this.minecraftVersion)
             ?: throw IllegalStateException("${MetaUniqueID.MINECRAFT.value} version meta is not found")
@@ -243,5 +242,13 @@ data class BasicInstance(
 
     fun getProcess(): InstanceProcess? {
         return MCSRLauncher.GAME_PROCESSES.find { it.instance == this }
+    }
+
+    fun setInstanceName(text: String) {
+        this.displayName = text
+        val beforeFile = this.getDirPath().toFile()
+        this.name = InstanceManager.getNewInstanceName(this.displayName)
+        val afterFile = this.getDirPath().toFile()
+        FileUtils.moveDirectory(beforeFile, afterFile)
     }
 }
