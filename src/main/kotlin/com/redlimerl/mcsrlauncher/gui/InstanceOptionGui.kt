@@ -9,8 +9,10 @@ import com.redlimerl.mcsrlauncher.util.SwingUtils
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Window
+import javax.swing.ListSelectionModel
+import javax.swing.table.DefaultTableModel
 
-class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceOptionDialog() {
+class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceOptionDialog(parent) {
 
     init {
         title = I18n.translate("text.settings")
@@ -20,6 +22,7 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         this.cancelButton.addActionListener { this.dispose() }
 
         initInstanceTab()
+        initVersionTab()
         initJavaTab()
 
         I18n.translateGui(this)
@@ -38,6 +41,35 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
             }
             if (instanceGroupField.selectedItem?.toString() != InstanceManager.getInstanceGroup(instance)) {
                 InstanceManager.moveInstanceGroup(instance, instanceGroupField.selectedItem as String)
+            }
+        }
+    }
+
+    private fun initVersionTab() {
+        versionsTable.tableHeader.reorderingAllowed = false
+        versionsTable.selectionModel.selectionMode = ListSelectionModel.SINGLE_SELECTION
+        versionsTable.setDefaultEditor(Object::class.java, null)
+        versionsTable.selectionModel.addListSelectionListener {
+            if (!it.valueIsAdjusting && versionsTable.selectedRow == -1 && versionsTable.rowCount > 0)
+                versionsTable.setRowSelectionInterval(it.lastIndex, it.lastIndex)
+        }
+
+        val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type"), I18n.translate("text.version")))
+        tableModel.addRow(arrayOf("Minecraft", instance.minecraftVersion))
+        tableModel.addRow(arrayOf("LWJGL", instance.lwjglVersion.version))
+        val fabric = instance.fabricVersion
+        if (fabric != null) {
+            tableModel.addRow(arrayOf("Fabric Loader", fabric.loaderVersion))
+            tableModel.addRow(arrayOf("Fabric Intermediary", "${fabric.intermediaryVersion} (${fabric.intermediaryType.intermediaryName})"))
+        }
+        versionsTable.model = tableModel
+
+        if (changeVersionButton.actionListeners.isEmpty()) {
+            changeVersionButton.addActionListener {
+                val changeVersion = ChangeGameVersionGui(this@InstanceOptionGui, instance)
+                if (changeVersion.hasChanged) {
+                    initVersionTab()
+                }
             }
         }
     }

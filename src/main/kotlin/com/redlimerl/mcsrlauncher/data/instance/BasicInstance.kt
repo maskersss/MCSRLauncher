@@ -34,9 +34,9 @@ import kotlin.io.path.absolutePathString
 data class BasicInstance(
     var name: String,
     var displayName: String,
-    val minecraftVersion: String,
-    val lwjglVersion: LWJGLVersionData,
-    val fabricVersion: FabricVersionData?,
+    var minecraftVersion: String,
+    var lwjglVersion: LWJGLVersionData,
+    var fabricVersion: FabricVersionData?,
     val options: InstanceOptions = InstanceOptions()
 ) {
 
@@ -82,12 +82,13 @@ data class BasicInstance(
             ?: throw IllegalStateException("LWJGL version $minecraftVersion is not exist")).install(worker)
 
         // Fabric Loader / Intermediary
-        if (this.fabricVersion != null) {
-            (MetaManager.getVersionMeta<MetaVersionFile>(MetaUniqueID.FABRIC_LOADER, this.fabricVersion.loaderVersion, worker)
+        val fabric = this.fabricVersion
+        if (fabric != null) {
+            (MetaManager.getVersionMeta<MetaVersionFile>(MetaUniqueID.FABRIC_LOADER, fabric.loaderVersion, worker)
                 ?: throw IllegalStateException("Fabric Loader version $minecraftVersion is not exist")).install(worker)
-            worker.properties["intermediary-type"] = this.fabricVersion.intermediaryType.name
-            (MetaManager.getVersionMeta<MetaVersionFile>(MetaUniqueID.FABRIC_INTERMEDIARY, this.fabricVersion.intermediaryVersion, worker)
-                ?: throw IllegalStateException("Fabric Intermediary version ${fabricVersion.intermediaryType} for ${fabricVersion.intermediaryVersion} is not exist")).install(worker)
+            worker.properties["intermediary-type"] = fabric.intermediaryType.name
+            (MetaManager.getVersionMeta<MetaVersionFile>(MetaUniqueID.FABRIC_INTERMEDIARY, fabric.intermediaryVersion, worker)
+                ?: throw IllegalStateException("Fabric Intermediary version ${fabric.intermediaryType} for ${fabric.intermediaryVersion} is not exist")).install(worker)
         }
 
         MCSRLauncher.LOGGER.info("Installed every game files and libraries!")
@@ -160,16 +161,16 @@ data class BasicInstance(
             ?: throw IllegalStateException("LWJGL ${this.lwjglVersion.version} is not found")
         lwjglMetaFile.libraries.filter { it.shouldApply() }.forEach { libraryMap.add(it.toInstanceLibrary()) }
 
-
-        if (this.fabricVersion != null) {
-            val fabricLoaderMetaFile = MetaManager.getVersionMeta<FabricLoaderMetaFile>(MetaUniqueID.FABRIC_LOADER, this.fabricVersion.loaderVersion)
+        val fabric = this.fabricVersion
+        if (fabric != null) {
+            val fabricLoaderMetaFile = MetaManager.getVersionMeta<FabricLoaderMetaFile>(MetaUniqueID.FABRIC_LOADER, fabric.loaderVersion)
                 ?: throw IllegalStateException("${MetaUniqueID.FABRIC_LOADER.value} fabric loader version is not found")
             mainClass = fabricLoaderMetaFile.mainClass
             fabricLoaderMetaFile.libraries.forEach { libraryMap.add(it.toInstanceLibrary()) }
 
-            val intermediaryMetaFile = MetaManager.getVersionMeta<FabricIntermediaryMetaFile>(MetaUniqueID.FABRIC_INTERMEDIARY, this.fabricVersion.intermediaryVersion)
-                ?: throw IllegalStateException("${this.fabricVersion.intermediaryVersion} intermediary version is not found")
-            libraryMap.add(intermediaryMetaFile.getLibrary(this.fabricVersion.intermediaryType).toInstanceLibrary())
+            val intermediaryMetaFile = MetaManager.getVersionMeta<FabricIntermediaryMetaFile>(MetaUniqueID.FABRIC_INTERMEDIARY, fabric.intermediaryVersion)
+                ?: throw IllegalStateException("${fabric.intermediaryVersion} intermediary version is not found")
+            libraryMap.add(intermediaryMetaFile.getLibrary(fabric.intermediaryType).toInstanceLibrary())
         }
 
         InstanceLibrary.fixLibraries(libraryMap)
