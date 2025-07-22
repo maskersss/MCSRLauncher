@@ -15,7 +15,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
 
     init {
         title = I18n.translate("instance.new")
-        minimumSize = Dimension(700, 500)
+        minimumSize = Dimension(700, 550)
         setLocationRelativeTo(parent)
 
         instanceNameField.text = I18n.translate("instance.new")
