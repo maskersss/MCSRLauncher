@@ -1,7 +1,7 @@
 # MCSR Launcher
 This is a Minecraft Launcher written in Kotlin and Java.
 The ultimate goal of this project is to create a Minecraft launcher tailored for Minecraft speedrunning.
-Join our Discord server to stay updated on this project or to contribute!
+Join our [Discord server](https://mcsrlauncher.github.io/discord) to stay updated on this project or to contribute!
 
 ## Why did this project start?
 The currently popular launchers in MCSR, such as PrismLauncher and MultiMC, include many features that speedrunners don’t need, while it’s often difficult to find the ones that are actually necessary.
