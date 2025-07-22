@@ -37,33 +37,33 @@ class MainMenuGui : MainForm() {
 
     private fun initLauncherMenu() {
         initHeaderButton(accountButton)
-        accountButton.text = I18n.translate("account.accounts")
         accountButton.addActionListener {
             AccountListGui(this)
         }
 
         initHeaderButton(createInstanceButton)
-        createInstanceButton.text = I18n.translate("instance.new")
         createInstanceButton.addActionListener {
             CreateInstanceGui(this)
         }
 
         initHeaderButton(settingsButton)
-        settingsButton.text = I18n.translate("text.settings")
         settingsButton.addActionListener {
             LauncherOptionGui(this)
         }
 
         initHeaderButton(discordButton)
-        discordButton.text = I18n.translate("text.join_discord_server")
         discordButton.addActionListener {
             Desktop.getDesktop().browse(URI.create("https://mcsrlauncher.github.io/discord"))
         }
 
         initHeaderButton(patreonButton)
-        patreonButton.text = I18n.translate("text.support_us")
         patreonButton.addActionListener {
             Desktop.getDesktop().browse(URI.create("https://mcsrlauncher.github.io/patreon"))
+        }
+
+        initHeaderButton(githubButton)
+        githubButton.addActionListener {
+            Desktop.getDesktop().browse(URI.create("https://github.com/MCSRLauncher/Launcher"))
         }
     }
 

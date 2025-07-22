@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="1284" height="459"/>
+      <xy x="20" y="20" width="1581" height="489"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -105,6 +105,25 @@
               <opaque value="false"/>
               <requestFocusEnabled value="false"/>
               <text value="text.support_us"/>
+              <verticalAlignment value="0"/>
+              <verticalTextPosition value="0"/>
+            </properties>
+          </component>
+          <component id="84d1c" class="javax.swing.JButton" binding="githubButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
+              <doubleBuffered value="false"/>
+              <enabled value="true"/>
+              <focusPainted value="true"/>
+              <horizontalTextPosition value="11"/>
+              <icon value="icons/github.png"/>
+              <iconTextGap value="6"/>
+              <margin top="5" left="10" bottom="5" right="10"/>
+              <opaque value="false"/>
+              <requestFocusEnabled value="false"/>
+              <text value="text.github"/>
               <verticalAlignment value="0"/>
               <verticalTextPosition value="0"/>
             </properties>
