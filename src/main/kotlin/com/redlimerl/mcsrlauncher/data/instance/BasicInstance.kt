@@ -10,6 +10,7 @@ import com.redlimerl.mcsrlauncher.instance.InstanceLibrary
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
 import com.redlimerl.mcsrlauncher.instance.JavaContainer
 import com.redlimerl.mcsrlauncher.instance.LegacyLaunchFixer
+import com.redlimerl.mcsrlauncher.instance.mod.ModData
 import com.redlimerl.mcsrlauncher.launcher.AccountManager
 import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
@@ -46,6 +47,10 @@ data class BasicInstance(
 
     fun getGamePath(): Path {
         return this.getDirPath().resolve(".minecraft")
+    }
+
+    fun getModsPath(): Path {
+        return this.getGamePath().resolve("mods")
     }
 
     private fun getNativePath(): Path {
@@ -249,7 +254,14 @@ data class BasicInstance(
         this.displayName = text
         val beforeFile = this.getDirPath().toFile()
         this.name = InstanceManager.getNewInstanceName(this.displayName)
+        MCSRLauncher.LOGGER.info("Update instance name to $name from ${beforeFile.name}")
         val afterFile = this.getDirPath().toFile()
         FileUtils.moveDirectory(beforeFile, afterFile)
+    }
+
+    fun getMods(): List<ModData> {
+        val modsDir = this.getModsPath().toFile()
+        if (!modsDir.exists() || !modsDir.isDirectory) return listOf()
+        return modsDir.listFiles()!!.filter { it.isFile }.mapNotNull { ModData.get(it) }
     }
 }

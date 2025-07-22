@@ -25,12 +25,13 @@ object InstanceManager {
     }
 
     fun getNewInstanceName(string: String): String {
+        val replacedName = string.replace(" ", "_").replace(Regex("[^\\p{L}\\p{N}_.]"), "")
         val allInstances = instances.values.flatten()
-        if (allInstances.find { it.name == string } == null) return string
+        if (allInstances.find { it.name == replacedName } == null) return replacedName
 
         var appendNumber = 2
         while (true) {
-            val newName = "${string}${appendNumber}"
+            val newName = "${replacedName}${appendNumber}"
             if (allInstances.find { it.name == newName } == null) return newName
             appendNumber++
         }
@@ -38,7 +39,7 @@ object InstanceManager {
 
     fun createInstance(text: String, vanillaVersion: MetaVersion, lwjglVersion: LWJGLVersionData, fabricVersion: FabricVersionData?): BasicInstance {
         return BasicInstance(
-            getNewInstanceName(text.replace(" ", "_").replace(Regex("[^\\p{L}\\p{N}_.]"), "")),
+            getNewInstanceName(text),
             text,
             vanillaVersion.version,
             lwjglVersion,

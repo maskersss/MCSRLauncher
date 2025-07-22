@@ -12,7 +12,8 @@ data class SpeedrunModMeta(
     val sources: String,
     val versions: List<SpeedrunModVersion>,
     val traits: List<SpeedrunModTrait> = listOf(),
-    val incompatibilities: List<String>
+    val incompatibilities: List<String>,
+    val recommended: Boolean = true
 )
 
 @Serializable
