@@ -29,6 +29,7 @@ public class InstanceOptionDialog extends JDialog {
     public JButton changeVersionButton;
     private JButton instancePasteConfigsButton;
     public JButton instanceOpenDirectoryButton;
+    public JTabbedPane optionTab;
 
     public InstanceOptionDialog(Window window) {
         super(window);
@@ -62,12 +63,12 @@ public class InstanceOptionDialog extends JDialog {
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        final JTabbedPane tabbedPane1 = new JTabbedPane();
-        tabbedPane1.setTabPlacement(2);
-        panel3.add(tabbedPane1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
+        optionTab = new JTabbedPane();
+        optionTab.setTabPlacement(2);
+        panel3.add(optionTab, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new GridLayoutManager(6, 1, new Insets(10, 10, 10, 10), -1, 15));
-        tabbedPane1.addTab("text.instance", panel4);
+        optionTab.addTab("text.instance", panel4);
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
         panel4.add(panel5, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -109,7 +110,7 @@ public class InstanceOptionDialog extends JDialog {
         panel6.add(separator1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel8 = new JPanel();
         panel8.setLayout(new GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
-        tabbedPane1.addTab("text.version", panel8);
+        optionTab.addTab("text.version", panel8);
         changeVersionButton = new JButton();
         changeVersionButton.setText("text.version.change");
         panel8.add(changeVersionButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -122,7 +123,7 @@ public class InstanceOptionDialog extends JDialog {
         scrollPane1.setViewportView(versionsTable);
         final JPanel panel9 = new JPanel();
         panel9.setLayout(new GridLayoutManager(2, 2, new Insets(10, 10, 10, 10), -1, -1));
-        tabbedPane1.addTab("text.mods", panel9);
+        optionTab.addTab("text.mods", panel9);
         final JPanel panel10 = new JPanel();
         panel10.setLayout(new GridLayoutManager(6, 1, new Insets(0, 0, 0, 0), -1, -1));
         panel9.add(panel10, new GridConstraints(0, 1, 2, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -151,7 +152,7 @@ public class InstanceOptionDialog extends JDialog {
         manageSpeedrunModsButton.setText("text.manage_speedrun_mods");
         panel9.add(manageSpeedrunModsButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         javaScrollPane = new JScrollPane();
-        tabbedPane1.addTab("text.java", javaScrollPane);
+        optionTab.addTab("text.java", javaScrollPane);
         javaScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         final JPanel panel11 = new JPanel();
         panel11.setLayout(new GridLayoutManager(3, 1, new Insets(10, 10, 10, 10), -1, -1));

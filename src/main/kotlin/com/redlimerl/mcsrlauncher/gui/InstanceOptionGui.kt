@@ -14,6 +14,11 @@ import java.awt.BorderLayout
 import java.awt.Desktop
 import java.awt.Dimension
 import java.awt.Window
+import java.awt.datatransfer.DataFlavor
+import java.awt.dnd.DnDConstants
+import java.awt.dnd.DropTarget
+import java.awt.dnd.DropTargetDragEvent
+import java.awt.dnd.DropTargetDropEvent
 import java.io.File
 import java.text.SimpleDateFormat
 import javax.swing.JFileChooser
@@ -186,6 +191,34 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
                     FileUtils.copyFile(file, instance.getModsPath().resolve(file.name).toFile())
                 }
                 updateMods()
+            }
+        }
+
+        this.dropTarget = object : DropTarget() {
+            override fun dragOver(dtde: DropTargetDragEvent) {
+                if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor) && optionTab.selectedIndex == 2) {
+                    dtde.acceptDrag(DnDConstants.ACTION_COPY)
+                } else {
+                    dtde.rejectDrag()
+                }
+            }
+            override fun drop(dtde: DropTargetDropEvent) {
+                if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor) && optionTab.selectedIndex == 2) {
+                    dtde.acceptDrop(DnDConstants.ACTION_COPY)
+                    val droppedFiles = dtde.transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
+                    for (file in droppedFiles) {
+                        if (file is File) {
+                            if (file.parentFile.absolutePath == instance.getModsPath().absolutePathString() || instance.getModsPath().resolve(file.name).exists()) continue
+                            if (ModData.get(file) == null) continue
+                            FileUtils.copyFile(file, instance.getModsPath().resolve(file.name).toFile())
+                        }
+                        updateMods()
+                    }
+                    dtde.dropComplete(true)
+                } else {
+                    dtde.rejectDrop()
+                    dtde.dropComplete(false)
+                }
             }
         }
 
