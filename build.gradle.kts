@@ -29,7 +29,7 @@ dependencies {
 
     implementation("com.github.zafarkhaja:java-semver:0.10.2")
 
-    implementation("com.formdev:flatlaf:3.6")
+    implementation("com.formdev:flatlaf:3.6.1")
     implementation("com.formdev:flatlaf-fonts-roboto:2.137")
     implementation("com.miglayout:miglayout-core:5.3")
     implementation("com.miglayout:miglayout-swing:5.3")
