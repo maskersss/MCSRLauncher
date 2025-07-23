@@ -96,7 +96,8 @@ object SwingUtils {
     fun autoResizeHtmlText(
         rawText: String,
         maxWidth: Int,
-        baseFontSize: Int = 16
+        baseFontSize: Int = 16,
+        minimumFontSize: Int = 6
     ): String {
         var fontSize = baseFontSize
         var html: String
@@ -107,7 +108,7 @@ object SwingUtils {
             width = measureHtmlTextWidth("<html>$html</html>")
             if (width <= maxWidth) break
             fontSize--
-        } while (fontSize > 4)
+        } while (fontSize > minimumFontSize)
 
         return html
     }
