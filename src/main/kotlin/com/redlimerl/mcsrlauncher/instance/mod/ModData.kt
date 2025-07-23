@@ -7,10 +7,11 @@ import java.io.InputStreamReader
 import java.util.jar.JarFile
 
 interface ModData {
+
     val file: File
     val name: String
     val version: String
-    var enabled: Boolean
+    var isEnabled: Boolean
         get() {
             return file.name.endsWith(".jar")
         }
@@ -18,9 +19,13 @@ interface ModData {
             file.renameTo(file.parentFile.resolve(file.nameWithoutExtension + ".${if (value) "jar" else "disabledjar"}"))
         }
 
+    fun delete() {
+        file.delete()
+    }
+
     companion object {
         fun get(file: File): ModData? {
-            if (!file.endsWith(".jar") && !file.endsWith(".diabledjar")) return null
+            if ((file.extension == "jar" || file.extension == "disabledjar").not()) return null
             try {
                 val jarFile = JarFile(file)
 
@@ -36,6 +41,7 @@ interface ModData {
                     val reader = BufferedReader(InputStreamReader(inputStream))
                     val modJson = MCSRLauncher.JSON.decodeFromString<FabricModJson>(reader.readText())
                     reader.close()
+                    jarFile.close()
 
                     return FabricModData(file, modJson.name, modJson.version)
                 }
@@ -58,7 +64,7 @@ class OptiFineData(override val file: File) : ModData {
     override val name: String
         get() = "OptiFine"
     override val version: String
-        get() = file.name.replace(OPTIFINE_PREFIX_REGEX, "").replace(".diabledjar", "").replace(".jar", "")
+        get() = file.name.replace(OPTIFINE_PREFIX_REGEX, "").replace(".disabledjar", "").replace(".jar", "")
 }
 
 class FabricModData(override val file: File, override val name: String, override val version: String) : ModData

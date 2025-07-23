@@ -8,11 +8,11 @@ import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.JavaUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
+import com.redlimerl.mcsrlauncher.util.SwingUtils
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
-import java.awt.event.ComponentListener
 import javax.swing.*
 import javax.swing.table.DefaultTableModel
 
@@ -81,25 +81,17 @@ class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerD
 
         javaListTable.autoResizeMode = JTable.AUTO_RESIZE_OFF
 
-        val columnModel = javaListTable.columnModel
-        columnModel.getColumn(0).preferredWidth = 70
-        columnModel.getColumn(1).preferredWidth = 130
-
-        fun resizeTableColumns() {
-            val parent = javaListTable.parent ?: return
-            val viewportWidth = parent.width
-            val secondColWidth = (viewportWidth - 200).coerceAtLeast(100)
-            columnModel.getColumn(2).preferredWidth = secondColWidth
-            javaListTable.revalidate()
-            javaListTable.repaint()
+        SwingUtilities.invokeLater {
+            SwingUtils.autoResizeColumnWidths(javaListTable, mapOf(1 to 130))
         }
 
-        if (javaListTable.parent != null && javaListTable.parent !is ComponentListener) {
-            javaListTable.parent.addComponentListener(object : ComponentAdapter() {
-                override fun componentResized(e: ComponentEvent?) = resizeTableColumns()
-            })
-        }
-        javaTabPane.addChangeListener { resizeTableColumns() }
+        this.addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent?) {
+                SwingUtilities.invokeLater {
+                    SwingUtils.autoResizeColumnWidths(javaListTable, mapOf(1 to 130))
+                }
+            }
+        })
     }
 
     private fun initDownloadJavaTab() {
