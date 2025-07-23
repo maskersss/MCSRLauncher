@@ -1,5 +1,6 @@
 package com.redlimerl.mcsrlauncher.gui.component
 
+import com.formdev.flatlaf.FlatClientProperties
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.data.instance.FabricVersionData
 import com.redlimerl.mcsrlauncher.data.instance.LWJGLVersionData
@@ -167,6 +168,7 @@ class GameVersionsPanel(val parent: JDialog, instance: BasicInstance? = null) : 
                 fabricVersionTable.setRowSelectionInterval(it.lastIndex, it.lastIndex)
         }
 
+        intermediaryHelpButton.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_HELP)
         intermediaryHelpButton.addActionListener {
             JOptionPane.showMessageDialog(parent, I18n.translate("message.help.intermediary"))
         }
