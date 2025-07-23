@@ -84,4 +84,32 @@ object SwingUtils {
         return tList
     }
 
+    private fun measureHtmlTextWidth(html: String): Int {
+        val label = JLabel(html)
+        val fakeParent = JPanel() // Layout 연산을 강제하기 위한 가짜 컨테이너
+        fakeParent.add(label)
+        label.doLayout()
+        label.validate()
+        return label.preferredSize.width
+    }
+
+    fun autoResizeHtmlText(
+        rawText: String,
+        maxWidth: Int,
+        baseFontSize: Int = 16
+    ): String {
+        var fontSize = baseFontSize
+        var html: String
+        var width: Int
+
+        do {
+            html = "<span style='font-size:${fontSize}px;'>$rawText</span>"
+            width = measureHtmlTextWidth("<html>$html</html>")
+            if (width <= maxWidth) break
+            fontSize--
+        } while (fontSize > 4)
+
+        return html
+    }
+
 }

@@ -127,7 +127,7 @@ class MainMenuGui : MainForm() {
             isRequestFocusEnabled = false
             text = """<html>
                 <div style='text-align:center;'>
-                    <div style='font-size: 1.1em; font-weight: bold;'>${instance.displayName}</div>
+                    <div style='font-weight: bold;'>${SwingUtils.autoResizeHtmlText(instance.displayName, 90, 16)}</div>
                     <div>v${instance.minecraftVersion} (${instance.getInstanceType()})</div>
                 </div> 
             </html>"""
