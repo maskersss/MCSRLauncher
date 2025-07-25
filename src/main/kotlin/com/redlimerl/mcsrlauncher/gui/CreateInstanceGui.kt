@@ -7,6 +7,7 @@ import com.redlimerl.mcsrlauncher.util.I18n
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.JFrame
+import javax.swing.JOptionPane
 
 
 class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
@@ -38,7 +39,25 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
         val instance = InstanceManager.createInstance(instanceNameField.text, gameVersionsPanel.getMinecraftVersion(), gameVersionsPanel.getLWJGLVersion(), gameVersionsPanel.getFabricVersion())
 
         InstanceManager.addInstance(instance, instanceGroupBox.selectedItem?.toString()?.trimEnd())
+
         this.dispose()
+        val launch = {
+            val launchConfirm = JOptionPane.showConfirmDialog(this, I18n.translate("message.download_success") + "\n" + I18n.translate("message.instance_launch_ask"), I18n.translate("instance.launch"), JOptionPane.YES_NO_OPTION)
+            if (launchConfirm == JOptionPane.YES_OPTION) {
+                instance.launchWithDialog()
+            }
+        }
+
+        if (instance.fabricVersion != null) {
+            val modInit = JOptionPane.showConfirmDialog(this, I18n.translate("message.speedrun_mods_setup_ask"), I18n.translate("text.manage_speedrun_mods"), JOptionPane.YES_NO_OPTION)
+            if (modInit == JOptionPane.YES_OPTION) {
+                ManageSpeedrunModsGui(this, instance, true) {
+                    launch()
+                }
+                return
+            }
+        }
+        launch()
     }
 
 }

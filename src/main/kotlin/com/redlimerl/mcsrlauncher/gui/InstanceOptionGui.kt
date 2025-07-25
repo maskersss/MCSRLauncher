@@ -8,6 +8,7 @@ import com.redlimerl.mcsrlauncher.instance.mod.ModData
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
 import com.redlimerl.mcsrlauncher.util.AssetUtils
 import com.redlimerl.mcsrlauncher.util.I18n
+import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SwingUtils
 import org.apache.commons.io.FileUtils
 import java.awt.BorderLayout
@@ -21,9 +22,7 @@ import java.awt.dnd.DropTargetDragEvent
 import java.awt.dnd.DropTargetDropEvent
 import java.io.File
 import java.text.SimpleDateFormat
-import javax.swing.JFileChooser
-import javax.swing.ListSelectionModel
-import javax.swing.SwingUtilities
+import javax.swing.*
 import javax.swing.filechooser.FileFilter
 import javax.swing.table.AbstractTableModel
 import javax.swing.table.DefaultTableModel
@@ -40,6 +39,7 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         setLocationRelativeTo(parent)
 
         this.cancelButton.addActionListener { this.dispose() }
+        this.launchButton.addActionListener { instance.launchWithDialog() }
 
         initInstanceTab()
         initVersionTab()
@@ -120,7 +120,7 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
                 val mod = mods[rowIndex]
                 return when(columnIndex) {
                     0 -> mod.name
-                    1 -> I18n.translate(if (mod.isEnabled) "text.enabled" else "text.disabled")
+                    1 -> if (mod.isEnabled) "✅" else "❌"
                     2 -> mod.version
                     3 -> SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.SHORT, MCSRLauncher.options.language.getLocale()).format(mod.file.lastModified())
                     4 -> AssetUtils.formatFileSize(mod.file.length())
@@ -143,7 +143,23 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
 
     private fun initModsTab() {
         manageSpeedrunModsButton.addActionListener {
-            ManageSpeedrunModsGui(this)
+            ManageSpeedrunModsGui(this, instance, false) {
+                updateMods()
+            }
+        }
+
+        updateSpeedrunModsButton.addActionListener {
+            object : LauncherWorker(this@InstanceOptionGui, I18n.translate("text.manage_speedrun_mods"), I18n.translate("message.checking_updates")) {
+                override fun work(dialog: JDialog) {
+                    val updates = instance.updateSpeedrunMods(this)
+                    if (updates.isNotEmpty()) {
+                        JOptionPane.showMessageDialog(this@InstanceOptionGui,
+                            I18n.translate("message.download_success").plus("\n")
+                                .plus(updates.joinToString("\n") { "- ${it.name} v${it.version}" })
+                        )
+                    }
+                }
+            }.showDialog().start()
         }
 
         updateMods()
@@ -162,6 +178,10 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         }
 
         updateModSelection()
+
+        openModsDirButton.addActionListener {
+            Desktop.getDesktop().open(instance.getModsPath().toFile().apply { mkdirs() })
+        }
 
         addModFileButton.addActionListener {
             val fileChooser = JFileChooser(instance.getModsPath().toFile()).apply {
@@ -223,24 +243,18 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         }
 
         enableModButton.addActionListener {
-            for (selectedRow in modsTable.selectedRows) {
-                mods[selectedRow].isEnabled = true
-                updateMods()
-            }
+            modsTable.selectedRows.map { mods[it] }.forEach { it.isEnabled = true }
+            updateMods()
         }
 
         disableModButton.addActionListener {
-            for (selectedRow in modsTable.selectedRows) {
-                mods[selectedRow].isEnabled = false
-                updateMods()
-            }
+            modsTable.selectedRows.map { mods[it] }.forEach { it.isEnabled = false }
+            updateMods()
         }
 
         deleteModButton.addActionListener {
-            for (selectedRow in modsTable.selectedRows) {
-                mods[selectedRow].delete()
-                updateMods()
-            }
+            modsTable.selectedRows.map { mods[it] }.forEach { it.delete() }
+            updateMods()
         }
     }
 

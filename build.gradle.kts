@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.1.0-RC2"
-    kotlin("plugin.serialization") version "2.1.0-RC2"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.serialization") version "2.1.20"
 }
 
 group = "com.redlimerl.mcsrlauncher"
@@ -27,7 +27,7 @@ dependencies {
 
     implementation("com.google.guava:guava:33.4.8-jre")
 
-    implementation("com.github.zafarkhaja:java-semver:0.10.2")
+    implementation("io.github.z4kn4fein:semver:1.4.2")
 
     implementation("com.formdev:flatlaf:3.6.1")
     implementation("com.formdev:flatlaf-fonts-roboto:2.137")

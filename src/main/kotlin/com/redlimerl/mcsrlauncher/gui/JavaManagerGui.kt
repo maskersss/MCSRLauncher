@@ -1,6 +1,5 @@
 package com.redlimerl.mcsrlauncher.gui
 
-import com.github.zafarkhaja.semver.Version
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.file.JavaMetaFile
 import com.redlimerl.mcsrlauncher.instance.JavaContainer
@@ -9,6 +8,7 @@ import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.JavaUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SwingUtils
+import io.github.z4kn4fein.semver.Version
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.event.ComponentAdapter

@@ -5,13 +5,21 @@ import com.redlimerl.mcsrlauncher.data.meta.LauncherTrait
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.file.MetaVersionFile
 import com.redlimerl.mcsrlauncher.data.meta.file.MinecraftMetaFile
+import com.redlimerl.mcsrlauncher.data.meta.file.SpeedrunModsMetaFile
+import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModMeta
+import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModTrait
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
 import com.redlimerl.mcsrlauncher.instance.LegacyLaunchFixer
+import com.redlimerl.mcsrlauncher.instance.mod.ModCategory
 import com.redlimerl.mcsrlauncher.instance.mod.ModData
+import com.redlimerl.mcsrlauncher.instance.mod.ModDownloadMethod
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
 import com.redlimerl.mcsrlauncher.launcher.MetaManager
+import com.redlimerl.mcsrlauncher.network.FileDownloader
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
+import io.github.z4kn4fein.semver.toVersion
+import io.github.z4kn4fein.semver.toVersionOrNull
 import kotlinx.serialization.Serializable
 import org.apache.commons.io.FileUtils
 import java.net.URL
@@ -138,5 +146,76 @@ data class BasicInstance(
         val modsDir = this.getModsPath().toFile()
         if (!modsDir.exists() || !modsDir.isDirectory) return listOf()
         return modsDir.listFiles()!!.filter { it.isFile }.mapNotNull { ModData.get(it) }
+    }
+
+    fun installRecommendedSpeedrunMods(worker: LauncherWorker, modCategory: ModCategory, downloadMethod: ModDownloadMethod, accessibility: Boolean): List<ModData> {
+        if (downloadMethod == ModDownloadMethod.UPDATE_EXISTING_MODS) return updateSpeedrunMods(worker)
+
+        val list = arrayListOf<ModData>()
+        this.getModsPath().toFile().mkdirs()
+        this.fabricVersion ?: throw IllegalStateException("This instance does not have Fabric Loader")
+
+        val modMeta = MetaManager.getVersionMeta<SpeedrunModsMetaFile>(MetaUniqueID.SPEEDRUN_MODS, SpeedrunModMeta.VERIFIED_MODS, worker) ?: throw IllegalStateException("Speedrun mods meta is not found")
+
+        val installedMods = this.getMods()
+
+        if (downloadMethod == ModDownloadMethod.DELETE_ALL_DOWNLOAD) {
+            installedMods.forEach { it.delete() }
+        }
+
+        val availableMods = modMeta.mods.filter {
+            it.recommended &&
+                    it.isAvailable(this) &&
+                    it.traits.all { trait ->
+                        when (trait) {
+                            SpeedrunModTrait.RSG -> modCategory == ModCategory.RANDOM_SEED
+                            SpeedrunModTrait.SSG -> modCategory == ModCategory.SET_SEED
+                            SpeedrunModTrait.ACCESSIBILITY -> accessibility
+                            else -> true
+                        }
+                    }
+        }
+
+        for (mod in availableMods) {
+            val version = mod.versions.find { it.isAvailableVersion(this) }!!
+
+            worker.setState("Downloading ${mod.name} v${version.version}...")
+            val file = this.getModsPath().resolve(version.url.split("/").last()).toFile()
+            FileDownloader.download(version.url, file)
+            installedMods.find { it.id == mod.modId }?.delete()
+            list.add(ModData.get(file)!!)
+        }
+        return list
+    }
+
+    fun updateSpeedrunMods(worker: LauncherWorker): List<ModData> {
+        val list = arrayListOf<ModData>()
+        this.getModsPath().toFile().mkdirs()
+        this.fabricVersion ?: throw IllegalStateException("This instance does not have Fabric Loader")
+
+        val modMeta = MetaManager.getVersionMeta<SpeedrunModsMetaFile>(MetaUniqueID.SPEEDRUN_MODS, SpeedrunModMeta.VERIFIED_MODS, worker) ?: throw IllegalStateException("Speedrun mods meta is not found")
+
+        val installedMods = this.getMods()
+        for (mod in modMeta.mods.filter { it.isAvailable(this) }) {
+            val version = mod.versions.find { it.isAvailableVersion(this) }!!
+
+            val shouldDownload = installedMods.any {
+                it.id == mod.modId &&
+                        if (it.version.toVersionOrNull(false) == null) {
+                            it.version != version.version
+                        } else {
+                            it.version.toVersion(false) < version.version.toVersion(false)
+                        }
+            }
+
+            if (shouldDownload) {
+                worker.setState("Downloading ${mod.name} v${version.version}...")
+                val file = this.getModsPath().resolve(version.url.split("/").last()).toFile()
+                FileDownloader.download(version.url, file)
+                installedMods.find { it.id == mod.modId }?.delete()
+                list.add(ModData.get(file)!!)
+            }
+        }
+        return list
     }
 }

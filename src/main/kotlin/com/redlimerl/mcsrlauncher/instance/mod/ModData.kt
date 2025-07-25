@@ -9,6 +9,7 @@ import java.util.jar.JarFile
 interface ModData {
 
     val file: File
+    val id: String
     val name: String
     val version: String
     var isEnabled: Boolean
@@ -43,7 +44,7 @@ interface ModData {
                     reader.close()
                     jarFile.close()
 
-                    return FabricModData(file, modJson.name, modJson.version)
+                    return FabricModData(file, modJson.id, modJson.name, modJson.version)
                 }
 
                 jarFile.close()
@@ -61,10 +62,12 @@ class OptiFineData(override val file: File) : ModData {
         val OPTIFINE_PREFIX_REGEX = Regex("(?i)^OptiFine_")
     }
 
+    override val id: String
+        get() = "optifine"
     override val name: String
         get() = "OptiFine"
     override val version: String
         get() = file.name.replace(OPTIFINE_PREFIX_REGEX, "").replace(".disabledjar", "").replace(".jar", "")
 }
 
-class FabricModData(override val file: File, override val name: String, override val version: String) : ModData
+class FabricModData(override val file: File, override val id: String, override val name: String, override val version: String) : ModData

@@ -1,6 +1,6 @@
 package com.redlimerl.mcsrlauncher.instance
 
-import com.github.zafarkhaja.semver.Version
+import io.github.z4kn4fein.semver.toVersionOrNull
 import java.nio.file.Path
 
 data class InstanceLibrary(
@@ -22,7 +22,7 @@ data class InstanceLibrary(
                     return@forEach
                 }
 
-                val versioned = group.mapNotNull { Version.tryParse(it.version, false).map { v -> it to v }.orElse(null) }
+                val versioned = group.mapNotNull { it.version.toVersionOrNull()?.let { v -> it to v } }
 
                 if (versioned.isEmpty()) {
                     result.addAll(group)

@@ -1,5 +1,7 @@
 package com.redlimerl.mcsrlauncher.data.meta.mod
 
+import com.redlimerl.mcsrlauncher.data.device.RuntimeOSType
+import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.data.meta.IntermediaryType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -12,9 +14,23 @@ data class SpeedrunModMeta(
     val sources: String,
     val versions: List<SpeedrunModVersion>,
     val traits: List<SpeedrunModTrait> = listOf(),
-    val incompatibilities: List<String>,
-    val recommended: Boolean = true
-)
+    val incompatibilities: List<String> = listOf(),
+    val recommended: Boolean = true,
+    val obsolete: Boolean = false
+) {
+    companion object {
+        const val VERIFIED_MODS = "verified"
+    }
+
+    fun isAvailable(instance: BasicInstance, checkObsolete: Boolean = true): Boolean {
+        return !this.obsolete && this.traits.all { trait ->
+            when (trait) {
+                SpeedrunModTrait.MAC -> RuntimeOSType.MAC_OS.isOn()
+                else -> true
+            }
+        } && this.versions.any { it.isAvailableVersion(instance, checkObsolete) }
+    }
+}
 
 @Serializable
 data class SpeedrunModVersion(
@@ -22,5 +38,11 @@ data class SpeedrunModVersion(
     val version: String,
     val url: String,
     val hash: String,
-    val intermediary: List<IntermediaryType>
-)
+    val intermediary: List<IntermediaryType>,
+    val obsolete: Boolean = false
+) {
+    fun isAvailableVersion(instance: BasicInstance, checkObsolete: Boolean = true): Boolean {
+        val fabric = instance.fabricVersion ?: return false
+        return this.intermediary.contains(fabric.intermediaryType) && this.gameVersions.contains(instance.minecraftVersion) && (!checkObsolete || !obsolete)
+    }
+}
