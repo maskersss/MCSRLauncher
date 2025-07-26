@@ -56,7 +56,7 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
                     val latestVersion = UpdaterUtils.checkLatestVersion(this)
                     dialog.dispose()
                     if (latestVersion != null) {
-                        val updateConfirm = JOptionPane.showConfirmDialog(this@LauncherOptionGui, I18n.translate("message.new_update_found"), I18n.translate("text.check_update"), JOptionPane.YES_NO_OPTION)
+                        val updateConfirm = JOptionPane.showConfirmDialog(this@LauncherOptionGui, I18n.translate("message.new_update_found").plus("\nCurrent: ${MCSRLauncher.APP_VERSION}\nNew: $latestVersion"), I18n.translate("text.check_update"), JOptionPane.YES_NO_OPTION)
                         if (updateConfirm == JOptionPane.YES_OPTION) {
                             UpdaterUtils.launchUpdater()
                         }
