@@ -7,6 +7,8 @@ import java.io.InputStream
 import java.nio.file.Path
 import java.security.MessageDigest
 import java.util.zip.ZipFile
+import kotlin.math.ln
+import kotlin.math.pow
 
 object AssetUtils {
 
@@ -60,9 +62,9 @@ object AssetUtils {
 
     fun formatFileSize(bytes: Long): String {
         if (bytes < 1024) return "$bytes B"
-        val exp = (Math.log(bytes.toDouble()) / Math.log(1024.0)).toInt()
+        val exp = (ln(bytes.toDouble()) / ln(1024.0)).toInt()
         val unit = "KMGTPE"[exp - 1]
-        val size = bytes / Math.pow(1024.0, exp.toDouble())
+        val size = bytes / 1024.0.pow(exp.toDouble())
         return String.format("%.1f %sB", size, unit)
     }
 

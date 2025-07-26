@@ -2,7 +2,6 @@ package com.redlimerl.mcsrlauncher.util
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import io.github.z4kn4fein.semver.Version
-import io.github.z4kn4fein.semver.toVersion
 import io.github.z4kn4fein.semver.toVersionOrNull
 import kotlinx.serialization.json.JsonObject
 import org.apache.hc.client5.http.classic.methods.HttpGet
@@ -53,7 +52,7 @@ object UpdaterUtils {
         if (!request.hasSuccess()) return null
 
         val json = request.get<JsonObject>()
-        val latest = json["tag_name"]!!.toString().toVersion(false)
+        val latest = Version.parse(json["tag_name"]!!.toString(), false)
         if (current < latest) return latest
         return null
     }
