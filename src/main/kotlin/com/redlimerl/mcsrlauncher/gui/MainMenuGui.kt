@@ -1,7 +1,7 @@
 package com.redlimerl.mcsrlauncher.gui
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
-import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
+import com.redlimerl.mcsrlauncher.gui.component.InstanceLaunchButton
 import com.redlimerl.mcsrlauncher.gui.layout.WrapLayout
 import com.redlimerl.mcsrlauncher.gui.listener.MouseFillListener
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
@@ -11,8 +11,6 @@ import net.miginfocom.swing.MigLayout
 import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import java.net.URI
 import javax.swing.*
 
@@ -108,83 +106,9 @@ class MainMenuGui : MainForm() {
 
         val groupPanel = JPanel(WrapLayout(FlowLayout.LEFT, 10, 10))
         for (basicInstance in InstanceManager.instances[group]!!) {
-            this.createInstanceButton(groupPanel, basicInstance)
+            groupPanel.add(InstanceLaunchButton(this, basicInstance), "gap 10")
         }
         panel.add(groupPanel)
-    }
-
-    private fun createInstanceButton(panel: JPanel, instance: BasicInstance) {
-        val instanceButton = JButton().apply {
-            preferredSize = Dimension(120, 120)
-            isContentAreaFilled = true
-            horizontalAlignment = SwingConstants.CENTER
-            horizontalTextPosition = SwingConstants.CENTER
-            verticalTextPosition = SwingConstants.BOTTOM
-            icon = ImageIcon(ImageIcon(instance.getIconResource()).image.getScaledInstance(60, 60, Image.SCALE_SMOOTH))
-            iconTextGap = 6
-            margin = Insets(5, 10, 5, 10)
-            isOpaque = false
-            isRequestFocusEnabled = false
-            text = """<html>
-                <div style='text-align:center;'>
-                    <div style='font-weight: bold;'>${SwingUtils.autoResizeHtmlText(instance.displayName, 90, 16)}</div>
-                    <div>v${instance.minecraftVersion} (${instance.getInstanceType()})</div>
-                </div> 
-            </html>"""
-            if (instance.isRunning()) {
-                putClientProperty("JComponent.outline", "warning")
-            }
-        }
-
-        val popupMenu = this.createInstanceMenu(instance)
-        instanceButton.addMouseListener(object : MouseAdapter() {
-            override fun mouseReleased(e: MouseEvent) {
-                if (e.isPopupTrigger) popupMenu.show(e.component, e.x, e.y)
-            }
-            override fun mouseClicked(e: MouseEvent) {
-                if (e.clickCount == 2 && SwingUtilities.isLeftMouseButton(e)) {
-                    instance.launchWithDialog()
-                }
-            }
-        })
-        panel.add(instanceButton, "gap 10")
-    }
-
-    private fun createInstanceMenu(instance: BasicInstance): JPopupMenu {
-        val popupMenu = JPopupMenu()
-
-        if (!instance.isRunning()) {
-            val launchItem = JMenuItem(I18n.translate("instance.launch")).apply {
-                addActionListener { instance.launchWithDialog() }
-            }
-            popupMenu.add(launchItem)
-        } else {
-            popupMenu.add(JMenuItem(I18n.translate("instance.kill_process")).apply {
-                addActionListener { instance.getProcess()?.exit() }
-            })
-        }
-
-        popupMenu.add(JMenuItem(I18n.translate("instance.edit")).apply {
-            addActionListener {
-                InstanceOptionGui(this@MainMenuGui, instance)
-            }
-        })
-
-        popupMenu.add(JMenuItem(I18n.translate("text.open.dot_minecraft")).apply {
-            addActionListener { Desktop.getDesktop().open(instance.getGamePath().toFile().apply { mkdirs() }) }
-        })
-
-        popupMenu.add(JMenuItem(I18n.translate("instance.delete")).apply {
-            addActionListener {
-                val confirm = JOptionPane.showConfirmDialog(this@MainMenuGui, I18n.translate("message.delete_instance_confirm"), I18n.translate("instance.delete"), JOptionPane.OK_CANCEL_OPTION)
-                if (confirm == JOptionPane.OK_OPTION) {
-                    InstanceManager.deleteInstance(instance)
-                }
-            }
-            isEnabled = !instance.isRunning()
-        })
-
-        return popupMenu
     }
 
 }
