@@ -53,6 +53,17 @@ tasks.named<ProcessResources>("processResources") {
     }
 }
 
+tasks.register<Copy>("buildUpdater") {
+    dependsOn(":LauncherUpdater:jar")
+
+    from(project(":LauncherUpdater").layout.buildDirectory.file("libs/LauncherUpdater.jar"))
+    into(layout.buildDirectory.dir("resources/main"))
+}
+
+tasks.named("processResources") {
+    dependsOn("buildUpdater")
+}
+
 tasks.withType<Jar> {
     archiveVersion = ""
     manifest {

@@ -1,0 +1,18 @@
+[23:14:01] [INFO] MCSRLauncher[main]: Starting launcher
+[23:14:01] [WARN] MCSRLauncher[main]: Loading theme
+[23:14:02] [WARN] MCSRLauncher[DefaultDispatcher-worker-2]: Base Path: D:\Projects\Java\MCSRLauncher\launcher
+[23:14:02] [INFO] MCSRLauncher[DefaultDispatcher-worker-2]: Loading Launcher Options...
+[23:14:02] [INFO] MCSRLauncher[DefaultDispatcher-worker-2]: Loading Updater...
+[23:14:02] [ERROR] MCSRLauncher[DefaultDispatcher-worker-2]: Launcher Updater is not found
+java.lang.IllegalArgumentException: Launcher Updater is not found
+	at com.redlimerl.mcsrlauncher.util.UpdaterUtils.setup(UpdaterUtils.kt:14) ~[classes/:?]
+	at com.redlimerl.mcsrlauncher.MCSRLauncher$main$1.work(MCSRLauncher.kt:75) ~[classes/:?]
+	at com.redlimerl.mcsrlauncher.util.LauncherWorker$start$2.invokeSuspend(LauncherWorker.kt:93) [classes/:?]
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33) [kotlin-stdlib-2.1.20.jar:2.1.20-release-217]
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100) [kotlinx-coroutines-core-jvm-1.10.2.jar:?]
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586) [kotlinx-coroutines-core-jvm-1.10.2.jar:?]
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:829) [kotlinx-coroutines-core-jvm-1.10.2.jar:?]
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717) [kotlinx-coroutines-core-jvm-1.10.2.jar:?]
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704) [kotlinx-coroutines-core-jvm-1.10.2.jar:?]
+[23:14:02] [INFO] MCSRLauncher[DefaultDispatcher-worker-2]: Loading languages - en_US
+[23:14:02] [INFO] MCSRLauncher[DefaultDispatcher-worker-2]: text.settings: Settings

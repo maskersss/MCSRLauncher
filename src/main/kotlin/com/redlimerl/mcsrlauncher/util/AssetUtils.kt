@@ -3,7 +3,9 @@ package com.redlimerl.mcsrlauncher.util
 import com.google.common.hash.Hashing
 import com.google.common.io.Files
 import java.io.File
+import java.io.InputStream
 import java.nio.file.Path
+import java.security.MessageDigest
 import java.util.zip.ZipFile
 
 object AssetUtils {
@@ -11,6 +13,18 @@ object AssetUtils {
     fun compareHash(file: File, sha1: String): Boolean {
         @Suppress("DEPRECATION")
         return Files.asByteSource(file).hash(Hashing.sha1()).toString() == sha1
+    }
+
+    fun calculateSha256(inputStream: InputStream): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        inputStream.use { stream ->
+            val buffer = ByteArray(8192)
+            var bytesRead: Int
+            while (stream.read(buffer).also { bytesRead = it } != -1) {
+                digest.update(buffer, 0, bytesRead)
+            }
+        }
+        return digest.digest().joinToString("") { "%02x".format(it) }
     }
 
     fun libraryNameToPath(path: Path, name: String): Path {

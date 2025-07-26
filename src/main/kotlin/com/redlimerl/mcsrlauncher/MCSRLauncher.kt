@@ -14,7 +14,9 @@ import com.redlimerl.mcsrlauncher.network.JsonHttpClientResponseHandler
 import com.redlimerl.mcsrlauncher.network.JsonResponseResult
 import com.redlimerl.mcsrlauncher.network.JsonSha256HttpClientResponseHandler
 import com.redlimerl.mcsrlauncher.network.JsonSha256ResponseResult
+import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
+import com.redlimerl.mcsrlauncher.util.UpdaterUtils
 import kotlinx.serialization.json.Json
 import org.apache.commons.io.FileUtils
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
@@ -26,6 +28,7 @@ import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.JDialog
+import javax.swing.JOptionPane
 import kotlin.io.path.absolute
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
@@ -70,6 +73,9 @@ object MCSRLauncher {
                     LauncherOptions()
                 }
 
+                this.setState("Loading Updater...")
+                UpdaterUtils.setup()
+
                 this.setState("Loading Accounts...")
                 AccountManager.load()
 
@@ -80,9 +86,16 @@ object MCSRLauncher {
                 GameAssetManager.init()
                 MetaManager.load(this)
 
-                this.setState("UI Initializing...")
-                dialog.dispose()
+                this.setState("Checking Launcher Update...")
+                val latestVersion = UpdaterUtils.checkLatestVersion(this)
+                if (latestVersion != null) {
+                    val updateConfirm = JOptionPane.showConfirmDialog(null, I18n.translate("message.new_update_found"), I18n.translate("text.check_update"), JOptionPane.YES_NO_OPTION)
+                    if (updateConfirm == JOptionPane.YES_OPTION) {
+                        UpdaterUtils.launchUpdater()
+                    }
+                }
 
+                dialog.dispose()
                 LOGGER.warn("Setup gui")
                 MAIN_FRAME = MainMenuGui()
             }
