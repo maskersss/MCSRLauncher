@@ -1,8 +1,6 @@
 package com.redlimerl.mcsrlauncher.util
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
-import io.github.z4kn4fein.semver.Version
-import io.github.z4kn4fein.semver.toVersionOrNull
 import kotlinx.serialization.json.JsonObject
 import org.apache.hc.client5.http.classic.methods.HttpGet
 import java.io.InputStream
@@ -45,15 +43,15 @@ object UpdaterUtils {
         return resourceChecksum == localChecksum
     }
 
-    fun checkLatestVersion(worker: LauncherWorker): Version? {
-        val current = MCSRLauncher.APP_VERSION.toVersionOrNull(false) ?: return null
+    fun checkLatestVersion(worker: LauncherWorker): String? {
+        val current = MCSRLauncher.APP_VERSION
 
         val request = MCSRLauncher.makeJsonRequest(HttpGet(API_ENDPOINT), worker)
         if (!request.hasSuccess()) return null
 
         val json = request.get<JsonObject>()
-        val latest = Version.parse(json["tag_name"]!!.toString(), false)
-        if (current < latest) return latest
+        val latest = json["tag_name"]!!.toString()
+        if (current != latest) return latest
         return null
     }
 
