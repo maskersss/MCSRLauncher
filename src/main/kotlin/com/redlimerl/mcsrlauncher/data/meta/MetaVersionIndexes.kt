@@ -31,6 +31,7 @@ data class MetaVersionIndexes(
 
     fun write() {
         val file = getPath(this.uid).toFile()
+        file.parentFile.mkdirs()
         for (metaFile in file.parentFile.listFiles()!!) {
             if (this.versions.none { "${it.version}.json" == metaFile.name }) FileUtils.delete(metaFile)
         }
