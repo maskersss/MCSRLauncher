@@ -41,7 +41,20 @@ kotlin {
     jvmToolchain(8)
 }
 
+tasks.named<ProcessResources>("processResources") {
+    doFirst {
+        val versionFile = file("${layout.buildDirectory.get()}/generated-resources/version")
+        versionFile.parentFile.mkdirs()
+        versionFile.writeText(version.toString())
+    }
+
+    from("${layout.buildDirectory.get()}/generated-resources") {
+        into("")
+    }
+}
+
 tasks.withType<Jar> {
+    archiveVersion = ""
     manifest {
         attributes(
             "Main-Class" to "com.redlimerl.mcsrlauncher.MCSRLauncher",
