@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class InstanceOptions(
     var useLauncherOption: Boolean = true,
+    var autoModUpdates: Boolean = false,
     override var minMemory: Int = 512,
     override var maxMemory: Int = 2048,
     override var javaPath: String = "",

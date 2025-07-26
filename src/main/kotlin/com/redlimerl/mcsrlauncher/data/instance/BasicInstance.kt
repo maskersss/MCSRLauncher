@@ -8,6 +8,7 @@ import com.redlimerl.mcsrlauncher.data.meta.file.MinecraftMetaFile
 import com.redlimerl.mcsrlauncher.data.meta.file.SpeedrunModsMetaFile
 import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModMeta
 import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModTrait
+import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModVersion
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
 import com.redlimerl.mcsrlauncher.instance.LegacyLaunchFixer
 import com.redlimerl.mcsrlauncher.instance.mod.ModCategory
@@ -104,6 +105,10 @@ data class BasicInstance(
         if (this.isRunning()) return
         object : LauncherWorker(MCSRLauncher.MAIN_FRAME, I18n.translate("instance.launching"), I18n.translate("message.loading") + "...") {
             override fun work(dialog: JDialog) {
+                if (options.autoModUpdates) {
+                    val updates = getSpeedRunModUpdates(this)
+                    if (updates.isNotEmpty()) updateSpeedrunMods(this)
+                }
                 this.setState(I18n.translate("text.download_assets") + "...")
                 install(this)
                 this.setProgress(null)
@@ -188,8 +193,8 @@ data class BasicInstance(
         return list
     }
 
-    fun updateSpeedrunMods(worker: LauncherWorker): List<ModData> {
-        val list = arrayListOf<ModData>()
+    fun getSpeedRunModUpdates(worker: LauncherWorker): List<Pair<SpeedrunModMeta, SpeedrunModVersion>> {
+        val list = arrayListOf<Pair<SpeedrunModMeta, SpeedrunModVersion>>()
         this.getModsPath().toFile().mkdirs()
         this.fabricVersion ?: throw IllegalStateException("This instance does not have Fabric Loader")
 
@@ -199,7 +204,7 @@ data class BasicInstance(
         for (mod in modMeta.mods.filter { it.isAvailable(this) }) {
             val version = mod.versions.find { it.isAvailableVersion(this) }!!
 
-            val shouldDownload = installedMods.any {
+            val canUpdate = installedMods.any {
                 it.id == mod.modId &&
                         if (it.version.toVersionOrNull(false) == null) {
                             it.version != version.version
@@ -207,15 +212,24 @@ data class BasicInstance(
                             it.version.toVersion(false) < version.version.toVersion(false)
                         }
             }
-
-            if (shouldDownload) {
-                worker.setState("Downloading ${mod.name} v${version.version}...")
-                val file = this.getModsPath().resolve(version.url.split("/").last()).toFile()
-                FileDownloader.download(version.url, file)
-                installedMods.find { it.id == mod.modId }?.delete()
-                list.add(ModData.get(file)!!)
-            }
+            if (canUpdate) list.add(mod to version)
         }
+        return list
+    }
+
+    fun updateSpeedrunMods(worker: LauncherWorker): List<ModData> {
+        val updates = getSpeedRunModUpdates(worker)
+
+        val list = arrayListOf<ModData>()
+        val installedMods = this.getMods()
+        updates.forEach { (mod, version) ->
+            worker.setState("Downloading ${mod.name} v${version.version}...")
+            val file = this.getModsPath().resolve(version.url.split("/").last()).toFile()
+            FileDownloader.download(version.url, file)
+            installedMods.find { it.id == mod.modId }?.delete()
+            list.add(ModData.get(file)!!)
+        }
+
         return list
     }
 }

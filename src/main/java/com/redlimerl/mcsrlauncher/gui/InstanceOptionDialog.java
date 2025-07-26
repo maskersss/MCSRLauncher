@@ -33,6 +33,7 @@ public class InstanceOptionDialog extends JDialog {
     public JButton launchButton;
     public JButton updateSpeedrunModsButton;
     public JButton openModsDirButton;
+    public JCheckBox autoUpdateSpeedrunModsCheckBox;
 
     public InstanceOptionDialog(Window window) {
         super(window);
@@ -158,7 +159,7 @@ public class InstanceOptionDialog extends JDialog {
         modsTable = new JTable();
         scrollPane2.setViewportView(modsTable);
         final JPanel panel11 = new JPanel();
-        panel11.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel11.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
         panel9.add(panel11, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         manageSpeedrunModsButton = new JButton();
         manageSpeedrunModsButton.setText("text.manage_speedrun_mods");
@@ -166,6 +167,9 @@ public class InstanceOptionDialog extends JDialog {
         updateSpeedrunModsButton = new JButton();
         updateSpeedrunModsButton.setText("text.check_download_updates");
         panel11.add(updateSpeedrunModsButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        autoUpdateSpeedrunModsCheckBox = new JCheckBox();
+        autoUpdateSpeedrunModsCheckBox.setText("text.update_speedrun_mods_launch");
+        panel11.add(autoUpdateSpeedrunModsCheckBox, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         javaScrollPane = new JScrollPane();
         optionTab.addTab("text.java", javaScrollPane);
         javaScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));

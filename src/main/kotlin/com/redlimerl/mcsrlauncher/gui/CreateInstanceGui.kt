@@ -52,6 +52,11 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
             val modInit = JOptionPane.showConfirmDialog(this, I18n.translate("message.speedrun_mods_setup_ask"), I18n.translate("text.manage_speedrun_mods"), JOptionPane.YES_NO_OPTION)
             if (modInit == JOptionPane.YES_OPTION) {
                 ManageSpeedrunModsGui(this, instance, true) {
+                    val autoUpdate = JOptionPane.showConfirmDialog(this, I18n.translate("message.auto_mod_update_ask"), I18n.translate("text.manage_speedrun_mods"), JOptionPane.YES_NO_OPTION)
+                    if (autoUpdate == JOptionPane.YES_OPTION) {
+                        instance.options.autoModUpdates = true
+                        instance.options.save()
+                    }
                     launch()
                 }
                 return

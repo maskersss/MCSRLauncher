@@ -162,6 +162,12 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
             }.showDialog().start()
         }
 
+        autoUpdateSpeedrunModsCheckBox.isSelected = instance.options.autoModUpdates
+        autoUpdateSpeedrunModsCheckBox.addActionListener {
+            instance.options.autoModUpdates = autoUpdateSpeedrunModsCheckBox.isSelected
+            instance.options.save()
+        }
+
         updateMods()
 
         fun updateModSelection() {
