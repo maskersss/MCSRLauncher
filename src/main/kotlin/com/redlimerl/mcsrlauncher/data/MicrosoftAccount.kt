@@ -37,7 +37,7 @@ data class MicrosoftAccount(
         postRequest.setHeader("Content-Type", "application/x-www-form-urlencoded")
         postRequest.setHeader("Accept", "application/json")
         postRequest.entity = UrlEncodedFormEntity(listOf(
-            BasicNameValuePair("client_id", MicrosoftAuthentication.AZURE_CLIENT_ID),
+            BasicNameValuePair("client_id", MicrosoftAuthentication.getAzureClientId()),
             BasicNameValuePair("grant_type", "refresh_token"),
             BasicNameValuePair("refresh_token", this.refreshToken),
             BasicNameValuePair("scope", MicrosoftAuthentication.TOKEN_SCOPE)

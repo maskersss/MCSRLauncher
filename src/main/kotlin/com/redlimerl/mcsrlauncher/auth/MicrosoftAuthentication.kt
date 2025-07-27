@@ -12,7 +12,9 @@ import org.apache.hc.core5.http.message.BasicNameValuePair
 class MicrosoftAuthentication {
     companion object {
         // because of https://aka.ms/AppRegInfo, I will use MCSR Ranked Launcher client instead on development
-        val AZURE_CLIENT_ID = if (MCSRLauncher.IS_DEV_VERSION) "9c60df0c-d89b-4106-a100-156cd239e819" else "0d2d1127-aae6-4b73-805e-0672eee704c4"
+        fun getAzureClientId(): String {
+            return if (MCSRLauncher.options.devLogin) "9c60df0c-d89b-4106-a100-156cd239e819" else "0d2d1127-aae6-4b73-805e-0672eee704c4"
+        }
         const val TOKEN_SCOPE = "XboxLive.SignIn XboxLive.offline_access"
 
         const val DEVICE_CODE_URL = "https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode"
@@ -38,7 +40,7 @@ data class MSDeviceCodeAuth(
             postRequest.setHeader("Content-Type", "application/x-www-form-urlencoded")
             postRequest.setHeader("Accept", "application/json")
             postRequest.entity = UrlEncodedFormEntity(listOf(
-                BasicNameValuePair("client_id", MicrosoftAuthentication.AZURE_CLIENT_ID),
+                BasicNameValuePair("client_id", MicrosoftAuthentication.getAzureClientId()),
                 BasicNameValuePair("scope", MicrosoftAuthentication.TOKEN_SCOPE)
             ))
 
@@ -69,7 +71,7 @@ data class MSTokenReceiverAuth(
             postRequest.setHeader("Content-Type", "application/x-www-form-urlencoded")
             postRequest.setHeader("Accept", "application/json")
             postRequest.entity = UrlEncodedFormEntity(listOf(
-                BasicNameValuePair("client_id", MicrosoftAuthentication.AZURE_CLIENT_ID),
+                BasicNameValuePair("client_id", MicrosoftAuthentication.getAzureClientId()),
                 BasicNameValuePair("grant_type", "urn:ietf:params:oauth:grant-type:device_code"),
                 BasicNameValuePair("device_code", deviceCode.deviceCode)
             ))

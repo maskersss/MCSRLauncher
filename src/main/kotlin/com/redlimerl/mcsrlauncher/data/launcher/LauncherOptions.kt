@@ -14,6 +14,7 @@ data class LauncherOptions(
     var debug: Boolean = false,
     var language: LauncherLanguage = LauncherLanguage.ENGLISH,
     var metaUrl: String = "https://mcsrlauncher.github.io/meta/",
+    var devLogin: Boolean = MCSRLauncher.IS_DEV_VERSION,
     override var javaPath: String = Paths.get(System.getProperty("java.home")).resolve("bin").resolve(JavaUtils.javaExecutableName()).absolutePathString(),
     override var jvmArguments: String = "",
     override var minMemory: Int = 512,

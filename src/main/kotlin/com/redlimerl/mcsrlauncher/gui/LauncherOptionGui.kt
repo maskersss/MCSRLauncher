@@ -67,6 +67,12 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
             }.showDialog().start()
         }
 
+        this.devLoginCheckBox.isSelected = MCSRLauncher.options.devLogin
+        this.devLoginCheckBox.addActionListener {
+            MCSRLauncher.options.devLogin = this.devLoginCheckBox.isSelected
+            MCSRLauncher.options.save()
+        }
+
         SwingUtils.fasterScroll(this.tabLauncherScrollPane)
     }
 
