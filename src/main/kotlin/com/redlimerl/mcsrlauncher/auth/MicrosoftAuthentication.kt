@@ -13,7 +13,7 @@ class MicrosoftAuthentication {
     companion object {
         // because of https://aka.ms/AppRegInfo, I will use MCSR Ranked Launcher client instead on development
         fun getAzureClientId(): String {
-            return if (MCSRLauncher.options.devLogin) "9c60df0c-d89b-4106-a100-156cd239e819" else "0d2d1127-aae6-4b73-805e-0672eee704c4"
+            return "0d2d1127-aae6-4b73-805e-0672eee704c4"
         }
         const val TOKEN_SCOPE = "XboxLive.SignIn XboxLive.offline_access"
 
