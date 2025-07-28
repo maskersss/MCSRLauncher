@@ -58,6 +58,8 @@ object JavaUtils {
             containers.addAll(findJavaInStandardDirs())
             containers.addAll(findJavaFromUpdateAlternatives())
         }
+        containers.add(JavaContainer(Paths.get("../").resolve("jre")))
+        containers.add(JavaContainer(Paths.get("").resolve("jre")))
 
         for (file in GameAssetManager.JAVA_PATH.toFile().listFiles()!!) {
             val javaBin = file.resolve("bin").resolve(javaExecutableName())
