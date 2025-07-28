@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>MCSRLauncher.jar</jar>
+  <outfile>out\launch.exe</outfile>
+  <errTitle>You do not have Java!</errTitle>
+  <priority>normal</priority>
+  <downloadUrl>https://adoptium.net/temurin/releases/?version=17</downloadUrl>
+  <supportUrl>https://mcsrlauncher.github.io/discord</supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <icon>icons\icon.ico</icon>
+  <jre>
+    <path>%JAVA_HOME%;%PATH%;jre</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>true</requires64Bit>
+    <minVersion>8</minVersion>
+  </jre>
+</launch4jConfig>
