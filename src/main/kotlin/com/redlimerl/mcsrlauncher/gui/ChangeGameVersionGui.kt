@@ -8,7 +8,7 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.JDialog
 
-class ChangeGameVersionGui(val parent: JDialog, val instance: BasicInstance) : ChangeGameVersionDialog(parent) {
+class ChangeGameVersionGui(parent: JDialog, val instance: BasicInstance) : ChangeGameVersionDialog(parent) {
 
     private val gameVersionsPanel: GameVersionsPanel
     var hasChanged = false
@@ -18,7 +18,7 @@ class ChangeGameVersionGui(val parent: JDialog, val instance: BasicInstance) : C
         minimumSize = Dimension(700, 500)
         setLocationRelativeTo(parent)
 
-        this.gameVersionsPanel = GameVersionsPanel(parent, instance)
+        this.gameVersionsPanel = GameVersionsPanel(instance)
         versionsPanel.layout = BorderLayout()
         versionsPanel.add(this.gameVersionsPanel, BorderLayout.CENTER)
 

@@ -22,7 +22,7 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.table.DefaultTableModel
 
-class GameVersionsPanel(val parent: JDialog, instance: BasicInstance? = null) : AbstractGameVersionsPanel() {
+class GameVersionsPanel(instance: BasicInstance? = null) : AbstractGameVersionsPanel() {
 
     init {
         layout = BorderLayout()

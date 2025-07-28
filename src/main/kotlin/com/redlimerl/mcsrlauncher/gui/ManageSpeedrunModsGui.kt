@@ -9,7 +9,7 @@ import java.awt.Dimension
 import javax.swing.JDialog
 import javax.swing.JOptionPane
 
-class ManageSpeedrunModsGui(val parent: JDialog, val instance: BasicInstance, isNew: Boolean, val updater: () -> Unit) : ManageSpeedrunModsDialog(parent) {
+class ManageSpeedrunModsGui(parent: JDialog, val instance: BasicInstance, isNew: Boolean, val updater: () -> Unit) : ManageSpeedrunModsDialog(parent) {
 
     init {
         title = I18n.translate("text.manage_speedrun_mods")
