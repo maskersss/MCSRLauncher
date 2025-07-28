@@ -10,7 +10,7 @@
   <supportUrl>https://mcsrlauncher.github.io/discord</supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
-  <icon>icons\icon.ico</icon>
+  <icon>..\icons\icon.ico</icon>
   <jre>
     <path>%JAVA_HOME%;%PATH%;jre</path>
     <requiresJdk>false</requiresJdk>
