@@ -2,6 +2,7 @@ package com.redlimerl.mcsrlauncher.instance
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.util.JavaUtils
+import java.io.FileNotFoundException
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.absolutePathString
@@ -55,6 +56,7 @@ class JavaContainer(val path: Path, version: String? = null, vendor: String? = n
 
             possibleVendor = properties.getProperty("IMPLEMENTOR")?.replace("\"", "") ?: possibleVendor
             possibleVersion = properties.getProperty("JAVA_VERSION")?.replace("\"", "") ?: possibleVersion
+        } catch (_: FileNotFoundException) {
         } catch (e: Exception) {
             MCSRLauncher.LOGGER.error(e)
         }
