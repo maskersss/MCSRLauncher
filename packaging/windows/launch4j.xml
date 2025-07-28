@@ -15,6 +15,6 @@
     <path>%JAVA_HOME%;%PATH%;jre</path>
     <requiresJdk>false</requiresJdk>
     <requires64Bit>true</requires64Bit>
-    <minVersion>8</minVersion>
+    <minVersion>17</minVersion>
   </jre>
 </launch4jConfig>
