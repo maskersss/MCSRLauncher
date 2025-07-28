@@ -66,7 +66,7 @@ class JavaContainer(val path: Path, version: String? = null, vendor: String? = n
         this.majorVersion = this.version.split(".").first().toInt().let { if (it == 1) this.version.split(".")[1].toInt() else it }
     }
 
-    fun getJavaRuntimePath(): String {
+    private fun getJavaRuntimePath(): String {
         return path.parent.resolve(JavaUtils.javaExecutableName()).absolutePathString()
     }
 
