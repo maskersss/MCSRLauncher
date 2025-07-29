@@ -57,7 +57,7 @@ Type: filesandordirs; Name: "{app}\jre"; Components: java
 const
   LAUNCHER_ENDPOINT = 'https://api.github.com/repos/MCSRLauncher/launcher/releases/latest';
   JRE_META_ENDPOINT = 'https://mcsrlauncher.github.io/meta/net.adoptium.java/java17.json';
-  
+
 const
   LAUNCHER_FALLBACK_URL = 'https://github.com/MCSRLauncher/Launcher/releases/download/0.1-beta/MCSRLauncher.jar';
   LAUNCHER_FALLBACK_HASH = '8284bf6b264e9aa6c186b568fc407de459a56ee5593b4b0ef389de0ff265332c';
@@ -71,9 +71,11 @@ var
 procedure GetLauncherInfo;
   var
     WinHttpReq: Variant;
+    I: integer;
     Json, TempHash: string;
+    FileName: WideString;
     JsonParser: TJsonParser;
-    JsonRoot, AssetObject: TJsonObject;
+    JsonRoot, AssetObject, FinalAssetObject: TJsonObject;
     AssetsArray: TJsonArray;
 begin
   Try
@@ -85,14 +87,23 @@ begin
       if ParseJsonAndLogErrors(JsonParser, Json) then begin
         JsonRoot := GetJsonRoot(JsonParser.Output);
         if FindJsonArray(JsonParser.Output, JsonRoot, 'assets', AssetsArray) then begin
-          AssetObject := JsonParser.Output.Objects[AssetsArray[0].Index];
+          for I := 0 to Length(AssetsArray) - 1 do begin
+            AssetObject := JsonParser.Output.Objects[AssetsArray[I].Index];
+            if FindJsonString(JsonParser.Output, AssetObject, 'name', FileName) and (FileName = '{#LauncherName}.jar') then begin
+              FinalAssetObject := AssetObject;
+              Break;
+            end;
+          end;
+          if Length(FinalAssetObject) = 0 then begin
+            RaiseException('Not found Launcher JAR');
+          end;
         end
         else begin
           RaiseException('Failed to read Launcher data from GitHub API, falling back to defaults');
         end;
 
-        if not FindJsonString(JsonParser.Output, AssetObject, 'browser_download_url', Url) or
-        not FindJsonString(JsonParser.Output, AssetObject, 'digest', Hash) then begin
+        if not FindJsonString(JsonParser.Output, FinalAssetObject, 'browser_download_url', Url) or
+        not FindJsonString(JsonParser.Output, FinalAssetObject, 'digest', Hash) then begin
           RaiseException('Failed to read Launcher data from GitHub API, falling back to defaults');
         end
         else begin
