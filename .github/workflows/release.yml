@@ -63,7 +63,8 @@ jobs:
           echo "Changelog:"
           git log $PREV_TAG..HEAD --pretty=format:"- %s" > changelog.txt
           cat changelog.txt
-          echo "::set-output name=body::$(cat changelog.txt | sed 's/%/%25/g; s/\n/%0A/g; s/\r/%0D/g')"
+          BODY=$(cat changelog.txt | sed 's/%/%25/g; s/\n/%0A/g; s/\r/%0D/g')
+          echo "body=$BODY" >> "$GITHUB_OUTPUT"
         shell: bash
 
       - name: Upload Release Assets
