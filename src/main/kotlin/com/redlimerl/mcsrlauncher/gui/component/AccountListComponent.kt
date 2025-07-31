@@ -7,7 +7,7 @@ import java.awt.*
 import javax.swing.*
 
 
-class AccountListComponent(private val parent: Window) : JPanel() {
+class AccountListComponent : JPanel() {
     private val accountListener: ArrayList<Runnable> = arrayListOf()
 
     init {
@@ -21,67 +21,91 @@ class AccountListComponent(private val parent: Window) : JPanel() {
 
     fun loadAll() {
         removeAll()
+        revalidate()
+        repaint()
         accountListener.clear()
 
-        val grid = GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, Insets(5, 3, 5, 3), 0, 0)
+        layout = GridBagLayout()
+        val grid = GridBagConstraints().apply {
+            gridy = 0
+            insets = Insets(5, 5, 5, 5)
+            anchor = GridBagConstraints.WEST
+        }
 
         for (account in AccountManager.getAllAccounts()) {
             grid.gridx = 0
             grid.weightx = 1.0
+            grid.fill = GridBagConstraints.HORIZONTAL
             val nicknameLabel = JLabel(account.profile.nickname)
             add(nicknameLabel, grid)
 
-            grid.gridx = 2
-            grid.weightx = 0.0
-            val selectAccountButton = JButton(I18n.translate("account.select"))
-            selectAccountButton.addActionListener {
-                AccountManager.setActiveAccount(account)
-                updateAccountStatus()
-            }
-            add(selectAccountButton, grid)
-            grid.gridx++
+            val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT, 5, 0)).apply {
+                val selectAccountButton = JButton(I18n.translate("account.select"))
+                val refreshTokenButton = JButton(I18n.translate("account.refresh"))
+                val removeAccountButton = JButton(I18n.translate("account.remove"))
 
-            val refreshTokenButton = JButton(I18n.translate("account.refresh"))
-            refreshTokenButton.addActionListener {
-                if (System.currentTimeMillis() - account.getLastRefreshTime() < 60 * 1000) {
-                    JOptionPane.showMessageDialog(parent, I18n.translate("message.refresh_cooldown_warning", 60), I18n.translate("text.error"), JOptionPane.OK_OPTION)
-                    return@addActionListener
+                add(selectAccountButton)
+                add(refreshTokenButton)
+                add(removeAccountButton)
+
+                selectAccountButton.addActionListener {
+                    AccountManager.setActiveAccount(account)
+                    updateAccountStatus()
                 }
 
-                refreshTokenButton.isEnabled = false
-                object : LauncherWorker() {
-                    override fun work(dialog: JDialog) {
-                        account.profile.refresh(this, account, true)
-                        AccountManager.save()
+                refreshTokenButton.addActionListener {
+                    if (System.currentTimeMillis() - account.getLastRefreshTime() < 60 * 1000) {
+                        JOptionPane.showMessageDialog(parent, I18n.translate("message.refresh_cooldown_warning", 60), I18n.translate("text.error"), JOptionPane.OK_OPTION)
+                        return@addActionListener
                     }
 
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        refreshTokenButton.isEnabled = true
-                    }
-                }.start()
-            }
-            add(refreshTokenButton, grid)
-            grid.gridx++
+                    refreshTokenButton.isEnabled = false
+                    object : LauncherWorker() {
+                        override fun work(dialog: JDialog) {
+                            account.profile.refresh(this, account, true)
+                            AccountManager.save()
+                        }
 
-            val removeAccountButton = JButton(I18n.translate("account.remove"))
-            removeAccountButton.addActionListener {
-                AccountManager.removeAccount(account)
-                SwingUtilities.invokeLater { loadAll() }
+                        override fun onError(e: Throwable) {
+                            super.onError(e)
+                            refreshTokenButton.isEnabled = true
+                        }
+                    }.start()
+                }
+
+                removeAccountButton.addActionListener {
+                    AccountManager.removeAccount(account)
+                    SwingUtilities.invokeLater { loadAll() }
+                }
+
+                accountListener.add {
+                    nicknameLabel.font = nicknameLabel.font.let {
+                        Font(it.name, if (account == AccountManager.getActiveAccount()) Font.BOLD else Font.PLAIN, it.size)
+                    }
+                    selectAccountButton.isEnabled = account != AccountManager.getActiveAccount()
+                }
             }
-            add(removeAccountButton, grid)
-            grid.gridx++
+
+            grid.gridx = 1
+            grid.weightx = 0.0
+            grid.fill = GridBagConstraints.NONE
+            grid.anchor = GridBagConstraints.EAST
+            add(buttonPanel, grid)
 
             grid.gridy++
-
-            accountListener.add {
-                nicknameLabel.font = nicknameLabel.font.let { Font(it.name, if (account == AccountManager.getActiveAccount()) Font.BOLD else Font.PLAIN, it.size) }
-                selectAccountButton.isEnabled = account != AccountManager.getActiveAccount()
-            }
         }
+
+        val spacer = GridBagConstraints().apply {
+            gridx = 0
+            gridy = grid.gridy // account 개수 이후
+            weighty = 1.0
+            fill = GridBagConstraints.VERTICAL
+            gridwidth = GridBagConstraints.REMAINDER
+        }
+        add(Box.createVerticalGlue(), spacer)
 
         updateAccountStatus()
         updateUI()
     }
+
 }

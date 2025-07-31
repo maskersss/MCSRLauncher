@@ -123,6 +123,9 @@ abstract class LauncherWorker(
 
     fun addBottomPanel(component: JComponent) {
         this.southPanel.add(component, BorderLayout.SOUTH)
+        this.southPanel.revalidate()
+        this.southPanel.repaint()
+        this.dialog.pack()
     }
 
     fun setState(string: String?, log: Boolean = true): LauncherWorker {

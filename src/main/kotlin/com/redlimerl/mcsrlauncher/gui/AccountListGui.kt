@@ -24,7 +24,7 @@ import javax.swing.*
 
 class AccountListGui(parent: JFrame) : AccountListDialog() {
 
-    private val accountList = AccountListComponent(this)
+    private val accountList = AccountListComponent()
 
     init {
         title = I18n.translate("account.accounts")
