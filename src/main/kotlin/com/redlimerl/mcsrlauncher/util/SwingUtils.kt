@@ -94,7 +94,7 @@ object SwingUtils {
         return label.preferredSize.width
     }
 
-    fun autoResizeHtmlText(
+    fun autoFitHtmlText(
         rawText: String,
         maxWidth: Int,
         baseFontSize: Int = 16,

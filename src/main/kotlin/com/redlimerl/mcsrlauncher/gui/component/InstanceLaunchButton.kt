@@ -24,8 +24,8 @@ class InstanceLaunchButton(private val windowParent: Window, val instance: Basic
         isRequestFocusEnabled = false
         text = """<html>
                 <div style='text-align:center;'>
-                    <div style='font-weight: bold;'>${SwingUtils.autoResizeHtmlText(instance.displayName, 90, 16)}</div>
-                    <div>${if (instance.isRunning()) "<span style='color: yellow'>PLAYING (PID:${instance.getProcess()?.process?.pid()})</span>" else "v${instance.minecraftVersion} (${instance.getInstanceType()})"}</div>
+                    <div style='font-weight: bold;'>${SwingUtils.autoFitHtmlText(instance.displayName, 92, 16)}</div>
+                    <div>${SwingUtils.autoFitHtmlText(if (instance.isRunning()) "<span style='color: yellow'>PLAYING (PID:${instance.getProcess()?.process?.pid()})</span>" else "v${instance.minecraftVersion} (${instance.getInstanceType()})", 92, 11)}</div>
                 </div> 
             </html>"""
         if (instance.isRunning()) {
