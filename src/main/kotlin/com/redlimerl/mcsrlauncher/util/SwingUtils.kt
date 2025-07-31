@@ -13,7 +13,7 @@ object SwingUtils {
         scrollPane.verticalScrollBar.unitIncrement *= 15
     }
 
-    fun autoResizeColumnWidths(table: JTable, preferredMaxWidths: Map<Int, Int> = emptyMap()) {
+    fun autoFitTableColumns(table: JTable, preferredMaxWidths: Map<Int, Int> = emptyMap()) {
         val model = table.model
         val colCount = table.columnCount
 

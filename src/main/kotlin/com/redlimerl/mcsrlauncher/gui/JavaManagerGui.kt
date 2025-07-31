@@ -79,13 +79,13 @@ class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerD
         javaListTable.autoResizeMode = JTable.AUTO_RESIZE_OFF
 
         SwingUtilities.invokeLater {
-            SwingUtils.autoResizeColumnWidths(javaListTable, mapOf(1 to 130))
+            SwingUtils.autoFitTableColumns(javaListTable, mapOf(1 to 130))
         }
 
         this.addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent?) {
                 SwingUtilities.invokeLater {
-                    SwingUtils.autoResizeColumnWidths(javaListTable, mapOf(1 to 130))
+                    SwingUtils.autoFitTableColumns(javaListTable, mapOf(1 to 130))
                 }
             }
         })

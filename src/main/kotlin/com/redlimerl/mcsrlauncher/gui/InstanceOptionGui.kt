@@ -137,7 +137,7 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         modsTable.model = modTableModel
 
         SwingUtilities.invokeLater {
-            SwingUtils.autoResizeColumnWidths(modsTable)
+            SwingUtils.autoFitTableColumns(modsTable)
         }
     }
 

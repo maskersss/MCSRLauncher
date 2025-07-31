@@ -13,6 +13,7 @@ import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SpeedrunUtils
+import com.redlimerl.mcsrlauncher.util.SwingUtils
 import io.github.z4kn4fein.semver.toVersion
 import java.awt.BorderLayout
 import javax.swing.DefaultComboBoxModel
@@ -154,6 +155,7 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
 
         vanillaVersionTable.model = tableModel
         if (vanillaVersionTable.rowCount > 0) vanillaVersionTable.setRowSelectionInterval(0, 0)
+        SwingUtils.autoFitTableColumns(vanillaVersionTable)
     }
 
     private fun initFabricComponents() {
@@ -223,6 +225,7 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
         }
         fabricVersionTable.model = tableModel
         if (fabricVersionTable.rowCount > 0) fabricVersionTable.setRowSelectionInterval(0, 0)
+        SwingUtils.autoFitTableColumns(fabricVersionTable)
     }
 
     private fun onSelectFabricMinecraftVersion(version: String) {
