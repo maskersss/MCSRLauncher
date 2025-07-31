@@ -22,7 +22,7 @@ data class InstanceLibrary(
                     return@forEach
                 }
 
-                val versioned = group.mapNotNull { it.version.toVersionOrNull()?.let { v -> it to v } }
+                val versioned = group.mapNotNull { it.version.toVersionOrNull(false)?.let { v -> it to v } }
 
                 if (versioned.isEmpty()) {
                     result.addAll(group)
