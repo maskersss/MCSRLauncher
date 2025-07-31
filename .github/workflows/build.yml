@@ -44,7 +44,7 @@ jobs:
         run: choco install innosetup -y
 
       - name: Build Installer with Inno Setup
-        run: '"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" packaging\installer.iss'
+        run: '"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" packaging\windows\installer.iss'
         shell: cmd
 
       - name: Upload Installer
