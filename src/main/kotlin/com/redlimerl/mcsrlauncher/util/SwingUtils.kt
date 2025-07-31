@@ -55,6 +55,23 @@ object SwingUtils {
     }
 
     fun makeEditablePathFileChooser(fileChooser: JFileChooser) {
+        fun <T : JComponent?> getDescendantsOfType(clazz: Class<T>, container: Container, nested: Boolean): List<T> {
+            val tList: MutableList<T> = ArrayList()
+            for (component in container.components) {
+                if (clazz.isAssignableFrom(component.javaClass)) {
+                    tList.add(clazz.cast(component))
+                }
+                if (nested || !clazz.isAssignableFrom(component.javaClass)) {
+                    tList.addAll(getDescendantsOfType(clazz, component as Container, nested))
+                }
+            }
+            return tList
+        }
+
+        fun <T : JComponent?> getDescendantsOfType(clazz: Class<T>, container: Container): List<T> {
+            return getDescendantsOfType(clazz, container, true)
+        }
+
         val jComboBox = getDescendantsOfType(JComboBox::class.java, fileChooser).first()
         jComboBox.isEditable = true
         jComboBox.editor = object : BasicComboBoxEditor.UIResource() {
@@ -68,51 +85,91 @@ object SwingUtils {
         }
     }
 
-    fun <T : JComponent?> getDescendantsOfType(clazz: Class<T>, container: Container): List<T> {
-        return getDescendantsOfType(clazz, container, true)
-    }
-
-    fun <T : JComponent?> getDescendantsOfType(clazz: Class<T>, container: Container, nested: Boolean): List<T> {
-        val tList: MutableList<T> = ArrayList()
-        for (component in container.components) {
-            if (clazz.isAssignableFrom(component.javaClass)) {
-                tList.add(clazz.cast(component))
-            }
-            if (nested || !clazz.isAssignableFrom(component.javaClass)) {
-                tList.addAll(getDescendantsOfType(clazz, component as Container, nested))
-            }
+    fun autoFitHtmlText(rawText: String, maxWidth: Int, baseFontSize: Int = 16, minimumFontSize: Int = 6): String {
+        fun measureHtmlTextWidth(html: String): Int {
+            val label = JLabel(html)
+            val fakeParent = JPanel()
+            fakeParent.add(label)
+            label.doLayout()
+            label.validate()
+            return label.preferredSize.width
         }
-        return tList
-    }
 
-    private fun measureHtmlTextWidth(html: String): Int {
-        val label = JLabel(html)
-        val fakeParent = JPanel() // Layout 연산을 강제하기 위한 가짜 컨테이너
-        fakeParent.add(label)
-        label.doLayout()
-        label.validate()
-        return label.preferredSize.width
-    }
+        fun breakLongWord(word: String, fontSize: Int, maxWidth: Int): String {
+            val sb = StringBuilder()
+            var current = ""
 
-    fun autoFitHtmlText(
-        rawText: String,
-        maxWidth: Int,
-        baseFontSize: Int = 16,
-        minimumFontSize: Int = 6
-    ): String {
+            for (ch in word) {
+                val test = current + ch
+                val width = measureHtmlTextWidth("<html><div style='font-size:${fontSize}px;'>$test</div></html>")
+                if (width > maxWidth) {
+                    sb.append(current).append("<br>")
+                    current = ch.toString()
+                } else {
+                    current = test
+                }
+            }
+
+            if (current.isNotEmpty()) {
+                sb.append(current)
+            }
+
+            return sb.toString()
+        }
+
+        fun insertLineBreaks(text: String, fontSize: Int, maxWidth: Int): String {
+            val words = text.split(" ")
+            val result = StringBuilder()
+            var currentLine = StringBuilder()
+
+            for (word in words) {
+                val testLine = if (currentLine.isEmpty()) word else "$currentLine $word"
+                val width = measureHtmlTextWidth("<html><div style='font-size:${fontSize}px;'>$testLine</div></html>")
+
+                if (width > maxWidth) {
+                    if (currentLine.isNotEmpty()) {
+                        result.append(currentLine.toString().trim()).append("<br>")
+                        currentLine = StringBuilder(word)
+                    } else {
+                        result.append(breakLongWord(word, fontSize, maxWidth)).append("<br>")
+                        currentLine = StringBuilder()
+                    }
+                } else {
+                    if (currentLine.isNotEmpty()) currentLine.append(" ")
+                    currentLine.append(word)
+                }
+            }
+
+            if (currentLine.isNotEmpty()) {
+                result.append(currentLine.toString().trim())
+            }
+
+            return result.toString()
+        }
+
         var fontSize = baseFontSize
         var html: String
         var width: Int
 
+        fun buildHtml(text: String, fontSize: Int): String {
+            return "<div style='font-size:${fontSize}px;'>$text</div>"
+        }
+
         do {
-            html = "<span style='font-size:${fontSize}px;'>$rawText</span>"
+            html = buildHtml(rawText, fontSize)
             width = measureHtmlTextWidth("<html>$html</html>")
             if (width <= maxWidth) break
             fontSize--
         } while (fontSize > minimumFontSize)
 
+        if (width > maxWidth) {
+            val wrapped = insertLineBreaks(rawText, fontSize, maxWidth)
+            html = buildHtml(wrapped, fontSize)
+        }
+
         return html
     }
+
 
     fun setEnabledRecursively(comp: Component, enabled: Boolean, vararg exclusives: Component) {
         if (exclusives.contains(comp))
