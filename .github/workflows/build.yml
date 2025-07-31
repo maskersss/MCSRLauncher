@@ -1,0 +1,44 @@
+name: Build Installer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Copy JAR to packaging/out
+        run: |
+          mkdir packaging/out
+          copy build\libs\*.jar packaging\windows\out\ /Y
+
+      - name: Install Launch4j
+        run: choco install launch4j -y
+
+      - name: Build EXE with Launch4j
+        run: launch4j packaging\windows\launch4j.xml
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Build Installer with Inno Setup
+        run: '"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" packaging\installer.iss'
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: MCSRLauncherInstaller
+          path: packaging\windows\Output\*.exe
