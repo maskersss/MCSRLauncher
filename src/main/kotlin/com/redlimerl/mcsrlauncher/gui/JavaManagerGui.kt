@@ -35,9 +35,6 @@ class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerD
             LauncherWorker(parent, I18n.translate("message.loading"), I18n.translate("message.loading.java_versions")) {
             override fun work(dialog: JDialog) {
                 updateInstalledJavaVersions()
-                for (javaMeta in MetaUniqueID.JAVA_METAS) {
-                    MetaManager.getVersions(javaMeta, this).forEach { it.getOrLoadMetaVersionFile<JavaMetaFile>(javaMeta, this) }
-                }
                 updateDownloadJavaList()
                 dialog.dispose()
                 isVisible = true
@@ -96,7 +93,19 @@ class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerD
 
     private fun initDownloadJavaTab() {
         javaVendorComboBox.addActionListener {
-            updateDownloadJavaVersionList()
+            object : LauncherWorker(this@JavaManagerGui) {
+                override fun work(dialog: JDialog) {
+                    SwingUtils.setEnabledRecursively(javaTabPane.getComponentAt(1), false, javaLoadingLabel)
+                    javaLoadingLabel.isVisible = true
+                    val metaUniqueID = MetaUniqueID.JAVA_METAS.find { MetaManager.getMetaName(it) == javaVendorComboBox.selectedItem!!.toString() }!!
+                    MetaManager.getVersions(metaUniqueID, this).forEach { it.getOrLoadMetaVersionFile<JavaMetaFile>(metaUniqueID, this) }
+                    SwingUtilities.invokeLater {
+                        updateDownloadJavaVersionList()
+                        SwingUtils.setEnabledRecursively(javaTabPane.getComponentAt(1), true)
+                        javaLoadingLabel.isVisible = false
+                    }
+                }
+            }.start()
         }
         recommendedCheckBox.addActionListener {
             updateDownloadJavaVersionList()

@@ -1,5 +1,6 @@
 package com.redlimerl.mcsrlauncher.util
 
+import java.awt.Component
 import java.awt.Container
 import java.io.File
 import javax.swing.*
@@ -111,6 +112,15 @@ object SwingUtils {
         } while (fontSize > minimumFontSize)
 
         return html
+    }
+
+    fun setEnabledRecursively(comp: Component, enabled: Boolean, vararg exclusives: Component) {
+        if (exclusives.contains(comp))
+            return
+
+        comp.isEnabled = enabled
+        if (comp is Container)
+            for (child in comp.components) setEnabledRecursively(child, enabled, *exclusives)
     }
 
 }
