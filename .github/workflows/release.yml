@@ -42,7 +42,7 @@ jobs:
         run: |
           set LAUNCH4J_XML=%CD%\packaging\windows\launch4j.xml
           .\launch4j\launch4j.exe "%LAUNCH4J_XML%"
-        shell: cmdv
+        shell: cmd
 
       - name: Install Inno Setup
         run: choco install innosetup -y
