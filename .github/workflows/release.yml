@@ -58,10 +58,11 @@ jobs:
       - name: Generate Changelog
         id: changelog
         run: |
+          REPO_URL=$(git config --get remote.origin.url | sed -E 's#(git@|https://)([^:/]+)[/:]([^/]+)/(.+).git#https://\2/\3/\4#')
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
           echo "Previous tag: $PREV_TAG"
           echo "Changelog:"
-          git log $PREV_TAG..HEAD --pretty=format:"- %s" > changelog.txt
+          git log $PREV_TAG..HEAD --pretty=format:"- [%h]($REPO_URL/commit/%H) %s" > changelog.txt
         shell: bash
 
       - name: Upload Release Assets
