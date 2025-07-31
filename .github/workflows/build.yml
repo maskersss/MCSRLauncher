@@ -36,7 +36,7 @@ jobs:
 
       - name: Run Launch4j
         run: |
-          launch4j\launch4j.exe packaging\windows\launch4j.xml
+          .\launch4j\launch4j-3.50\launch4j.exe packaging\windows\launch4j.xml
         shell: cmd
 
       - name: Install Inno Setup
