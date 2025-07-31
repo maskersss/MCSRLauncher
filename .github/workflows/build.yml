@@ -51,4 +51,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MCSRLauncherInstaller
-          path: packaging\windows\Output\*.exe
+          path: |
+            packaging\windows\Output\*.exe
+            build/libs/*.jar
