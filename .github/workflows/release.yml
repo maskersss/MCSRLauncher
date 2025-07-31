@@ -1,11 +1,9 @@
 name: Build and Release Installer
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to tag and release'
-        required: true
+  push:
+    tags:
+      - '*'
 
 permissions:
   contents: write
@@ -68,21 +66,14 @@ jobs:
           echo "::set-output name=body::$(cat changelog.txt | sed 's/%/%25/g; s/\n/%0A/g; s/\r/%0D/g')"
         shell: bash
 
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ inputs.version }}
-          release_name: Release ${{ inputs.version }}
-          body: ${{ steps.changelog.outputs.body }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.body }}
+          draft: false
+          prerelease: false
           files: |
             packaging/windows/Output/*.exe
             build/libs/*.jar
