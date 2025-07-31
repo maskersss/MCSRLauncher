@@ -32,12 +32,12 @@ jobs:
       - name: Download and extract Launch4j
         run: |
           curl -L -o launch4j.zip https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip/download
-          7z x launch4j.zip -olaunch4j
+          7z x launch4j.zip
         shell: cmd
 
       - name: Run Launch4j
         run: |
-          .\launch4j\launch4j-3.50\bin\launch4j.exe packaging\windows\launch4j.xml
+          .\launch4j\launch4j.exe packaging\windows\launch4j.xml
         shell: cmd
 
       - name: Install Inno Setup
