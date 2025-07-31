@@ -29,11 +29,15 @@ jobs:
           mkdir -p packaging/windows/out
           Copy-Item -Path build/libs/*.jar -Destination packaging/windows/out/ -Force
 
-      - name: Install Launch4j
-        run: choco install launch4j -y
+      - name: Download Launch4j
+        run: |
+          curl -L -o launch4j.zip https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip/download
+          7z x launch4j.zip -olaunch4j
 
-      - name: Build EXE with Launch4j
-        run: launch4j packaging\windows\launch4j.xml
+      - name: Run Launch4j
+        run: |
+          launch4j\launch4j.exe packaging\windows\launch4j.xml
+        shell: cmd
 
       - name: Install Inno Setup
         run: choco install innosetup -y
