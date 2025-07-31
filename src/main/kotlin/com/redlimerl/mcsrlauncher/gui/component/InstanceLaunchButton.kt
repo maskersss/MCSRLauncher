@@ -33,6 +33,9 @@ class InstanceLaunchButton(private val windowParent: Window, val instance: Basic
         }
 
         this.addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent) {
+                if (e.isPopupTrigger) getPopupMenu().show(e.component, e.x, e.y)
+            }
             override fun mouseReleased(e: MouseEvent) {
                 if (e.isPopupTrigger) getPopupMenu().show(e.component, e.x, e.y)
             }
