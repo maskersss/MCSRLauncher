@@ -62,10 +62,6 @@ jobs:
           echo "Previous tag: $PREV_TAG"
           echo "Changelog:"
           git log $PREV_TAG..HEAD --pretty=format:"- %s" > changelog.txt
-          cat changelog.txt
-          echo "body<<EOF" >> "$GITHUB_OUTPUT"
-          cat changelog.txt >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
         shell: bash
 
       - name: Upload Release Assets
@@ -73,7 +69,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          body: ${{ steps.changelog.outputs.body }}
+          body_path: changelog.txt
           draft: false
           prerelease: false
           files: |
