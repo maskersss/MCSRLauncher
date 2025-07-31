@@ -24,10 +24,10 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Copy JAR to packaging/out
+      - name: Copy JAR to packaging
         run: |
-          mkdir packaging/out
-          copy build\libs\*.jar packaging\windows\out\ /Y
+          mkdir -p packaging/windows/out
+          Copy-Item -Path build/libs/*.jar -Destination packaging/windows/out/ -Force
 
       - name: Install Launch4j
         run: choco install launch4j -y
