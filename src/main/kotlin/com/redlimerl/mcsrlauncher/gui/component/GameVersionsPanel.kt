@@ -13,6 +13,7 @@ import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SpeedrunUtils
+import io.github.z4kn4fein.semver.toVersion
 import java.awt.BorderLayout
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JDialog
@@ -22,7 +23,7 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.table.DefaultTableModel
 
-class GameVersionsPanel(private val parentWindow: JDialog, instance: BasicInstance? = null) : AbstractGameVersionsPanel() {
+class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicInstance? = null) : AbstractGameVersionsPanel() {
 
     init {
         layout = BorderLayout()
@@ -71,8 +72,12 @@ class GameVersionsPanel(private val parentWindow: JDialog, instance: BasicInstan
 
     fun getLWJGLVersion(): LWJGLVersionData {
         val vanillaVersion = this.getMinecraftVersion()
-        return vanillaVersion.requires.find { it.uid == MetaUniqueID.LWJGL3 || it.uid == MetaUniqueID.LWJGL2 }!!
-            .let { LWJGLVersionData(it.uid, it.equals ?: it.suggests ?: throw IllegalStateException("Not found version requirements for MC ${vanillaVersion.version}")) }
+        val isFabric = gameTabPane.selectedIndex == 0
+        val currentLWJGLComboBox = (if (isFabric) fabricLWJGLComboBox else vanillaLWJGLComboBox)
+        val lwjglRequire = vanillaVersion.requires.first()
+        val lwjglSelected = currentLWJGLComboBox.selectedItem as? String ?: throw IllegalStateException("LWJGL version is not selected")
+        if (MetaManager.getVersions(lwjglRequire.uid).none { it.version == lwjglSelected }) throw IllegalStateException("$lwjglSelected is not selectable version in ${lwjglRequire.uid}")
+        return LWJGLVersionData(lwjglRequire.uid, currentLWJGLComboBox.selectedItem as? String ?: throw IllegalStateException("LWJGL version is not selected"))
     }
 
     fun getFabricVersion(): FabricVersionData? {
@@ -121,6 +126,15 @@ class GameVersionsPanel(private val parentWindow: JDialog, instance: BasicInstan
     }
 
     private fun updateVanillaVersions() {
+        vanillaVersionTable.selectionModel.addListSelectionListener {
+            if (!it.valueIsAdjusting) {
+                val selectedRow = vanillaVersionTable.selectedRow
+                if (selectedRow >= 0) {
+                    this.onSelectVanillaMinecraftVersion(vanillaVersionTable.getValueAt(selectedRow, 1).toString())
+                }
+            }
+        }
+
         val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type"), I18n.translate("text.version"), I18n.translate("text.date")))
         MetaManager.getVersions(MetaUniqueID.MINECRAFT).filter {
             if (it.type == MetaVersionType.RELEASE && !vanillaReleaseCheckBox.isSelected
@@ -216,6 +230,32 @@ class GameVersionsPanel(private val parentWindow: JDialog, instance: BasicInstan
         val intermediaryVersion = MetaManager.getVersions(MetaUniqueID.FABRIC_INTERMEDIARY).find { it.version == version }!!
         for (compatibleIntermediary in intermediaryVersion.compatibleIntermediaries.sortedByDescending { it.recommendLevel }) {
             intermediaryComboBox.addItem(compatibleIntermediary)
+        }
+
+        val minecraftVersion = MetaManager.getVersions(MetaUniqueID.MINECRAFT).find { it.version == version }!!
+
+        fabricLWJGLComboBox.removeAllItems()
+        val lwjglRequire = minecraftVersion.requires.first()
+        val availableLWJGL = MetaManager.getVersions(lwjglRequire.uid)
+            .filter { it.version.toVersion() >= lwjglRequire.suggests?.toVersion()!! }
+            .sortedByDescending { it.version.toVersion() }
+        availableLWJGL.forEach { fabricLWJGLComboBox.addItem(it.version) }
+        fabricLWJGLComboBox.selectedIndex = availableLWJGL.indexOfFirst {
+            it.version == (instance?.lwjglVersion?.version ?: lwjglRequire.suggests)
+        }
+    }
+
+    private fun onSelectVanillaMinecraftVersion(version: String) {
+        val minecraftVersion = MetaManager.getVersions(MetaUniqueID.MINECRAFT).find { it.version == version }!!
+
+        vanillaLWJGLComboBox.removeAllItems()
+        val lwjglRequire = minecraftVersion.requires.first()
+        val availableLWJGL = MetaManager.getVersions(lwjglRequire.uid)
+            .filter { it.version.toVersion() >= lwjglRequire.suggests?.toVersion()!! }
+            .sortedByDescending { it.version.toVersion() }
+        availableLWJGL.forEach { vanillaLWJGLComboBox.addItem(it.version) }
+        vanillaLWJGLComboBox.selectedIndex = availableLWJGL.indexOfFirst {
+            it.version == (instance?.lwjglVersion?.version ?: lwjglRequire.suggests)
         }
     }
 
