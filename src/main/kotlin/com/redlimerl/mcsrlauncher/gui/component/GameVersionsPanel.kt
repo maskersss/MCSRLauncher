@@ -22,7 +22,7 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.table.DefaultTableModel
 
-class GameVersionsPanel(instance: BasicInstance? = null) : AbstractGameVersionsPanel() {
+class GameVersionsPanel(private val parentWindow: JDialog, instance: BasicInstance? = null) : AbstractGameVersionsPanel() {
 
     init {
         layout = BorderLayout()
@@ -144,7 +144,7 @@ class GameVersionsPanel(instance: BasicInstance? = null) : AbstractGameVersionsP
 
     private fun initFabricComponents() {
         fabricRefreshButton.addActionListener {
-            object : LauncherWorker(parent, I18n.translate("message.loading"), I18n.translate("message.updating.versions")) {
+            object : LauncherWorker(parentWindow, I18n.translate("message.loading"), I18n.translate("message.updating.versions")) {
                 override fun work(dialog: JDialog) {
                     MetaManager.load(this, true)
                     updateVanillaVersions()

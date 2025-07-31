@@ -25,7 +25,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
         cancelButton.addActionListener { this.dispose() }
         createInstanceButton.addActionListener { this.createInstance() }
 
-        this.gameVersionsPanel = GameVersionsPanel()
+        this.gameVersionsPanel = GameVersionsPanel(this)
         versionsPanel.layout = BorderLayout()
         versionsPanel.add(this.gameVersionsPanel, BorderLayout.CENTER)
 

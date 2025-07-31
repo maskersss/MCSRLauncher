@@ -18,7 +18,7 @@ class ChangeGameVersionGui(parent: JDialog, val instance: BasicInstance) : Chang
         minimumSize = Dimension(700, 500)
         setLocationRelativeTo(parent)
 
-        this.gameVersionsPanel = GameVersionsPanel(instance)
+        this.gameVersionsPanel = GameVersionsPanel(this, instance)
         versionsPanel.layout = BorderLayout()
         versionsPanel.add(this.gameVersionsPanel, BorderLayout.CENTER)
 
