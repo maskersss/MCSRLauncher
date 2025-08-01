@@ -16,13 +16,11 @@ import com.redlimerl.mcsrlauncher.util.SpeedrunUtils
 import com.redlimerl.mcsrlauncher.util.SwingUtils
 import io.github.z4kn4fein.semver.toVersion
 import java.awt.BorderLayout
-import javax.swing.DefaultComboBoxModel
-import javax.swing.JDialog
-import javax.swing.JOptionPane
-import javax.swing.ListSelectionModel
+import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.table.DefaultTableModel
+
 
 class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicInstance? = null) : AbstractGameVersionsPanel() {
 
@@ -47,7 +45,6 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
                         break
                     }
                 }
-                intermediaryComboBox.selectedItem = fabric.intermediaryType
             } else {
                 gameTabPane.selectedIndex = 1
             }
@@ -121,21 +118,19 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
         vanillaVersionTable.selectionModel.selectionMode = ListSelectionModel.SINGLE_SELECTION
         vanillaVersionTable.setDefaultEditor(Object::class.java, null)
         vanillaVersionTable.selectionModel.addListSelectionListener {
-            if (!it.valueIsAdjusting && vanillaVersionTable.selectedRow == -1 && vanillaVersionTable.rowCount > 0)
-                vanillaVersionTable.setRowSelectionInterval(it.lastIndex, it.lastIndex)
-        }
-    }
-
-    private fun updateVanillaVersions() {
-        vanillaVersionTable.selectionModel.addListSelectionListener {
             if (!it.valueIsAdjusting) {
+                if (vanillaVersionTable.selectedRow == -1 && vanillaVersionTable.rowCount > 0)
+                    vanillaVersionTable.setRowSelectionInterval(it.lastIndex, it.lastIndex)
+
                 val selectedRow = vanillaVersionTable.selectedRow
                 if (selectedRow >= 0) {
                     this.onSelectVanillaMinecraftVersion(vanillaVersionTable.getValueAt(selectedRow, 1).toString())
                 }
             }
         }
+    }
 
+    private fun updateVanillaVersions() {
         val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type"), I18n.translate("text.version"), I18n.translate("text.date")))
         MetaManager.getVersions(MetaUniqueID.MINECRAFT).filter {
             if (it.type == MetaVersionType.RELEASE && !vanillaReleaseCheckBox.isSelected
@@ -180,8 +175,15 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
         fabricVersionTable.selectionModel.selectionMode = ListSelectionModel.SINGLE_SELECTION
         fabricVersionTable.setDefaultEditor(Object::class.java, null)
         fabricVersionTable.selectionModel.addListSelectionListener {
-            if (!it.valueIsAdjusting && fabricVersionTable.selectedRow == -1 && fabricVersionTable.rowCount > 0)
-                fabricVersionTable.setRowSelectionInterval(it.lastIndex, it.lastIndex)
+            if (!it.valueIsAdjusting) {
+                if (fabricVersionTable.selectedRow == -1 && fabricVersionTable.rowCount > 0)
+                    fabricVersionTable.setRowSelectionInterval(it.lastIndex, it.lastIndex)
+
+                val selectedRow = fabricVersionTable.selectedRow
+                if (selectedRow >= 0) {
+                    this.onSelectFabricMinecraftVersion(fabricVersionTable.getValueAt(selectedRow, 1).toString())
+                }
+            }
         }
 
         intermediaryHelpButton.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_HELP)
@@ -196,16 +198,11 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
 
         fabricLoaderVersions.forEach { loaderModel.addElement(it.version) }
         fabricLoaderVersionComboBox.model = loaderModel
-        fabricLoaderVersionComboBox.selectedIndex = fabricLoaderVersions.indexOfFirst { it.recommended }
-
-        fabricVersionTable.selectionModel.addListSelectionListener {
-            if (!it.valueIsAdjusting) {
-                val selectedRow = fabricVersionTable.selectedRow
-                if (selectedRow >= 0) {
-                    this.onSelectFabricMinecraftVersion(fabricVersionTable.getValueAt(selectedRow, 1).toString())
-                }
-            }
+        fabricLoaderVersionComboBox.selectedIndex = fabricLoaderVersions.indexOfFirst {
+            val instanceVersion = instance?.fabricVersion?.loaderVersion
+            return@indexOfFirst if (instanceVersion != null) it.version == instanceVersion else it.recommended
         }
+
         val tableModel = DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.type"), I18n.translate("text.version"), I18n.translate("text.date")))
         MetaManager.getVersions(MetaUniqueID.MINECRAFT).filter {
             if (!MetaManager.containsVersion(MetaUniqueID.FABRIC_INTERMEDIARY, it.version)) return@filter false
@@ -231,34 +228,37 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
     private fun onSelectFabricMinecraftVersion(version: String) {
         intermediaryComboBox.removeAllItems()
         val intermediaryVersion = MetaManager.getVersions(MetaUniqueID.FABRIC_INTERMEDIARY).find { it.version == version }!!
+        var instanceIntermediary: IntermediaryType? = null
         for (compatibleIntermediary in intermediaryVersion.compatibleIntermediaries.sortedByDescending { it.recommendLevel }) {
             intermediaryComboBox.addItem(compatibleIntermediary)
+            if (instance?.fabricVersion?.intermediaryType == compatibleIntermediary)
+                instanceIntermediary = compatibleIntermediary
+        }
+
+        if (instanceIntermediary != null) {
+            intermediaryComboBox.selectedItem = instanceIntermediary
         }
 
         val minecraftVersion = MetaManager.getVersions(MetaUniqueID.MINECRAFT).find { it.version == version }!!
-
-        fabricLWJGLComboBox.removeAllItems()
-        val lwjglRequire = minecraftVersion.requires.first()
-        val availableLWJGL = MetaManager.getVersions(lwjglRequire.uid)
-            .filter { it.version.toVersion() >= lwjglRequire.suggests?.toVersion()!! }
-            .sortedByDescending { it.version.toVersion() }
-        availableLWJGL.forEach { fabricLWJGLComboBox.addItem(it.version) }
-        fabricLWJGLComboBox.selectedIndex = availableLWJGL.indexOfFirst {
-            it.version == (instance?.lwjglVersion?.version ?: lwjglRequire.suggests)
-        }
+        updateLWJGLVersion(fabricLWJGLComboBox, minecraftVersion)
     }
 
     private fun onSelectVanillaMinecraftVersion(version: String) {
         val minecraftVersion = MetaManager.getVersions(MetaUniqueID.MINECRAFT).find { it.version == version }!!
+        updateLWJGLVersion(vanillaLWJGLComboBox, minecraftVersion)
+    }
 
-        vanillaLWJGLComboBox.removeAllItems()
+    private fun updateLWJGLVersion(lwjglComboBox: JComboBox<String>, minecraftVersion: MetaVersion) {
+        lwjglComboBox.removeAllItems()
         val lwjglRequire = minecraftVersion.requires.first()
         val availableLWJGL = MetaManager.getVersions(lwjglRequire.uid)
             .filter { it.version.toVersion() >= lwjglRequire.suggests?.toVersion()!! }
             .sortedByDescending { it.version.toVersion() }
-        availableLWJGL.forEach { vanillaLWJGLComboBox.addItem(it.version) }
-        vanillaLWJGLComboBox.selectedIndex = availableLWJGL.indexOfFirst {
-            it.version == (instance?.lwjglVersion?.version ?: lwjglRequire.suggests)
+        availableLWJGL.forEach { lwjglComboBox.addItem(it.version) }
+        var instanceLWJGL = instance?.lwjglVersion?.version
+        if (availableLWJGL.none { it.version == instanceLWJGL } || (instance != null && instance.minecraftVersion != minecraftVersion.version)) instanceLWJGL = null
+        lwjglComboBox.selectedIndex = availableLWJGL.indexOfFirst {
+            it.version == (instanceLWJGL ?: lwjglRequire.suggests)
         }
     }
 
