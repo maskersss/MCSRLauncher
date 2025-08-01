@@ -2,12 +2,11 @@ package com.redlimerl.mcsrlauncher.instance
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.util.JavaUtils
-import java.io.FileNotFoundException
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.absolutePathString
 
-class JavaContainer(val path: Path, version: String? = null, vendor: String? = null) {
+class JavaContainer(val path: Path) {
 
     val vendor: String
     val version: String
@@ -30,9 +29,23 @@ class JavaContainer(val path: Path, version: String? = null, vendor: String? = n
     }
 
     init {
-        var possibleVendor: String
-        var possibleVersion: String
-        if (version == null || vendor == null) {
+        var possibleVendor: String? = null
+        var possibleVersion: String? = null
+
+        val releaseFile = path.parent.parent.resolve("release").toFile()
+        if (releaseFile.exists()) {
+            try {
+                val properties = Properties()
+                releaseFile.bufferedReader().use { reader -> properties.load(reader) }
+
+                possibleVendor = properties.getProperty("IMPLEMENTOR")?.replace("\"", "") ?: "Unknown Vendor"
+                possibleVersion = properties.getProperty("JAVA_VERSION")?.replace("\"", "") ?: "Unknown Version"
+            } catch (e: Exception) {
+                MCSRLauncher.LOGGER.error(e)
+            }
+        }
+
+        if (possibleVersion == null || possibleVendor == null) {
             val stderrLines = getVersionLists(this.getJavaRuntimePath())
 
             val versionLine = stderrLines.firstOrNull {
@@ -45,20 +58,6 @@ class JavaContainer(val path: Path, version: String? = null, vendor: String? = n
 
             val vendorLine = stderrLines.getOrNull(1) ?: "Unknown Vendor"
             possibleVendor = vendorLine.trim()
-        } else {
-            possibleVendor = vendor
-            possibleVersion = version
-        }
-
-        try {
-            val properties = Properties()
-            path.parent.parent.resolve("release").toFile().bufferedReader().use { reader -> properties.load(reader) }
-
-            possibleVendor = properties.getProperty("IMPLEMENTOR")?.replace("\"", "") ?: possibleVendor
-            possibleVersion = properties.getProperty("JAVA_VERSION")?.replace("\"", "") ?: possibleVersion
-        } catch (_: FileNotFoundException) {
-        } catch (e: Exception) {
-            MCSRLauncher.LOGGER.error(e)
         }
 
         this.version = possibleVersion
