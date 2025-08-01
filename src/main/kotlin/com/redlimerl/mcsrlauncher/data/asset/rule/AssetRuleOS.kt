@@ -1,13 +1,13 @@
 package com.redlimerl.mcsrlauncher.data.asset.rule
 
 import com.redlimerl.mcsrlauncher.data.device.DeviceArchitectureType
-import com.redlimerl.mcsrlauncher.data.device.DeviceOSType
+import com.redlimerl.mcsrlauncher.data.device.RuntimeOSType
 import com.redlimerl.mcsrlauncher.util.OSUtils
 import kotlinx.serialization.Serializable
 
 @Serializable
 class AssetRuleOS(
-    val name: DeviceOSType? = null,
+    val name: RuntimeOSType? = null,
     val version: String? = null,
     val arch: DeviceArchitectureType? = null
 ) {
