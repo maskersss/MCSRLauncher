@@ -127,8 +127,6 @@ class JavaManagerGui(parent: JDialog, private val currentJavaPath: String, onSel
         }
 
         repeat(javaListTable.rowCount) { i ->
-            MCSRLauncher.LOGGER.info(currentJavaPath)
-            MCSRLauncher.LOGGER.info(Paths.get(javaListTable.getValueAt(i, 2).toString()))
             if (Paths.get(currentJavaPath).equals(Paths.get(javaListTable.getValueAt(i, 2).toString()))) {
                 javaListTable.setRowSelectionInterval(i, i)
                 return@repeat
