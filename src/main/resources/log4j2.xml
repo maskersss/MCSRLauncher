@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Properties>
-        <Property name="layoutPattern">[%d{HH:mm:ss}] %highlight{[%p]}{FATAL=bg_red, ERROR=red, INFO=green, DEBUG=blue} %logger[%t]: %msg%n</Property>
+        <Property name="layoutPattern">[%d{HH:mm:ss}] [%p] %logger[%t]: %msg%n</Property>
     </Properties>
 
     <Appenders>
