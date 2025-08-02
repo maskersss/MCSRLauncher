@@ -1,7 +1,9 @@
 package com.redlimerl.mcsrlauncher.instance
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
+import com.redlimerl.mcsrlauncher.data.device.DeviceOSType
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
+import com.redlimerl.mcsrlauncher.data.meta.LauncherTrait
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.file.FabricIntermediaryMetaFile
 import com.redlimerl.mcsrlauncher.data.meta.file.FabricLoaderMetaFile
@@ -68,6 +70,10 @@ class InstanceProcess(val instance: BasicInstance) {
         val minCompatibleVersion = minecraftMetaFile.compatibleJavaMajors.min()
         if (minCompatibleVersion > javaContainer.majorVersion) {
             throw IllegalStateException("Required minimum Java version is ${minCompatibleVersion}, you are at ${javaContainer.majorVersion}")
+        }
+
+        if (minecraftMetaFile.traits.contains(LauncherTrait.FIRST_THREAD_MACOS) && DeviceOSType.OSX.isOn()) {
+            arguments.add("-XstartOnFirstThread")
         }
 
         minecraftMetaFile.libraries.filter { it.shouldApply() }.forEach { libraryMap.add(it.toInstanceLibrary()) }
