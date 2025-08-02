@@ -16,13 +16,32 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.zip.GZIPInputStream
+import kotlin.io.path.name
 
 object JavaUtils {
 
     fun javaExecutableName(): String {
         return if (DeviceOSType.WINDOWS.isOn()) "javaw.exe" else "java"
+    }
+
+    private fun toJavaExecutePath(path: Path): Path? {
+        var basicPath = path
+        if (basicPath.name != "bin") basicPath = basicPath.resolve("bin")
+        var file = basicPath.resolve(javaExecutableName()).toFile()
+        if (file.exists()) return file.toPath()
+
+        MCSRLauncher.LOGGER.info(path)
+        val macPath = path.resolve("Contents")
+        if (macPath.resolve("MacOS").toFile().exists()) {
+            file = macPath.resolve("Home").resolve("bin").resolve(javaExecutableName()).toFile()
+            MCSRLauncher.LOGGER.info(file)
+            if (file.exists()) return file.toPath()
+        }
+
+        return null
     }
 
     fun javaHomeVersions(): Set<JavaContainer> {
@@ -32,8 +51,7 @@ object JavaUtils {
         val javaHome = System.getenv("JAVA_HOME")
         if (!javaHome.isNullOrBlank()) {
             try {
-                val javaBin = Paths.get(javaHome, "bin", javaExecutableName()).toFile()
-                if (javaBin.exists()) containers.add(JavaContainer(javaBin.toPath()))
+                toJavaExecutePath(Paths.get(javaHome))?.let { containers.add(JavaContainer(it)) }
             } catch (e: Exception) {
                 MCSRLauncher.LOGGER.error(e)
             }
@@ -44,8 +62,7 @@ object JavaUtils {
             val paths = pathEnv.split(File.pathSeparator)
             for (dir in paths) {
                 try {
-                    val javaBin = File(dir, javaExecutableName())
-                    if (javaBin.exists()) containers.add(JavaContainer(javaBin.toPath()))
+                    toJavaExecutePath(Paths.get(dir))?.let { containers.add(JavaContainer(it)) }
                 } catch (e: Exception) {
                     MCSRLauncher.LOGGER.error(e)
                 }
@@ -56,21 +73,17 @@ object JavaUtils {
             containers.addAll(findJavaFromWindowsRegistry())
         } else {
             containers.addAll(findJavaInStandardDirs())
-            containers.addAll(findJavaFromUpdateAlternatives())
         }
 
         try {
-            val localJrePath = Paths.get("../", "jre", "bin", javaExecutableName())
-            if (localJrePath.toFile().exists()) JavaContainer(localJrePath)
+            toJavaExecutePath(Paths.get("../", "jre"))?.let { containers.add(JavaContainer(it)) }
         } catch (_: Throwable) {}
         try {
-            val localJrePath = Paths.get("", "jre", "bin", javaExecutableName())
-            if (localJrePath.toFile().exists()) JavaContainer(localJrePath)
+            toJavaExecutePath(Paths.get("", "jre"))?.let { containers.add(JavaContainer(it)) }
         } catch (_: Throwable) {}
 
         for (file in GameAssetManager.JAVA_PATH.toFile().listFiles()!!) {
-            val javaBin = file.resolve("bin").resolve(javaExecutableName())
-            if (javaBin.exists()) containers.add(JavaContainer(javaBin.toPath()))
+            toJavaExecutePath(file.toPath())?.let { containers.add(JavaContainer(it)) }
         }
 
         return containers
@@ -110,31 +123,6 @@ object JavaUtils {
             }
         }
 
-        return result.distinct()
-    }
-
-    private fun findJavaFromUpdateAlternatives(): List<JavaContainer> {
-        val result = mutableListOf<JavaContainer>()
-        try {
-            val process = ProcessBuilder("update-alternatives", "--list", "java")
-                .redirectErrorStream(true)
-                .start()
-            val output = process.inputStream.bufferedReader().readLines()
-            process.waitFor()
-
-            for (line in output) {
-                val f = File(line.trim())
-                if (f.exists() && f.canExecute()) {
-                    try {
-                        result.add(JavaContainer(f.toPath()))
-                    } catch (e: Exception) {
-                        MCSRLauncher.LOGGER.error(e)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            MCSRLauncher.LOGGER.error(e)
-        }
         return result.distinct()
     }
 
