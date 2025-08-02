@@ -3,6 +3,7 @@ package com.redlimerl.mcsrlauncher
 import com.formdev.flatlaf.FlatDarkLaf
 import com.formdev.flatlaf.FlatLaf
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont
+import com.redlimerl.mcsrlauncher.data.device.RuntimeOSType
 import com.redlimerl.mcsrlauncher.data.launcher.LauncherOptions
 import com.redlimerl.mcsrlauncher.gui.MainMenuGui
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
@@ -61,6 +62,7 @@ object MCSRLauncher {
         object : LauncherWorker(null, "Loading...") {
             override fun work(dialog: JDialog) {
                 LOGGER.warn("Base Path: {}", BASE_PATH.absolutePathString())
+                LOGGER.warn("OS & Arch: {}", RuntimeOSType.current())
 
                 this.setState("Loading Launcher Options...")
                 options = try {

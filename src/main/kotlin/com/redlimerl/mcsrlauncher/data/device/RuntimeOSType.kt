@@ -25,4 +25,12 @@ enum class RuntimeOSType(private val osType: DeviceOSType, private val architect
         return this.osType.isOn() && (this.architecture == null || this.architecture.isOn())
     }
 
+    companion object {
+        fun current(): RuntimeOSType {
+            return entries.filter { it.architecture != null }.find { it.isOn() }
+                ?: entries.filter { it.architecture == null }.find { it.isOn() }
+                ?: throw IllegalStateException("Not supported OS")
+        }
+    }
+
 }
