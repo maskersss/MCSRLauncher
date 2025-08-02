@@ -38,7 +38,7 @@ class JavaContainer(val path: Path) {
                 val properties = Properties()
                 releaseFile.bufferedReader().use { reader -> properties.load(reader) }
 
-                possibleVendor = properties.getProperty("IMPLEMENTOR")?.replace("\"", "") ?: "Unknown Vendor"
+                possibleVendor = properties.getProperty("IMPLEMENTOR")?.replace("\"", "") ?: "Unknown"
                 possibleVersion = properties.getProperty("JAVA_VERSION")?.replace("\"", "") ?: "Unknown Version"
             } catch (e: Exception) {
                 MCSRLauncher.LOGGER.error(e)
@@ -56,8 +56,16 @@ class JavaContainer(val path: Path) {
             val versionMatch = versionRegex.find(versionLine) ?: throw IllegalStateException("Cannot parse Java version from: $versionLine")
             possibleVersion = versionMatch.groupValues[1]
 
-            val vendorLine = stderrLines.getOrNull(1) ?: "Unknown Vendor"
-            possibleVendor = vendorLine.trim()
+            val vendorLine = stderrLines.drop(1).joinToString(" ")
+            possibleVendor = when {
+                vendorLine.contains("Oracle", ignoreCase = true) -> "Oracle"
+                vendorLine.contains("OpenJDK", ignoreCase = true) -> "OpenJDK"
+                vendorLine.contains("Adoptium", ignoreCase = true) -> "Eclipse Adoptium"
+                vendorLine.contains("Amazon", ignoreCase = true) -> "Amazon Corretto"
+                vendorLine.contains("Zulu", ignoreCase = true) -> "Zulu"
+                vendorLine.contains("IBM", ignoreCase = true) -> "IBM"
+                else -> vendorLine.take(64)
+            }
         }
 
         this.version = possibleVersion
