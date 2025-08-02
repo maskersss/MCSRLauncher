@@ -100,8 +100,8 @@ class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerD
                     val metaUniqueID = MetaUniqueID.JAVA_METAS.find { MetaManager.getMetaName(it) == javaVendorComboBox.selectedItem!!.toString() }!!
                     MetaManager.getVersions(metaUniqueID, this).forEach { it.getOrLoadMetaVersionFile<JavaMetaFile>(metaUniqueID, this) }
                     SwingUtilities.invokeLater {
-                        updateDownloadJavaVersionList()
                         SwingUtils.setEnabledRecursively(javaTabPane.getComponentAt(1), true)
+                        updateDownloadJavaVersionList()
                         javaLoadingLabel.isVisible = false
                     }
                 }
@@ -112,9 +112,6 @@ class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerD
         }
         javaVersionComboBox.addActionListener {
             if (javaVersionComboBox.selectedItem != null) updateDownloadJavaBuildList()
-        }
-        javaBuildComboBox.addActionListener {
-            installJavaButton.isEnabled = javaBuildComboBox.selectedItem != null
         }
 
         javaVersionComboBox.renderer = object : DefaultListCellRenderer() {
@@ -174,6 +171,8 @@ class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerD
                 }
             }
         }
+
+        installJavaButton.isEnabled = javaBuildComboBox.selectedItem != null
     }
 
     private fun updateDownloadJavaBuildList(metaName: String = javaVendorComboBox.selectedItem!!.toString(), majorVersion: Int = javaVersionComboBox.selectedItem as Int) {
@@ -182,7 +181,8 @@ class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerD
 
         javaBuildComboBox.removeAllItems()
         for (runtime in meta.runtimes) {
-            if (runtime.runtimeOS.isOn()) javaBuildComboBox.addItem(runtime.version.getName())
+            if (runtime.runtimeOS.isOn())
+                javaBuildComboBox.addItem(runtime.version.getName())
         }
     }
 }
