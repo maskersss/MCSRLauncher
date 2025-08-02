@@ -18,7 +18,10 @@ data class LauncherOptions(
     override var javaPath: String = Paths.get(System.getProperty("java.home")).resolve("bin").resolve(JavaUtils.javaExecutableName()).absolutePathString(),
     override var jvmArguments: String = "",
     override var minMemory: Int = 512,
-    override var maxMemory: Int = 2048
+    override var maxMemory: Int = 2048,
+    override var maximumResolution: Boolean = false,
+    override var resolutionWidth: Int = 854,
+    override var resolutionHeight: Int = 480
 ) : LauncherSharedOptions {
 
     companion object {

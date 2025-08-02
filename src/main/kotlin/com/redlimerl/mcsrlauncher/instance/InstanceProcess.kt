@@ -20,6 +20,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.apache.commons.io.FileUtils
+import java.awt.Toolkit
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -94,7 +95,21 @@ class InstanceProcess(val instance: BasicInstance) {
             .replace("\${user_type}", "msa")
             .replace("\${version_type}", minecraftMetaFile.type.toTypeId())
             .replace("\${user_properties}", "{}")
-            .split(" ")
+            .split(" ").toMutableList()
+
+        if (!minecraftMetaFile.traits.contains(LauncherTrait.LEGACY_LAUNCH)) {
+            if (instance.options.getSharedValue { it.maximumResolution }) {
+                gameArgs.add("--width")
+                gameArgs.add(Toolkit.getDefaultToolkit().screenSize.width.toString())
+                gameArgs.add("--height")
+                gameArgs.add(Toolkit.getDefaultToolkit().screenSize.height.toString())
+            } else {
+                gameArgs.add("--width")
+                gameArgs.add(instance.options.getSharedValue { it.resolutionWidth }.toString())
+                gameArgs.add("--height")
+                gameArgs.add(instance.options.getSharedValue { it.resolutionHeight }.toString())
+            }
+        }
 
         val lwjglMetaFile = MetaManager.getVersionMeta<LWJGLMetaFile>(instance.lwjglVersion.type, instance.lwjglVersion.version, worker)
             ?: throw IllegalStateException("LWJGL ${instance.lwjglVersion.version} is not found")

@@ -5,4 +5,7 @@ interface LauncherSharedOptions {
     var jvmArguments: String
     var minMemory: Int
     var maxMemory: Int
+    var maximumResolution: Boolean
+    var resolutionWidth: Int
+    var resolutionHeight: Int
 }
