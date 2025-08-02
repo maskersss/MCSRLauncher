@@ -117,7 +117,7 @@ class InstanceProcess(val instance: BasicInstance) {
             if (!libFile.exists()) throw IllegalStateException("Library: ${libFile.name} is not exist!")
             if (libFile.name.endsWith(".jar") && libFile.name.contains("natives")) {
                 if (MCSRLauncher.options.debug) MCSRLauncher.LOGGER.info("Native extracting: ${libFile.name}")
-                AssetUtils.extractZip(libFile, instance.getNativePath().toFile())
+                AssetUtils.extractZip(libFile, instance.getNativePath().toFile(), true)
                 nativeLibs.add(libraryPath)
             }
         }

@@ -5,6 +5,7 @@ import com.google.common.io.Files
 import java.io.File
 import java.io.InputStream
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.security.MessageDigest
 import java.util.zip.ZipFile
 import kotlin.math.ln
@@ -46,11 +47,16 @@ object AssetUtils {
         return "$groupPath/$artifact/$version/$jarName"
     }
 
-    fun extractZip(jar: File, destDir: File) {
+    fun extractZip(jar: File, destDir: File, flatten: Boolean = false) {
         ZipFile(jar).use { zip ->
             zip.entries().asSequence().forEach { entry ->
+                val name = entry.name
                 if (!entry.isDirectory) {
-                    val outFile = File(destDir, entry.name)
+                    val outFile: File = if (flatten) {
+                        File(destDir, Paths.get(name).fileName.toString())
+                    } else {
+                        File(destDir, entry.name)
+                    }
                     outFile.parentFile.mkdirs()
                     zip.getInputStream(entry).use { input ->
                         outFile.outputStream().use { output -> input.copyTo(output) }
