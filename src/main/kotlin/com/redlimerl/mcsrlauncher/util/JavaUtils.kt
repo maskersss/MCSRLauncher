@@ -33,11 +33,9 @@ object JavaUtils {
         var file = basicPath.resolve(javaExecutableName()).toFile()
         if (file.exists()) return file.toPath()
 
-        MCSRLauncher.LOGGER.info(path)
         val macPath = path.resolve("Contents")
         if (macPath.resolve("MacOS").toFile().exists()) {
             file = macPath.resolve("Home").resolve("bin").resolve(javaExecutableName()).toFile()
-            MCSRLauncher.LOGGER.info(file)
             if (file.exists()) return file.toPath()
         }
 
