@@ -38,7 +38,7 @@ class JavaSettingsPanel(parent: JDialog, val options: LauncherSharedOptions, pri
         refreshJavaPath()
 
         this.javaChangeButton.addActionListener {
-            JavaManagerGui(parent) {
+            JavaManagerGui(parent, options.javaPath) {
                 options.javaPath = it
                 onUpdate()
                 refreshJavaPath()

@@ -1,5 +1,6 @@
 package com.redlimerl.mcsrlauncher.gui
 
+import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.file.JavaMetaFile
 import com.redlimerl.mcsrlauncher.instance.JavaContainer
@@ -13,10 +14,13 @@ import java.awt.Component
 import java.awt.Dimension
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.io.File
+import java.nio.file.Paths
 import javax.swing.*
+import javax.swing.filechooser.FileFilter
 import javax.swing.table.DefaultTableModel
 
-class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerDialog(parent) {
+class JavaManagerGui(parent: JDialog, private val currentJavaPath: String, onSelect: (String) -> Unit) : JavaManagerDialog(parent) {
 
     private val javaList = arrayListOf<JavaContainer>()
     var selectedJavaPath: String? = null
@@ -56,12 +60,52 @@ class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerD
                 javaListTable.setRowSelectionInterval(it.lastIndex, it.lastIndex)
         }
 
+        javaBrowseButton.addActionListener {
+            val fileChooser = JFileChooser().apply {
+                dialogType = JFileChooser.CUSTOM_DIALOG
+                dialogTitle = I18n.translate("text.java.browse")
+                fileSelectionMode = JFileChooser.FILES_ONLY
+                fileFilter = object : FileFilter() {
+                    override fun accept(f: File): Boolean {
+                        return f.isDirectory || f.name.equals(JavaUtils.javaExecutableName())
+                    }
+
+                    override fun getDescription(): String {
+                        return JavaUtils.javaExecutableName()
+                    }
+                }
+            }
+            SwingUtils.makeEditablePathFileChooser(fileChooser)
+
+            val result = fileChooser.showDialog(this, I18n.translate("text.select"))
+
+            if (result == JFileChooser.APPROVE_OPTION) {
+                MCSRLauncher.options.customJavaPaths.add(fileChooser.selectedFile.parentFile.parentFile.absolutePath)
+                MCSRLauncher.options.save()
+                updateInstalledJavaVersions()
+                repeat(javaListTable.rowCount) { i ->
+                    if (Paths.get(javaListTable.getValueAt(i, 2).toString()).parent.equals(fileChooser.selectedFile.parentFile.toPath())) {
+                        javaListTable.setRowSelectionInterval(i, i)
+                        return@repeat
+                    }
+                }
+            }
+        }
+
         selectJavaVersionButton.addActionListener {
             if (javaListTable.selectedRow >= 0) {
                 selectedJavaPath = javaListTable.getValueAt(javaListTable.selectedRow, 2).toString()
             }
             this.dispose()
         }
+
+        this.addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent?) {
+                SwingUtilities.invokeLater {
+                    SwingUtils.autoFitTableColumns(javaListTable, mapOf(1 to 130))
+                }
+            }
+        })
     }
 
     fun updateInstalledJavaVersions() {
@@ -82,13 +126,14 @@ class JavaManagerGui(parent: JDialog, onSelect: (String) -> Unit) : JavaManagerD
             SwingUtils.autoFitTableColumns(javaListTable, mapOf(1 to 130))
         }
 
-        this.addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent?) {
-                SwingUtilities.invokeLater {
-                    SwingUtils.autoFitTableColumns(javaListTable, mapOf(1 to 130))
-                }
+        repeat(javaListTable.rowCount) { i ->
+            MCSRLauncher.LOGGER.info(currentJavaPath)
+            MCSRLauncher.LOGGER.info(Paths.get(javaListTable.getValueAt(i, 2).toString()))
+            if (Paths.get(currentJavaPath).equals(Paths.get(javaListTable.getValueAt(i, 2).toString()))) {
+                javaListTable.setRowSelectionInterval(i, i)
+                return@repeat
             }
-        })
+        }
     }
 
     private fun initDownloadJavaTab() {

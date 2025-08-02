@@ -84,6 +84,14 @@ object JavaUtils {
             toJavaExecutePath(file.toPath())?.let { containers.add(JavaContainer(it)) }
         }
 
+        for (customJavaPath in MCSRLauncher.options.customJavaPaths.toMutableList()) {
+            toJavaExecutePath(Paths.get(customJavaPath))?.let { containers.add(JavaContainer(it)) }
+                ?: {
+                    MCSRLauncher.options.customJavaPaths.remove(customJavaPath)
+                    MCSRLauncher.options.save()
+                }
+        }
+
         return containers
     }
 
