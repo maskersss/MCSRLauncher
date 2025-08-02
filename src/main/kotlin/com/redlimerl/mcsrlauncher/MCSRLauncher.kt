@@ -17,6 +17,7 @@ import com.redlimerl.mcsrlauncher.network.JsonSha256HttpClientResponseHandler
 import com.redlimerl.mcsrlauncher.network.JsonSha256ResponseResult
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
+import com.redlimerl.mcsrlauncher.util.OSUtils
 import com.redlimerl.mcsrlauncher.util.UpdaterUtils
 import kotlinx.serialization.json.Json
 import org.apache.commons.io.FileUtils
@@ -63,6 +64,9 @@ object MCSRLauncher {
             override fun work(dialog: JDialog) {
                 LOGGER.warn("Base Path: {}", BASE_PATH.absolutePathString())
                 LOGGER.warn("OS & Arch: {}", RuntimeOSType.current())
+                LOGGER.warn("System OS: {}", OSUtils.systemInfo.operatingSystem.family)
+                LOGGER.warn("System Bits: {}", OSUtils.systemInfo.operatingSystem.bitness)
+                LOGGER.warn("System Arch: {}", System.getProperty("os.arch"))
 
                 this.setState("Loading Launcher Options...")
                 options = try {
