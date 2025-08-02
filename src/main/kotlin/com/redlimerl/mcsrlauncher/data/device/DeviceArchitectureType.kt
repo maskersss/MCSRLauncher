@@ -21,7 +21,7 @@ enum class DeviceArchitectureType(val bit: Int) {
                 else X86
             } else {
                 if (is64Bit) ARM64
-                ARM32
+                else ARM32
             }
         }
     }
