@@ -38,6 +38,11 @@ class AccountListComponent : JPanel() {
             grid.fill = GridBagConstraints.HORIZONTAL
             val nicknameLabel = JLabel(account.profile.nickname)
             add(nicknameLabel, grid)
+            object : LauncherWorker() {
+                override fun work(dialog: JDialog) {
+                    nicknameLabel.icon = AccountManager.getSkinHead(account, nicknameLabel.font.size)
+                }
+            }.start()
 
             val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT, 5, 0)).apply {
                 val selectAccountButton = JButton(I18n.translate("account.select"))

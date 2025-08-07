@@ -22,6 +22,8 @@ public class LauncherOptionDialog extends JDialog {
     public JScrollPane tabJavaScrollPane;
     public JScrollPane tabLauncherScrollPane;
     public JButton checkUpdateButton;
+    public JComboBox<String> skinHeadTypeComboBox;
+    public JScrollPane tabInterfaceScrollPane;
 
     public LauncherOptionDialog(JFrame parent) {
         super(parent);
@@ -107,6 +109,22 @@ public class LauncherOptionDialog extends JDialog {
         tabJavaScrollPane.setHorizontalScrollBarPolicy(31);
         settingsTabPane.addTab("text.java", tabJavaScrollPane);
         tabJavaScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+        tabInterfaceScrollPane = new JScrollPane();
+        settingsTabPane.addTab("text.interface", tabInterfaceScrollPane);
+        tabInterfaceScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+        final JPanel panel7 = new JPanel();
+        panel7.setLayout(new GridLayoutManager(1, 3, new Insets(10, 10, 10, 10), -1, 15));
+        tabInterfaceScrollPane.setViewportView(panel7);
+        final JPanel panel8 = new JPanel();
+        panel8.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
+        panel7.add(panel8, new GridConstraints(0, 0, 1, 3, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JLabel label3 = new JLabel();
+        label3.setText("text.skin_head_type");
+        panel8.add(label3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer5 = new Spacer();
+        panel8.add(spacer5, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        skinHeadTypeComboBox = new JComboBox();
+        panel8.add(skinHeadTypeComboBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

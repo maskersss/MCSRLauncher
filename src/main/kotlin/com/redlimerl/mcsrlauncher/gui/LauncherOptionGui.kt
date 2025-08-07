@@ -3,6 +3,7 @@ package com.redlimerl.mcsrlauncher.gui
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.launcher.LauncherLanguage
 import com.redlimerl.mcsrlauncher.gui.component.JavaSettingsPanel
+import com.redlimerl.mcsrlauncher.launcher.AccountManager
 import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
@@ -24,6 +25,7 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
 
         this.initLauncherTab()
         this.initJavaTab()
+        this.initInterfaceTab()
 
         I18n.translateGui(this)
         isVisible = true
@@ -74,5 +76,16 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
         val javaSettingsPanel = JavaSettingsPanel(this, MCSRLauncher.options, MCSRLauncher.options::save)
         this.tabJavaScrollPane.setViewportView(javaSettingsPanel)
         SwingUtils.fasterScroll(this.tabJavaScrollPane)
+    }
+
+    private fun initInterfaceTab() {
+        skinHeadTypeComboBox.addItem("2D")
+        skinHeadTypeComboBox.addItem("3D")
+        skinHeadTypeComboBox.selectedIndex = if (MCSRLauncher.options.skinHead3d) 1 else 0
+        skinHeadTypeComboBox.addActionListener {
+            MCSRLauncher.options.skinHead3d = skinHeadTypeComboBox.selectedIndex != 0
+            AccountManager.clearSkinHeadCache()
+            MCSRLauncher.options.save()
+        }
     }
 }

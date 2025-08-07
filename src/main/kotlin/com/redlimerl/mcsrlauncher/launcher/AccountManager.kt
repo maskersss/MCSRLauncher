@@ -5,12 +5,17 @@ import com.redlimerl.mcsrlauncher.MCSRLauncher.JSON
 import com.redlimerl.mcsrlauncher.data.MicrosoftAccount
 import kotlinx.serialization.json.*
 import org.apache.commons.io.FileUtils
+import java.awt.Image
+import java.net.URL
 import java.nio.file.Path
+import javax.swing.ImageIcon
 
 object AccountManager {
 
     private var activeIndex: Int = -1
     private val accounts: ArrayList<MicrosoftAccount> = arrayListOf()
+    private val cachedSkinHead: HashMap<MicrosoftAccount, Image> = hashMapOf()
+
     val path: Path = MCSRLauncher.BASE_PATH.resolve("accounts.json")
 
     fun addAccount(newAccount: MicrosoftAccount) {
@@ -69,5 +74,18 @@ object AccountManager {
         ))
 
         FileUtils.writeStringToFile(path.toFile(), JSON.encodeToString(json), Charsets.UTF_8)
+    }
+
+    fun getSkinHead(account: MicrosoftAccount, size: Int): ImageIcon {
+        return if (MCSRLauncher.options.skinHead3d) ImageIcon(cachedSkinHead.computeIfAbsent(account) {
+                ImageIcon(URL("https://mc-heads.net/head/${account.profile.uuid}")).image
+            }.getScaledInstance(size, (size * 1.15f).toInt(), Image.SCALE_SMOOTH))
+        else ImageIcon(cachedSkinHead.computeIfAbsent(account) {
+            ImageIcon(URL("https://mc-heads.net/avatar/${account.profile.uuid}")).image
+        }.getScaledInstance(size, size, Image.SCALE_SMOOTH))
+    }
+
+    fun clearSkinHeadCache() {
+        cachedSkinHead.clear()
     }
 }

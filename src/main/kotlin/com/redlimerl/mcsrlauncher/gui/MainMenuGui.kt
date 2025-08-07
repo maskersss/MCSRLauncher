@@ -1,11 +1,14 @@
 package com.redlimerl.mcsrlauncher.gui
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
+import com.redlimerl.mcsrlauncher.data.MicrosoftAccount
 import com.redlimerl.mcsrlauncher.gui.component.InstanceLaunchButton
 import com.redlimerl.mcsrlauncher.gui.layout.WrapLayout
 import com.redlimerl.mcsrlauncher.gui.listener.MouseFillListener
+import com.redlimerl.mcsrlauncher.launcher.AccountManager
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
 import com.redlimerl.mcsrlauncher.util.I18n
+import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SwingUtils
 import net.miginfocom.swing.MigLayout
 import java.awt.*
@@ -34,9 +37,25 @@ class MainMenuGui : MainForm() {
     }
 
     private fun initLauncherMenu() {
+        fun refreshAccountButtonIcon(newAccount: MicrosoftAccount?) {
+            if (newAccount != null) {
+                object : LauncherWorker() {
+                    override fun work(dialog: JDialog) {
+                        accountButton.icon = AccountManager.getSkinHead(newAccount, 24)
+                    }
+                }.start()
+            } else {
+                accountButton.icon = ImageIcon(ImageIcon(javaClass.getResource("/icons/steve.png")).image.getScaledInstance(24, 24, Image.SCALE_SMOOTH))
+            }
+        }
+
         initHeaderButton(accountButton)
+        refreshAccountButtonIcon(AccountManager.getActiveAccount())
         accountButton.addActionListener {
+            val currentAccount = AccountManager.getActiveAccount()
             AccountListGui(this)
+            val newAccount = AccountManager.getActiveAccount()
+            if (currentAccount != newAccount) refreshAccountButtonIcon(newAccount)
         }
 
         initHeaderButton(createInstanceButton)
@@ -47,6 +66,7 @@ class MainMenuGui : MainForm() {
         initHeaderButton(settingsButton)
         settingsButton.addActionListener {
             LauncherOptionGui(this)
+            refreshAccountButtonIcon(AccountManager.getActiveAccount())
         }
 
         initHeaderButton(discordButton)
@@ -66,7 +86,7 @@ class MainMenuGui : MainForm() {
     }
 
     private fun initHeaderButton(button: JButton) {
-        button.icon = ImageIcon((button.icon as ImageIcon).image.getScaledInstance(24, 24, Image.SCALE_SMOOTH))
+        button.icon = ImageIcon((button.icon as? ImageIcon)?.image?.getScaledInstance(24, 24, Image.SCALE_SMOOTH))
         button.addMouseListener(MouseFillListener(button))
     }
 
