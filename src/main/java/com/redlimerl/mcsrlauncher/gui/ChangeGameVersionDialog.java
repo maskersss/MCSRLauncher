@@ -16,7 +16,6 @@ public class ChangeGameVersionDialog extends JDialog {
         super(window);
         setContentPane(contentPane);
         setModal(true);
-        getRootPane().setDefaultButton(cancelButton);
     }
 
     {

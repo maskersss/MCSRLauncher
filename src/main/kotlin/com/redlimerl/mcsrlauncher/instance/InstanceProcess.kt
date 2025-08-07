@@ -33,7 +33,7 @@ class InstanceProcess(val instance: BasicInstance) {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun start(worker: LauncherWorker) {
-        val javaTarget = instance.options.getSharedValue { it.javaPath }
+        val javaTarget = instance.options.getSharedJavaValue { it.javaPath }
         val noJavaException = IllegalStateException("Java has not selected. Try change your java path")
         if (javaTarget.isEmpty()) throw noJavaException
         val javaContainer: JavaContainer
@@ -60,11 +60,11 @@ class InstanceProcess(val instance: BasicInstance) {
         val libraryMap = arrayListOf<InstanceLibrary>()
 
         val arguments = arrayListOf(
-            "-Xms${instance.options.getSharedValue { it.minMemory }}M",
-            "-Xmx${instance.options.getSharedValue { it.maxMemory }}M"
+            "-Xms${instance.options.getSharedJavaValue { it.minMemory }}M",
+            "-Xmx${instance.options.getSharedJavaValue { it.maxMemory }}M"
         )
 
-        arguments.addAll(instance.options.getSharedValue { it.jvmArguments }.split(" ").flatMap { it.split("\n") }.filter { it.isNotBlank() })
+        arguments.addAll(instance.options.getSharedJavaValue { it.jvmArguments }.split(" ").flatMap { it.split("\n") }.filter { it.isNotBlank() })
 
         val minecraftMetaFile = MetaManager.getVersionMeta<MinecraftMetaFile>(MetaUniqueID.MINECRAFT, instance.minecraftVersion)
             ?: throw IllegalStateException("${MetaUniqueID.MINECRAFT.value} version meta is not found")
@@ -98,16 +98,16 @@ class InstanceProcess(val instance: BasicInstance) {
             .split(" ").toMutableList()
 
         if (!minecraftMetaFile.traits.contains(LauncherTrait.LEGACY_LAUNCH)) {
-            if (instance.options.getSharedValue { it.maximumResolution }) {
+            if (instance.options.getSharedJavaValue { it.maximumResolution }) {
                 gameArgs.add("--width")
                 gameArgs.add(Toolkit.getDefaultToolkit().screenSize.width.toString())
                 gameArgs.add("--height")
                 gameArgs.add(Toolkit.getDefaultToolkit().screenSize.height.toString())
             } else {
                 gameArgs.add("--width")
-                gameArgs.add(instance.options.getSharedValue { it.resolutionWidth }.toString())
+                gameArgs.add(instance.options.getSharedResolutionValue { it.resolutionWidth }.toString())
                 gameArgs.add("--height")
-                gameArgs.add(instance.options.getSharedValue { it.resolutionHeight }.toString())
+                gameArgs.add(instance.options.getSharedResolutionValue { it.resolutionHeight }.toString())
             }
         }
 

@@ -4,6 +4,7 @@ import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.gui.component.InstanceGroupComboBox
 import com.redlimerl.mcsrlauncher.gui.component.JavaSettingsPanel
+import com.redlimerl.mcsrlauncher.gui.component.ResolutionSettingsPanel
 import com.redlimerl.mcsrlauncher.instance.mod.ModData
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
 import com.redlimerl.mcsrlauncher.util.AssetUtils
@@ -73,6 +74,19 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         instanceOpenDirectoryButton.addActionListener {
             Desktop.getDesktop().open(instance.getGamePath().toFile().apply { mkdirs() })
         }
+
+        val resolutionSettingsPanel = ResolutionSettingsPanel(instance.options, instance.options::save)
+
+        instanceResolutionCheckBox.addActionListener {
+            SwingUtils.setEnabledRecursively(resolutionSettingsPanel, !instanceResolutionCheckBox.isSelected)
+            instance.options.useLauncherResolutionOption = instanceResolutionCheckBox.isSelected
+            instance.options.save()
+        }
+        instanceResolutionCheckBox.isSelected = instance.options.useLauncherJavaOption
+        SwingUtils.setEnabledRecursively(resolutionSettingsPanel, !instanceResolutionCheckBox.isSelected)
+
+        this.instanceResolutionPanel.layout = BorderLayout()
+        this.instanceResolutionPanel.add(resolutionSettingsPanel, BorderLayout.CENTER)
     }
 
     private fun initVersionTab() {
@@ -268,12 +282,12 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         val javaSettingsPanel = JavaSettingsPanel(this, instance.options, instance.options::save)
 
         javaLauncherSettingCheckBox.addActionListener {
-            javaSettingsPanel.setAllEnabled(!javaLauncherSettingCheckBox.isSelected)
-            instance.options.useLauncherOption = javaLauncherSettingCheckBox.isSelected
+            SwingUtils.setEnabledRecursively(javaSettingsPanel, !javaLauncherSettingCheckBox.isSelected)
+            instance.options.useLauncherJavaOption = javaLauncherSettingCheckBox.isSelected
             instance.options.save()
         }
-        javaLauncherSettingCheckBox.isSelected = instance.options.useLauncherOption
-        javaSettingsPanel.setAllEnabled(!javaLauncherSettingCheckBox.isSelected)
+        javaLauncherSettingCheckBox.isSelected = instance.options.useLauncherJavaOption
+        SwingUtils.setEnabledRecursively(javaSettingsPanel, !javaLauncherSettingCheckBox.isSelected)
 
         javaSettingsPane.layout = BorderLayout()
         javaSettingsPane.add(javaSettingsPanel, BorderLayout.CENTER)

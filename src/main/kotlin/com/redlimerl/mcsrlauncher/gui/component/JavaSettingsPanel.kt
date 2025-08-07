@@ -4,8 +4,6 @@ import com.redlimerl.mcsrlauncher.data.launcher.LauncherSharedOptions
 import com.redlimerl.mcsrlauncher.gui.JavaManagerGui
 import com.redlimerl.mcsrlauncher.gui.components.AbstractJavaSettingsPanel
 import java.awt.BorderLayout
-import java.awt.Component
-import java.awt.Container
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import javax.swing.JDialog
@@ -84,18 +82,5 @@ class JavaSettingsPanel(parent: JDialog, val options: LauncherSharedOptions, pri
                 onUpdate()
             }
         })
-    }
-
-    fun setAllEnabled(enabled: Boolean) {
-        setEnabledRecursively(this, enabled)
-    }
-
-    private fun setEnabledRecursively(component: Component, enabled: Boolean) {
-        component.isEnabled = enabled
-        if (component is Container) {
-            for (child in component.components) {
-                setEnabledRecursively(child, enabled)
-            }
-        }
     }
 }

@@ -19,7 +19,6 @@ public class AccountListDialog extends JDialog {
     public AccountListDialog() {
         setContentPane(contentPane);
         setModal(true);
-        getRootPane().setDefaultButton(closeButton);
     }
 
     {

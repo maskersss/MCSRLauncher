@@ -20,7 +20,6 @@ public class ManageSpeedrunModsDialog extends JDialog {
         super(window);
         setContentPane(contentPane);
         setModal(true);
-        getRootPane().setDefaultButton(applyButton);
     }
 
     {

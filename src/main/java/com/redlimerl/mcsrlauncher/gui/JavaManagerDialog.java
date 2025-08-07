@@ -28,7 +28,6 @@ public class JavaManagerDialog extends JDialog {
         super(parent);
         setContentPane(contentPane);
         setModal(true);
-        getRootPane().setDefaultButton(buttonCancel);
     }
 
     {
