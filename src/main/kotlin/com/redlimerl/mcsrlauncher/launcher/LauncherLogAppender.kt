@@ -1,6 +1,5 @@
 package com.redlimerl.mcsrlauncher.launcher
 
-import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -13,7 +12,8 @@ import org.apache.logging.log4j.core.config.Property
 import org.apache.logging.log4j.core.layout.PatternLayout
 import javax.swing.SwingUtilities
 
-class LauncherLogAppender(private val layout: PatternLayout) : AbstractAppender(MCSRLauncher.APP_NAME, null, layout, false, Property.EMPTY_ARRAY) {
+class LauncherLogAppender(private val layout: PatternLayout)
+    : AbstractAppender("Appender", null, layout, false, Property.EMPTY_ARRAY) {
 
     private var logArchive = StringBuilder()
     private var logChannel = Channel<String>(Channel.UNLIMITED)
@@ -24,6 +24,7 @@ class LauncherLogAppender(private val layout: PatternLayout) : AbstractAppender(
         val msg = layout.toSerializable(event) ?: return
         GlobalScope.launch {
             logChannel.send(msg)
+            print(msg)
         }
     }
 
