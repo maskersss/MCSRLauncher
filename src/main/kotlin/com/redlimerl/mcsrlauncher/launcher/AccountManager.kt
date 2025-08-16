@@ -1,13 +1,17 @@
 package com.redlimerl.mcsrlauncher.launcher
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
+import com.redlimerl.mcsrlauncher.MCSRLauncher.APP_NAME
 import com.redlimerl.mcsrlauncher.MCSRLauncher.JSON
+import com.redlimerl.mcsrlauncher.MCSRLauncher.LOGGER
 import com.redlimerl.mcsrlauncher.data.MicrosoftAccount
 import kotlinx.serialization.json.*
 import org.apache.commons.io.FileUtils
 import java.awt.Image
+import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.file.Path
+import javax.imageio.ImageIO
 import javax.swing.ImageIcon
 
 object AccountManager {
@@ -77,12 +81,25 @@ object AccountManager {
     }
 
     fun getSkinHead(account: MicrosoftAccount, size: Int): ImageIcon {
-        return if (MCSRLauncher.options.skinHead3d) ImageIcon(cachedSkinHead.computeIfAbsent(account) {
-                ImageIcon(URL("https://mc-heads.net/head/${account.profile.uuid}")).image
+        try {
+            return if (MCSRLauncher.options.skinHead3d) ImageIcon(cachedSkinHead.computeIfAbsent(account) {
+                val conn = URL("https://mc-heads.net/head/${account.profile.uuid}").openConnection() as HttpURLConnection
+                conn.setRequestProperty("User-Agent", APP_NAME)
+                conn.connect()
+
+                conn.inputStream.use { input -> ImageIO.read(input) }
             }.getScaledInstance(size, (size * 1.15f).toInt(), Image.SCALE_SMOOTH))
-        else ImageIcon(cachedSkinHead.computeIfAbsent(account) {
-            ImageIcon(URL("https://mc-heads.net/avatar/${account.profile.uuid}")).image
-        }.getScaledInstance(size, size, Image.SCALE_SMOOTH))
+            else ImageIcon(cachedSkinHead.computeIfAbsent(account) {
+                val conn = URL("https://mc-heads.net/avatar/${account.profile.uuid}").openConnection() as HttpURLConnection
+                conn.setRequestProperty("User-Agent", APP_NAME)
+                conn.connect()
+
+                conn.inputStream.use { input -> ImageIO.read(input) }
+            }.getScaledInstance(size, size, Image.SCALE_SMOOTH))
+        } catch (e: Exception) {
+            LOGGER.error(e)
+            return ImageIcon(ImageIcon(javaClass.getResource("/icons/steve.png")).image.getScaledInstance(size, size, Image.SCALE_SMOOTH))
+        }
     }
 
     fun clearSkinHeadCache() {
