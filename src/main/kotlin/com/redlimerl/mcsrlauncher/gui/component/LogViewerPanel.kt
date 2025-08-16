@@ -1,5 +1,6 @@
 package com.redlimerl.mcsrlauncher.gui.component
 
+import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.gui.components.AbstractLogViewerPanel
 import com.redlimerl.mcsrlauncher.util.HttpUtils.makeJsonRequest
@@ -120,6 +121,10 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
     fun syncInstance(instance: BasicInstance) {
         instance.logViewerPanel = this
         instance.getProcess()?.syncLogViewer(this)
+    }
+
+    fun syncLauncher() {
+        MCSRLauncher.LOG_APPENDER.syncLogViewer(this)
     }
 
     fun onLiveUpdate() {

@@ -7,10 +7,7 @@ import com.redlimerl.mcsrlauncher.data.device.RuntimeOSType
 import com.redlimerl.mcsrlauncher.data.launcher.LauncherOptions
 import com.redlimerl.mcsrlauncher.gui.MainMenuGui
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
-import com.redlimerl.mcsrlauncher.launcher.AccountManager
-import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
-import com.redlimerl.mcsrlauncher.launcher.InstanceManager
-import com.redlimerl.mcsrlauncher.launcher.MetaManager
+import com.redlimerl.mcsrlauncher.launcher.*
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.OSUtils
@@ -19,6 +16,7 @@ import kotlinx.serialization.json.Json
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.apache.logging.log4j.core.layout.PatternLayout
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -32,7 +30,13 @@ import kotlin.system.exitProcess
 object MCSRLauncher {
 
     val APP_NAME: String = javaClass.simpleName
-    val LOGGER: Logger = LogManager.getLogger(APP_NAME)
+    val LOG_APPENDER: LauncherLogAppender
+    val LOGGER: Logger = LogManager.getLogger(APP_NAME).also {
+        val mainLogger = (it as org.apache.logging.log4j.core.Logger)
+        LOG_APPENDER = LauncherLogAppender(mainLogger.appenders.values.first().layout as PatternLayout)
+        LOG_APPENDER.start()
+        mainLogger.addAppender(LOG_APPENDER)
+    }
     val BASE_PATH: Path = Paths.get("").absolute().let { if (it.name != "launcher") it.resolve("launcher") else it }
     val IS_DEV_VERSION = javaClass.`package`.implementationVersion == null
     val APP_VERSION = javaClass.`package`.implementationVersion ?: "dev"

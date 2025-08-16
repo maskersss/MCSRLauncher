@@ -3,6 +3,7 @@ package com.redlimerl.mcsrlauncher.gui
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.launcher.LauncherLanguage
 import com.redlimerl.mcsrlauncher.gui.component.JavaSettingsPanel
+import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
 import com.redlimerl.mcsrlauncher.gui.component.ResolutionSettingsPanel
 import com.redlimerl.mcsrlauncher.launcher.AccountManager
 import com.redlimerl.mcsrlauncher.launcher.MetaManager
@@ -28,6 +29,7 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
         this.initLauncherTab()
         this.initJavaTab()
         this.initInterfaceTab()
+        this.initLogTab()
 
         I18n.translateGui(this)
         isVisible = true
@@ -93,5 +95,10 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
             AccountManager.clearSkinHeadCache()
             MCSRLauncher.options.save()
         }
+    }
+
+    private fun initLogTab() {
+        logPanel.layout = BorderLayout()
+        logPanel.add(LogViewerPanel(MCSRLauncher.BASE_PATH).also { it.syncLauncher() }, BorderLayout.CENTER)
     }
 }
