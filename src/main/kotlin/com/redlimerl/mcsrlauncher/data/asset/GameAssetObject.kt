@@ -6,6 +6,7 @@ import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
 import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
 import com.redlimerl.mcsrlauncher.network.FileDownloader
 import com.redlimerl.mcsrlauncher.util.AssetUtils
+import com.redlimerl.mcsrlauncher.util.HttpUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import kotlinx.serialization.Serializable
 import org.apache.commons.io.FileUtils
@@ -22,7 +23,7 @@ data class GameAssetObject(
     fun getAssetIndexes(worker: LauncherWorker): GameAssetIndex {
         val assetIndexFile = GameAssetManager.INDEXES_PATH.resolve("${this.id}.json").toFile()
         if (!assetIndexFile.exists() || GameAssetManager.getChecksum(this.url) != this.sha1) {
-            val assetIndexResponse = MCSRLauncher.makeJsonRequest(HttpGet(this.url), worker)
+            val assetIndexResponse = HttpUtils.makeJsonRequest(HttpGet(this.url), worker)
             if (!assetIndexResponse.hasSuccess()) throw IllegalRequestResponseException("Failed to get game asset index: ${this.url}")
 
             val assetIndex = assetIndexResponse.get<GameAssetIndex>()

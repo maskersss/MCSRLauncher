@@ -175,7 +175,7 @@ object JavaUtils {
         if (targetDir.exists()) throw IllegalStateException("Directory is already exist: ${targetDir.absolutePath}")
         targetDir.mkdirs()
 
-        val jsonRequest = MCSRLauncher.makeJsonRequest(HttpGet(url), worker)
+        val jsonRequest = HttpUtils.makeJsonRequest(HttpGet(url), worker)
         if (!jsonRequest.hasSuccess()) throw IllegalRequestResponseException("Failed to get java manifest: $url")
 
         val manifest = jsonRequest.get<JavaRuntimeManifest>()

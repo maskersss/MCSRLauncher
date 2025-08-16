@@ -5,6 +5,7 @@ import com.redlimerl.mcsrlauncher.auth.MCTokenReceiverAuth
 import com.redlimerl.mcsrlauncher.auth.MinecraftAuthentication
 import com.redlimerl.mcsrlauncher.auth.XBLTokenReceiverAuth
 import com.redlimerl.mcsrlauncher.data.serializer.UUIDSerializer
+import com.redlimerl.mcsrlauncher.util.HttpUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -57,7 +58,7 @@ data class MinecraftProfile(
         val getRequest = HttpGet(MinecraftAuthentication.PROFILE_URL)
         getRequest.setHeader("Authorization", "Bearer $accessToken")
 
-        val response = MCSRLauncher.makeJsonRequest(getRequest, worker)
+        val response = HttpUtils.makeJsonRequest(getRequest, worker)
         return response.hasSuccess()
     }
 

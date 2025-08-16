@@ -11,25 +11,32 @@ import com.redlimerl.mcsrlauncher.data.meta.file.LWJGLMetaFile
 import com.redlimerl.mcsrlauncher.data.meta.file.MinecraftMetaFile
 import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
 import com.redlimerl.mcsrlauncher.exception.InvalidAccessTokenException
+import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
 import com.redlimerl.mcsrlauncher.launcher.AccountManager
 import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
 import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.AssetUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.apache.commons.io.FileUtils
 import java.awt.Toolkit
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import java.nio.file.Path
 import java.nio.file.Paths
+import javax.swing.SwingUtilities
 import kotlin.io.path.absolutePathString
+
 
 class InstanceProcess(val instance: BasicInstance) {
 
     var process: Process? = null
         private set
+    private var logArchive = StringBuilder()
+    private var logChannel = Channel<String>(Channel.UNLIMITED)
+    private var viewerUpdater: Job? = null
 
     @OptIn(DelicateCoroutinesApi::class)
     fun start(worker: LauncherWorker) {
@@ -157,11 +164,20 @@ class InstanceProcess(val instance: BasicInstance) {
         if (MCSRLauncher.options.debug) MCSRLauncher.LOGGER.info(finalizeArgs)
 
         GlobalScope.launch {
-            process = ProcessBuilder(finalizeArgs)
+            val process = ProcessBuilder(finalizeArgs)
                 .directory(instance.getGamePath().toFile())
-//                .redirectOutput(OSUtils.getNullFile())
-                .inheritIO()
+                .redirectErrorStream(true)
                 .start()
+
+            launch(Dispatchers.IO) {
+                BufferedReader(InputStreamReader(process.inputStream)).useLines { lines ->
+                    lines.forEach { line ->
+                        logChannel.send(line + "\n")
+                    }
+                }
+            }
+
+            this@InstanceProcess.process = process
             MCSRLauncher.GAME_PROCESSES.add(this@InstanceProcess)
             instance.onLaunch()
             val exitCode = process!!.waitFor()
@@ -170,9 +186,30 @@ class InstanceProcess(val instance: BasicInstance) {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
+    fun syncLogViewer(logViewer: LogViewerPanel) {
+        viewerUpdater?.cancel()
+
+        viewerUpdater = GlobalScope.launch {
+            SwingUtilities.invokeLater {
+                logViewer.updateLogs()
+                logViewer.liveLogArea.text = ""
+                logViewer.liveLogArea.append(logArchive.toString())
+            }
+            for (line in logChannel) {
+                SwingUtilities.invokeLater {
+                    logViewer.liveLogArea.append(line)
+                    logArchive.append(line)
+                    logViewer.onLiveUpdate()
+                }
+            }
+        }
+    }
+
     private fun onExit(code: Int) {
         MCSRLauncher.GAME_PROCESSES.remove(this)
         this.instance.onProcessExit(code)
+        this.logChannel.close()
     }
 
     fun exit() {

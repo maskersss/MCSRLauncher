@@ -6,6 +6,7 @@ import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.MetaVersion
 import com.redlimerl.mcsrlauncher.data.meta.file.MetaVersionFile
 import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
+import com.redlimerl.mcsrlauncher.util.HttpUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import org.apache.commons.io.FileUtils
 import org.apache.hc.client5.http.classic.methods.HttpGet
@@ -28,7 +29,7 @@ object MetaManager {
         if (!force && System.currentTimeMillis() - META_PACKAGES.latestUpdate < 1000 * 60 * 60 * 6) return onLoad(worker)
 
         MCSRLauncher.LOGGER.info("Getting meta packages...")
-        val response = MCSRLauncher.makeJsonRequest(HttpGet(this.getMetaURI()), worker)
+        val response = HttpUtils.makeJsonRequest(HttpGet(this.getMetaURI()), worker)
         if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to get meta packages")
 
         META_PACKAGES = response.get<MetaPackageIndexes>()

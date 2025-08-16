@@ -4,6 +4,7 @@ import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.auth.MSTokenReceiverAuth
 import com.redlimerl.mcsrlauncher.auth.MicrosoftAuthentication
 import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
+import com.redlimerl.mcsrlauncher.util.HttpUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.jsonArray
@@ -43,7 +44,7 @@ data class MicrosoftAccount(
             BasicNameValuePair("scope", MicrosoftAuthentication.TOKEN_SCOPE)
         ))
 
-        val response = MCSRLauncher.makeJsonRequest(postRequest, worker)
+        val response = HttpUtils.makeJsonRequest(postRequest, worker)
         if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to refresh MSA token! (${response.code}) ${response.result?.jsonObject?.get("error_codes")?.jsonArray}")
 
         val authResult = response.get<MSTokenReceiverAuth>()

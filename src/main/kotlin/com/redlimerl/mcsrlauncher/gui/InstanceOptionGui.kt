@@ -4,6 +4,7 @@ import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.gui.component.InstanceGroupComboBox
 import com.redlimerl.mcsrlauncher.gui.component.JavaSettingsPanel
+import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
 import com.redlimerl.mcsrlauncher.gui.component.ResolutionSettingsPanel
 import com.redlimerl.mcsrlauncher.instance.mod.ModData
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
@@ -46,6 +47,7 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         initVersionTab()
         initModsTab()
         initJavaTab()
+        initLogTab()
 
         I18n.translateGui(this)
         isVisible = true
@@ -292,5 +294,10 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         javaSettingsPane.layout = BorderLayout()
         javaSettingsPane.add(javaSettingsPanel, BorderLayout.CENTER)
         SwingUtils.fasterScroll(javaScrollPane)
+    }
+
+    private fun initLogTab() {
+        logPanel.layout = BorderLayout()
+        logPanel.add(LogViewerPanel(instance.getGamePath()).also { it.syncInstance(instance) }, BorderLayout.CENTER)
     }
 }

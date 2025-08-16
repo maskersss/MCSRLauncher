@@ -102,7 +102,7 @@ class AccountListComponent : JPanel() {
 
         val spacer = GridBagConstraints().apply {
             gridx = 0
-            gridy = grid.gridy // account 개수 이후
+            gridy = grid.gridy
             weighty = 1.0
             fill = GridBagConstraints.VERTICAL
             gridwidth = GridBagConstraints.REMAINDER

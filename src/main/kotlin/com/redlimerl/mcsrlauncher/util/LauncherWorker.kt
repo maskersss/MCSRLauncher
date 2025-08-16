@@ -76,8 +76,7 @@ abstract class LauncherWorker(
         val arrayOption = arrayOf(I18n.translate("text.copy.stacktrace_close"), I18n.translate("text.close"))
         val result = JOptionPane.showOptionDialog(parent, e.message, "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, arrayOption, arrayOption[1])
         if (result == 0) {
-            val selection = StringSelection(e.stackTraceToString())
-            Toolkit.getDefaultToolkit().systemClipboard.setContents(selection, selection)
+            Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(e.stackTraceToString()), null)
 
             JOptionPane.showMessageDialog(parent, "Stacktrace copied to clipboard.", "Copied", JOptionPane.INFORMATION_MESSAGE)
         }

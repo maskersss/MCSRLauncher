@@ -1,7 +1,7 @@
 package com.redlimerl.mcsrlauncher.auth
 
-import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
+import com.redlimerl.mcsrlauncher.util.HttpUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -62,7 +62,7 @@ data class XBLTokenReceiverAuth(
             postRequest.setHeader("Accept", "application/json")
             postRequest.entity = StringEntity(createUserProperties(accessToken).toString(), ContentType.APPLICATION_JSON)
 
-            val response = MCSRLauncher.makeJsonRequest(postRequest, worker)
+            val response = HttpUtils.makeJsonRequest(postRequest, worker)
 
             if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to get Xbox-Live User Token")
             return createTokenFromJson(response.result!!.jsonObject)
@@ -76,7 +76,7 @@ data class XBLTokenReceiverAuth(
             postRequest.setHeader("Accept", "application/json")
             postRequest.entity = StringEntity(createXSTSProperties(xblToken).toString(), ContentType.APPLICATION_JSON)
 
-            val response = MCSRLauncher.makeJsonRequest(postRequest, worker)
+            val response = HttpUtils.makeJsonRequest(postRequest, worker)
 
             if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to get Xbox-Live XSTS Token")
             return createTokenFromJson(response.result!!.jsonObject)

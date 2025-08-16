@@ -1,8 +1,8 @@
 package com.redlimerl.mcsrlauncher.auth
 
-import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.MinecraftProfile
 import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
+import com.redlimerl.mcsrlauncher.util.HttpUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -35,7 +35,7 @@ data class MCTokenReceiverAuth(
             postRequest.setHeader("Accept", "application/json")
             postRequest.entity = StringEntity("""{"identityToken": "XBL3.0 x=${xblToken.hash};${xblToken.token}"}""", ContentType.APPLICATION_JSON)
 
-            val response = MCSRLauncher.makeJsonRequest(postRequest, worker)
+            val response = HttpUtils.makeJsonRequest(postRequest, worker)
 
             if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to generate Minecraft Access Token")
             return response.get<MCTokenReceiverAuth>()
@@ -47,7 +47,7 @@ data class MCTokenReceiverAuth(
         getRequest.setHeader("Authorization", "Bearer $token")
         getRequest.setHeader("Accept", "application/json")
 
-        val response = MCSRLauncher.makeJsonRequest(getRequest, worker)
+        val response = HttpUtils.makeJsonRequest(getRequest, worker)
 
         if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to check game ownership")
         if (response.result!!.jsonObject["items"]!!.jsonArray.isEmpty()) throw IllegalStateException("You are not owned the game")
@@ -58,7 +58,7 @@ data class MCTokenReceiverAuth(
         getRequest.setHeader("Authorization", "Bearer $token")
         getRequest.setHeader("Accept", "application/json")
 
-        val response = MCSRLauncher.makeJsonRequest(getRequest, worker)
+        val response = HttpUtils.makeJsonRequest(getRequest, worker)
 
         if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to check Minecraft profile")
         return response.get<MinecraftProfile>()

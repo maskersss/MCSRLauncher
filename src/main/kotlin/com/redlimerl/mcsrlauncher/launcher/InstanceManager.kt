@@ -91,7 +91,7 @@ object InstanceManager {
             instanceLoop@ for (basicInstance in instances[key]!!) {
                 if (instance == basicInstance) {
                     instances[key]?.remove(instance)
-                    instance.getDirPath().toFile().also {
+                    instance.getInstancePath().toFile().also {
                         if (it.exists()) it.deleteRecursively()
                     }
                     break@instanceLoop

@@ -49,7 +49,7 @@ object UpdaterUtils {
     fun checkLatestVersion(worker: LauncherWorker): Version? {
         val current = MCSRLauncher.APP_VERSION.toVersionOrNull(false) ?: return null
 
-        val request = MCSRLauncher.makeJsonRequest(HttpGet(API_ENDPOINT), worker)
+        val request = HttpUtils.makeJsonRequest(HttpGet(API_ENDPOINT), worker)
         if (!request.hasSuccess()) return null
 
         val json = request.get<JsonObject>()

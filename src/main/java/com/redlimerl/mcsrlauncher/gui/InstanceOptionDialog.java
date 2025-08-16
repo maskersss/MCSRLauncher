@@ -33,6 +33,7 @@ public class InstanceOptionDialog extends JDialog {
     public JCheckBox autoUpdateSpeedrunModsCheckBox;
     public JPanel instanceResolutionPanel;
     public JCheckBox instanceResolutionCheckBox;
+    public JPanel logPanel;
 
     public InstanceOptionDialog(Window window) {
         super(window);
@@ -182,6 +183,12 @@ public class InstanceOptionDialog extends JDialog {
         javaSettingsPane = new JPanel();
         javaSettingsPane.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         panel12.add(javaSettingsPane, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel13 = new JPanel();
+        panel13.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        optionTab.addTab("text.log", panel13);
+        logPanel = new JPanel();
+        logPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel13.add(logPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     }
 
     /**

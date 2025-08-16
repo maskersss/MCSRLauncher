@@ -3,6 +3,7 @@ package com.redlimerl.mcsrlauncher.data.meta
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
 import com.redlimerl.mcsrlauncher.launcher.MetaManager
+import com.redlimerl.mcsrlauncher.util.HttpUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import kotlinx.serialization.Serializable
 import org.apache.commons.io.FileUtils
@@ -38,7 +39,7 @@ data class MetaPackage(
 
     fun updateVersions(worker: LauncherWorker): MetaVersionIndexes {
         worker.setState("Updating ${uid.name}-meta versions...")
-        val response = MCSRLauncher.makeJsonSha256Request(HttpGet(this.getURI()), worker)
+        val response = HttpUtils.makeJsonSha256Request(HttpGet(this.getURI()), worker)
         if (!response.hasSuccess()) throw IllegalStateException("Failed to get meta versions")
 
         val indexes = response.get<MetaVersionIndexes>()

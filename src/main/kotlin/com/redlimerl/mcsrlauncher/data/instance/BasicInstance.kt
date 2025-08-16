@@ -9,6 +9,7 @@ import com.redlimerl.mcsrlauncher.data.meta.file.SpeedrunModsMetaFile
 import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModMeta
 import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModTrait
 import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModVersion
+import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
 import com.redlimerl.mcsrlauncher.instance.LegacyLaunchFixer
 import com.redlimerl.mcsrlauncher.instance.mod.ModCategory
@@ -22,6 +23,7 @@ import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import io.github.z4kn4fein.semver.toVersion
 import io.github.z4kn4fein.semver.toVersionOrNull
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.apache.commons.io.FileUtils
 import java.net.URL
 import java.nio.file.Path
@@ -34,15 +36,18 @@ data class BasicInstance(
     var minecraftVersion: String,
     var lwjglVersion: LWJGLVersionData,
     var fabricVersion: FabricVersionData?,
-    val options: InstanceOptions = InstanceOptions()
+    val options: InstanceOptions = InstanceOptions(),
+
+    @Transient
+    var logViewerPanel: LogViewerPanel? = null
 ) {
 
-    fun getDirPath(): Path {
+    fun getInstancePath(): Path {
         return MCSRLauncher.BASE_PATH.resolve("instances").resolve(name)
     }
 
     fun getGamePath(): Path {
-        return this.getDirPath().resolve(".minecraft")
+        return this.getInstancePath().resolve(".minecraft")
     }
 
     fun getModsPath(): Path {
@@ -50,16 +55,19 @@ data class BasicInstance(
     }
 
     fun getNativePath(): Path {
-        return this.getDirPath().resolve("native")
+        return this.getInstancePath().resolve("native")
     }
 
     fun onCreate() {
-        this.getDirPath().toFile().mkdirs()
+        this.getInstancePath().toFile().mkdirs()
+        this.getGamePath().toFile().mkdirs()
+        this.getModsPath().toFile().mkdirs()
     }
 
     fun onLaunch() {
         MCSRLauncher.LOGGER.info("Launched instance: $name")
         InstanceManager.refreshInstanceList()
+        logViewerPanel?.let { getProcess()?.syncLogViewer(it) }
     }
 
     fun onProcessExit(code: Int) {
@@ -140,10 +148,10 @@ data class BasicInstance(
 
     fun setInstanceName(text: String) {
         this.displayName = text
-        val beforeFile = this.getDirPath().toFile()
+        val beforeFile = this.getInstancePath().toFile()
         this.name = InstanceManager.getNewInstanceName(this.displayName)
         MCSRLauncher.LOGGER.info("Update instance name to $name from ${beforeFile.name}")
-        val afterFile = this.getDirPath().toFile()
+        val afterFile = this.getInstancePath().toFile()
         FileUtils.moveDirectory(beforeFile, afterFile)
     }
 

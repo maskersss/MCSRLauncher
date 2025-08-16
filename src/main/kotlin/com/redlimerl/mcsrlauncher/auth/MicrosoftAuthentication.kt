@@ -2,6 +2,7 @@ package com.redlimerl.mcsrlauncher.auth
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
+import com.redlimerl.mcsrlauncher.util.HttpUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -44,7 +45,7 @@ data class MSDeviceCodeAuth(
                 BasicNameValuePair("scope", MicrosoftAuthentication.TOKEN_SCOPE)
             ))
 
-            val response = MCSRLauncher.makeJsonRequest(postRequest, worker)
+            val response = HttpUtils.makeJsonRequest(postRequest, worker)
 
             if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to get MSA device-code")
             return response.get<MSDeviceCodeAuth>()
@@ -76,7 +77,7 @@ data class MSTokenReceiverAuth(
                 BasicNameValuePair("device_code", deviceCode.deviceCode)
             ))
 
-            val response = MCSRLauncher.makeJsonRequest(postRequest, worker)
+            val response = HttpUtils.makeJsonRequest(postRequest, worker)
 
             if (!response.hasSuccess()) {
                 val errorType = response.get<MSAuthenticationError>()

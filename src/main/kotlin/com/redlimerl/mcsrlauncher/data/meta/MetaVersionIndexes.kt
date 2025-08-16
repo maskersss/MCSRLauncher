@@ -5,6 +5,7 @@ import com.redlimerl.mcsrlauncher.data.meta.file.MetaVersionFile
 import com.redlimerl.mcsrlauncher.data.serializer.ISO8601Serializer
 import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
 import com.redlimerl.mcsrlauncher.launcher.MetaManager
+import com.redlimerl.mcsrlauncher.util.HttpUtils
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SpeedrunUtils
@@ -56,7 +57,7 @@ data class MetaVersion(
 
     fun updateFile(uid: MetaUniqueID, worker: LauncherWorker): MetaVersionFile {
         MCSRLauncher.LOGGER.info("Updating meta version($version) file...")
-        val response = MCSRLauncher.makeJsonSha256Request(HttpGet(this.getURI(uid)), worker)
+        val response = HttpUtils.makeJsonSha256Request(HttpGet(this.getURI(uid)), worker)
         if (!response.hasSuccess()) throw IllegalStateException("Failed to get meta version file")
 
         val versionFile = response.get<MetaVersionFile>()
