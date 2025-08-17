@@ -173,6 +173,7 @@ class InstanceProcess(val instance: BasicInstance) {
                 put("INST_DIR", instance.getInstancePath().absolutePathString())
                 put("INST_MC_DIR", instance.getGamePath().absolutePathString())
                 put("INST_JAVA", javaContainer.path.absolutePathString())
+                put("INST_JAVA_ARGS", arguments.joinToString(" "))
             }
             val process = processBuilder.start()
 
