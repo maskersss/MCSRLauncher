@@ -164,10 +164,17 @@ class InstanceProcess(val instance: BasicInstance) {
         if (MCSRLauncher.options.debug) MCSRLauncher.LOGGER.info(finalizeArgs)
 
         GlobalScope.launch {
-            val process = ProcessBuilder(finalizeArgs)
+            val processBuilder = ProcessBuilder(finalizeArgs)
                 .directory(instance.getGamePath().toFile())
                 .redirectErrorStream(true)
-                .start()
+            processBuilder.environment().apply {
+                put("INST_ID", instance.name)
+                put("INST_NAME", instance.displayName)
+                put("INST_DIR", instance.getInstancePath().absolutePathString())
+                put("INST_MC_DIR", instance.getGamePath().absolutePathString())
+                put("INST_JAVA", javaContainer.path.absolutePathString())
+            }
+            val process = processBuilder.start()
 
             launch(Dispatchers.IO) {
                 BufferedReader(InputStreamReader(process.inputStream)).useLines { lines ->
