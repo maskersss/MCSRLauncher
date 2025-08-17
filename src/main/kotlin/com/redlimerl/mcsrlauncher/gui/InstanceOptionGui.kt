@@ -13,10 +13,7 @@ import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SwingUtils
 import org.apache.commons.io.FileUtils
-import java.awt.BorderLayout
-import java.awt.Desktop
-import java.awt.Dimension
-import java.awt.Window
+import java.awt.*
 import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
@@ -34,6 +31,7 @@ import kotlin.io.path.exists
 class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceOptionDialog(parent) {
 
     var mods: List<ModData> = emptyList()
+    private val launchBlockComponents = arrayListOf<Component>()
 
     init {
         title = getUpdatedTitle()
@@ -42,6 +40,7 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
 
         this.cancelButton.addActionListener { this.dispose() }
         this.launchButton.addActionListener { instance.launchWithDialog() }
+        launchBlockComponents.add(launchButton)
 
         initInstanceTab()
         initVersionTab()
@@ -50,7 +49,10 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         initLogTab()
 
         I18n.translateGui(this)
+        instance.optionDialog = this
+        setLauncherLaunched(instance.isRunning())
         isVisible = true
+        instance.optionDialog = null
     }
 
     private fun getUpdatedTitle(): String {
@@ -72,6 +74,7 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
                 InstanceManager.moveInstanceGroup(instance, instanceGroupField.selectedItem as String)
             }
         }
+        launchBlockComponents.add(instanceApplyChangesButton)
 
         instanceOpenDirectoryButton.addActionListener {
             Desktop.getDesktop().open(instance.getGamePath().toFile().apply { mkdirs() })
@@ -110,14 +113,13 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         }
         versionsTable.model = tableModel
 
-        if (changeVersionButton.actionListeners.isEmpty()) {
-            changeVersionButton.addActionListener {
-                val changeVersion = ChangeGameVersionGui(this@InstanceOptionGui, instance)
-                if (changeVersion.hasChanged) {
-                    initVersionTab()
-                }
+        changeVersionButton.addActionListener {
+            val changeVersion = ChangeGameVersionGui(this@InstanceOptionGui, instance)
+            if (changeVersion.hasChanged) {
+                initVersionTab()
             }
         }
+        launchBlockComponents.add(changeVersionButton)
     }
 
     private fun updateMods() {
@@ -155,6 +157,7 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         SwingUtilities.invokeLater {
             SwingUtils.autoFitTableColumns(modsTable)
         }
+        launchBlockComponents.add(changeVersionButton)
     }
 
     private fun initModsTab() {
@@ -265,19 +268,25 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         }
 
         enableModButton.addActionListener {
+            if (checkInstanceLaunched()) return@addActionListener
             modsTable.selectedRows.map { mods[it] }.forEach { it.isEnabled = true }
             updateMods()
         }
 
         disableModButton.addActionListener {
+            if (checkInstanceLaunched()) return@addActionListener
             modsTable.selectedRows.map { mods[it] }.forEach { it.isEnabled = false }
             updateMods()
         }
 
         deleteModButton.addActionListener {
+            if (checkInstanceLaunched()) return@addActionListener
             modsTable.selectedRows.map { mods[it] }.forEach { it.delete() }
             updateMods()
         }
+
+        launchBlockComponents.add(manageSpeedrunModsButton)
+        launchBlockComponents.add(updateSpeedrunModsButton)
     }
 
     private fun initJavaTab() {
@@ -299,5 +308,17 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
     private fun initLogTab() {
         logPanel.layout = BorderLayout()
         logPanel.add(LogViewerPanel(instance.getGamePath()).also { it.syncInstance(instance) }, BorderLayout.CENTER)
+    }
+
+    private fun checkInstanceLaunched(): Boolean {
+        if (instance.isRunning()) {
+            JOptionPane.showMessageDialog(this@InstanceOptionGui, I18n.translate("message.instance_launched_warning"), I18n.translate("text.error"), JOptionPane.ERROR_MESSAGE)
+            return true
+        }
+        return false
+    }
+
+    fun setLauncherLaunched(launched: Boolean) {
+        launchBlockComponents.forEach { SwingUtils.setEnabledRecursively(it, !launched) }
     }
 }

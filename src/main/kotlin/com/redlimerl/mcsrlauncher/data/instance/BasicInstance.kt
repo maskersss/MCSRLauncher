@@ -9,6 +9,7 @@ import com.redlimerl.mcsrlauncher.data.meta.file.SpeedrunModsMetaFile
 import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModMeta
 import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModTrait
 import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModVersion
+import com.redlimerl.mcsrlauncher.gui.InstanceOptionGui
 import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
 import com.redlimerl.mcsrlauncher.instance.LegacyLaunchFixer
@@ -39,7 +40,9 @@ data class BasicInstance(
     val options: InstanceOptions = InstanceOptions(),
 
     @Transient
-    var logViewerPanel: LogViewerPanel? = null
+    var logViewerPanel: LogViewerPanel? = null,
+    @Transient
+    var optionDialog: InstanceOptionGui? = null
 ) {
 
     fun getInstancePath(): Path {
@@ -68,12 +71,14 @@ data class BasicInstance(
         MCSRLauncher.LOGGER.info("Launched instance: $name")
         InstanceManager.refreshInstanceList()
         logViewerPanel?.let { getProcess()?.syncLogViewer(it) }
+        optionDialog?.setLauncherLaunched(true)
     }
 
     fun onProcessExit(code: Int) {
         MCSRLauncher.LOGGER.info("Exited instance: $name ($code)")
         FileUtils.deleteDirectory(this.getNativePath().toFile())
         InstanceManager.refreshInstanceList()
+        optionDialog?.setLauncherLaunched(false)
     }
 
     fun install(worker: LauncherWorker) {
