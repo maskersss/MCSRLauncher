@@ -1,16 +1,16 @@
 package com.redlimerl.mcsrlauncher.launcher
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
-import com.redlimerl.mcsrlauncher.MCSRLauncher.APP_NAME
 import com.redlimerl.mcsrlauncher.MCSRLauncher.JSON
 import com.redlimerl.mcsrlauncher.MCSRLauncher.LOGGER
 import com.redlimerl.mcsrlauncher.data.MicrosoftAccount
 import kotlinx.serialization.json.*
 import org.apache.commons.io.FileUtils
 import java.awt.Image
-import java.net.HttpURLConnection
-import java.net.URL
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
 import java.nio.file.Path
+import java.util.*
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
 
@@ -18,7 +18,6 @@ object AccountManager {
 
     private var activeIndex: Int = -1
     private val accounts: ArrayList<MicrosoftAccount> = arrayListOf()
-    private val cachedSkinHead: HashMap<MicrosoftAccount, Image> = hashMapOf()
 
     val path: Path = MCSRLauncher.BASE_PATH.resolve("accounts.json")
 
@@ -81,28 +80,27 @@ object AccountManager {
     }
 
     fun getSkinHead(account: MicrosoftAccount, size: Int): ImageIcon {
+        val defaultIcon = ImageIcon(ImageIcon(javaClass.getResource("/icons/steve.png")).image.getScaledInstance(size, size, Image.SCALE_SMOOTH))
         try {
-            return if (MCSRLauncher.options.skinHead3d) ImageIcon(cachedSkinHead.computeIfAbsent(account) {
-                val conn = URL("https://mc-heads.net/head/${account.profile.uuid}").openConnection() as HttpURLConnection
-                conn.setRequestProperty("User-Agent", APP_NAME)
-                conn.connect()
+            val skin = account.profile.skin ?: return defaultIcon
 
-                conn.inputStream.use { input -> ImageIO.read(input) }
-            }.getScaledInstance(size, (size * 1.15f).toInt(), Image.SCALE_SMOOTH))
-            else ImageIcon(cachedSkinHead.computeIfAbsent(account) {
-                val conn = URL("https://mc-heads.net/avatar/${account.profile.uuid}").openConnection() as HttpURLConnection
-                conn.setRequestProperty("User-Agent", APP_NAME)
-                conn.connect()
+            val skinBytes = Base64.getDecoder().decode(skin.data)
+            val skinImage = ImageIO.read(ByteArrayInputStream(skinBytes))
 
-                conn.inputStream.use { input -> ImageIO.read(input) }
-            }.getScaledInstance(size, size, Image.SCALE_SMOOTH))
+            val head = skinImage.getSubimage(8, 8, 8, 8)
+
+            val overlay = skinImage.getSubimage(40, 8, 8, 8)
+
+            val result = BufferedImage(8, 8, BufferedImage.TYPE_INT_ARGB)
+            val g = result.createGraphics()
+            g.drawImage(head, 0, 0, null)
+            g.drawImage(overlay, 0, 0, null)
+            g.dispose()
+
+            return ImageIcon(result.getScaledInstance(size, size, Image.SCALE_SMOOTH))
         } catch (e: Exception) {
             LOGGER.error(e)
-            return ImageIcon(ImageIcon(javaClass.getResource("/icons/steve.png")).image.getScaledInstance(size, size, Image.SCALE_SMOOTH))
+            return defaultIcon
         }
-    }
-
-    fun clearSkinHeadCache() {
-        cachedSkinHead.clear()
     }
 }

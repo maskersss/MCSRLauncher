@@ -5,7 +5,6 @@ import com.redlimerl.mcsrlauncher.data.launcher.LauncherLanguage
 import com.redlimerl.mcsrlauncher.gui.component.JavaSettingsPanel
 import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
 import com.redlimerl.mcsrlauncher.gui.component.ResolutionSettingsPanel
-import com.redlimerl.mcsrlauncher.launcher.AccountManager
 import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
@@ -87,14 +86,6 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
     }
 
     private fun initInterfaceTab() {
-        skinHeadTypeComboBox.addItem("2D")
-        skinHeadTypeComboBox.addItem("3D")
-        skinHeadTypeComboBox.selectedIndex = if (MCSRLauncher.options.skinHead3d) 1 else 0
-        skinHeadTypeComboBox.addActionListener {
-            MCSRLauncher.options.skinHead3d = skinHeadTypeComboBox.selectedIndex != 0
-            AccountManager.clearSkinHeadCache()
-            MCSRLauncher.options.save()
-        }
     }
 
     private fun initLogTab() {

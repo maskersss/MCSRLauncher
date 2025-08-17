@@ -1,6 +1,7 @@
 package com.redlimerl.mcsrlauncher.auth
 
 import com.redlimerl.mcsrlauncher.data.MinecraftProfile
+import com.redlimerl.mcsrlauncher.data.MinecraftProfileApiResponse
 import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
 import com.redlimerl.mcsrlauncher.util.HttpUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
@@ -61,7 +62,7 @@ data class MCTokenReceiverAuth(
         val response = HttpUtils.makeJsonRequest(getRequest, worker)
 
         if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to check Minecraft profile")
-        return response.get<MinecraftProfile>()
+        return response.get<MinecraftProfileApiResponse>().toProfile()
     }
 }
 

@@ -7,9 +7,11 @@ import java.io.InputStream
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.security.MessageDigest
+import java.util.*
 import java.util.zip.ZipFile
 import kotlin.math.ln
 import kotlin.math.pow
+
 
 object AssetUtils {
 
@@ -72,6 +74,15 @@ object AssetUtils {
         val unit = "KMGTPE"[exp - 1]
         val size = bytes / 1024.0.pow(exp.toDouble())
         return String.format("%.1f %sB", size, unit)
+    }
+
+    fun parseUUID(uuid: String): UUID {
+        return UUID.fromString(
+            uuid.replace("-".toRegex(), "").replaceFirst(
+                "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)".toRegex(),
+                "$1-$2-$3-$4-$5"
+            )
+        )
     }
 
 }

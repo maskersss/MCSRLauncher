@@ -69,13 +69,14 @@ class AccountListComponent : JPanel() {
                         override fun work(dialog: JDialog) {
                             account.profile.refresh(this, account, true)
                             AccountManager.save()
+                            nicknameLabel.icon = AccountManager.getSkinHead(account, nicknameLabel.font.size)
                         }
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
                             refreshTokenButton.isEnabled = true
                         }
-                    }.start()
+                    }.showDialog().start()
                 }
 
                 removeAccountButton.addActionListener {

@@ -15,7 +15,6 @@ data class LauncherOptions(
     var language: LauncherLanguage = LauncherLanguage.ENGLISH,
     var metaUrl: String = "https://mcsrlauncher.github.io/meta/",
     val customJavaPaths: LinkedHashSet<String> = linkedSetOf(),
-    var skinHead3d: Boolean = false,
     override var javaPath: String = Paths.get(System.getProperty("java.home")).resolve("bin").resolve(JavaUtils.javaExecutableName()).absolutePathString(),
     override var jvmArguments: String = "",
     override var minMemory: Int = 512,
