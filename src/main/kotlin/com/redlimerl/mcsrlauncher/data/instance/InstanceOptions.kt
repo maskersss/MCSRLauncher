@@ -2,7 +2,6 @@ package com.redlimerl.mcsrlauncher.data.instance
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.launcher.LauncherSharedOptions
-import com.redlimerl.mcsrlauncher.launcher.InstanceManager
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,10 +17,6 @@ data class InstanceOptions(
     override var resolutionWidth: Int = 854,
     override var resolutionHeight: Int = 480
 ) : LauncherSharedOptions {
-
-    fun save() {
-        InstanceManager.save()
-    }
 
     fun <T> getSharedJavaValue(sharedOptions: (LauncherSharedOptions) -> T): T {
         return sharedOptions(if (useLauncherJavaOption) MCSRLauncher.options else this)

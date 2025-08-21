@@ -7,24 +7,26 @@ import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.data.instance.FabricVersionData
 import com.redlimerl.mcsrlauncher.data.instance.LWJGLVersionData
 import com.redlimerl.mcsrlauncher.data.meta.MetaVersion
-import org.apache.commons.io.FileUtils
 import java.nio.file.Path
 
 object InstanceManager {
 
-    private const val DEFAULT_GROUP = "Default"
+    const val DEFAULT_GROUP = "Default"
+    val INSTANCES_PATH: Path = MCSRLauncher.BASE_PATH.resolve("instances")
 
-    val path: Path = MCSRLauncher.BASE_PATH.resolve("instances.json")
+    private val oldConfigPath: Path = MCSRLauncher.BASE_PATH.resolve("instances.json")
     val instances = linkedMapOf<String, ArrayList<BasicInstance>>()
 
-    fun load() {
-        if (!path.toFile().exists()) return save()
+    fun loadAll() {
+        migrateOldConfig()
 
-        instances.putAll(JSON.decodeFromString<Map<String, ArrayList<BasicInstance>>>(FileUtils.readFileToString(path.toFile(), Charsets.UTF_8)))
-    }
-
-    fun save() {
-        FileUtils.writeStringToFile(path.toFile(), JSON.encodeToString(instances), Charsets.UTF_8)
+        INSTANCES_PATH.toFile().mkdirs()
+        for (file in INSTANCES_PATH.toFile().listFiles()!!) {
+            if (file.exists() && file.isDirectory) {
+                val configFile = file.toPath().resolve("instance.json").toFile()
+                if (configFile.exists()) addInstance(JSON.decodeFromString(configFile.readText()), true)
+            }
+        }
     }
 
     fun getNewInstanceName(string: String): String {
@@ -48,12 +50,12 @@ object InstanceManager {
             vanillaVersion.version,
             lwjglVersion,
             fabricVersion
-        ).also { addInstance(it, it.group) }
+        ).also { addInstance(it) }
     }
 
     fun renameInstance(instance: BasicInstance, name: String) {
         instance.setInstanceName(name)
-        save()
+        instance.save()
         refreshInstanceList()
     }
 
@@ -70,7 +72,7 @@ object InstanceManager {
 
         instances.getOrPut(group ?: DEFAULT_GROUP) { arrayListOf() }.add(instance)
         instance.group = group ?: DEFAULT_GROUP
-        save()
+        instance.save()
         refreshInstanceList()
     }
 
@@ -85,11 +87,11 @@ object InstanceManager {
         throw IllegalArgumentException("instance is not exist in InstanceManager")
     }
 
-    private fun addInstance(instance: BasicInstance, group: String?) {
-        instances.getOrPut(group ?: DEFAULT_GROUP) { arrayListOf() }.add(instance)
+    private fun addInstance(instance: BasicInstance, preload: Boolean = false) {
+        instances.getOrPut(instance.group) { arrayListOf() }.add(instance)
         instance.onCreate()
-        save()
-        refreshInstanceList()
+        instance.save()
+        if (!preload) refreshInstanceList()
     }
 
     fun deleteInstance(instance: BasicInstance) {
@@ -105,11 +107,23 @@ object InstanceManager {
             }
             if (instances[key].isNullOrEmpty()) instances.remove(key)
         }
-        save()
         refreshInstanceList()
     }
 
     fun refreshInstanceList() {
         MAIN_FRAME.loadInstanceList()
+    }
+
+    fun migrateOldConfig() {
+        if (!oldConfigPath.toFile().exists()) return
+
+        val oldConfigs = JSON.decodeFromString<Map<String, ArrayList<BasicInstance>>>(oldConfigPath.toFile().readText())
+        for (groupEntry in oldConfigs) {
+            for (instance in groupEntry.value) {
+                instance.group = groupEntry.key
+                instance.save()
+            }
+        }
+        oldConfigPath.toFile().delete()
     }
 }

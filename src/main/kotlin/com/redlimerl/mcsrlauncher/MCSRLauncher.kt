@@ -83,7 +83,7 @@ object MCSRLauncher {
                 AccountManager.load()
 
                 this.setState("Loading Instances...")
-                InstanceManager.load()
+                InstanceManager.loadAll()
 
                 this.setState("Loading Meta...")
                 GameAssetManager.init()

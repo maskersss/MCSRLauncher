@@ -80,12 +80,12 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
             Desktop.getDesktop().open(instance.getGamePath().toFile().apply { mkdirs() })
         }
 
-        val resolutionSettingsPanel = ResolutionSettingsPanel(instance.options, instance.options::save)
+        val resolutionSettingsPanel = ResolutionSettingsPanel(instance.options, instance::save)
 
         instanceResolutionCheckBox.addActionListener {
             SwingUtils.setEnabledRecursively(resolutionSettingsPanel, !instanceResolutionCheckBox.isSelected)
             instance.options.useLauncherResolutionOption = instanceResolutionCheckBox.isSelected
-            instance.options.save()
+            instance.save()
         }
         instanceResolutionCheckBox.isSelected = instance.options.useLauncherJavaOption
         SwingUtils.setEnabledRecursively(resolutionSettingsPanel, !instanceResolutionCheckBox.isSelected)
@@ -184,7 +184,7 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         autoUpdateSpeedrunModsCheckBox.isSelected = instance.options.autoModUpdates
         autoUpdateSpeedrunModsCheckBox.addActionListener {
             instance.options.autoModUpdates = autoUpdateSpeedrunModsCheckBox.isSelected
-            instance.options.save()
+            instance.save()
         }
 
         updateMods()
@@ -290,12 +290,12 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
     }
 
     private fun initJavaTab() {
-        val javaSettingsPanel = JavaSettingsPanel(this, instance.options, instance.options::save)
+        val javaSettingsPanel = JavaSettingsPanel(this, instance.options, instance::save)
 
         javaLauncherSettingCheckBox.addActionListener {
             SwingUtils.setEnabledRecursively(javaSettingsPanel, !javaLauncherSettingCheckBox.isSelected)
             instance.options.useLauncherJavaOption = javaLauncherSettingCheckBox.isSelected
-            instance.options.save()
+            instance.save()
         }
         javaLauncherSettingCheckBox.isSelected = instance.options.useLauncherJavaOption
         SwingUtils.setEnabledRecursively(javaSettingsPanel, !javaLauncherSettingCheckBox.isSelected)

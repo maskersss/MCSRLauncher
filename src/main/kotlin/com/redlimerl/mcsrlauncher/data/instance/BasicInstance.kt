@@ -34,7 +34,7 @@ import javax.swing.JDialog
 data class BasicInstance(
     var name: String,
     var displayName: String,
-    var group: String,
+    var group: String = "",
     var minecraftVersion: String,
     var lwjglVersion: LWJGLVersionData,
     var fabricVersion: FabricVersionData?,
@@ -47,7 +47,7 @@ data class BasicInstance(
 ) {
 
     fun getInstancePath(): Path {
-        return MCSRLauncher.BASE_PATH.resolve("instances").resolve(name)
+        return InstanceManager.INSTANCES_PATH.resolve(name)
     }
 
     fun getGamePath(): Path {
@@ -245,5 +245,10 @@ data class BasicInstance(
         }
 
         return list
+    }
+
+    fun save() {
+        val configJson = this.getInstancePath().resolve("instance.json")
+        configJson.toFile().writeText(MCSRLauncher.JSON.encodeToString(this))
     }
 }
