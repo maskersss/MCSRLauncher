@@ -11,6 +11,9 @@ import org.apache.commons.io.FileUtils
 import java.nio.file.Path
 
 object InstanceManager {
+
+    private const val DEFAULT_GROUP = "Default"
+
     val path: Path = MCSRLauncher.BASE_PATH.resolve("instances.json")
     val instances = linkedMapOf<String, ArrayList<BasicInstance>>()
 
@@ -37,14 +40,15 @@ object InstanceManager {
         }
     }
 
-    fun createInstance(text: String, vanillaVersion: MetaVersion, lwjglVersion: LWJGLVersionData, fabricVersion: FabricVersionData?): BasicInstance {
+    fun createInstance(text: String, group: String?, vanillaVersion: MetaVersion, lwjglVersion: LWJGLVersionData, fabricVersion: FabricVersionData?): BasicInstance {
         return BasicInstance(
             getNewInstanceName(text),
             text,
+            group ?: DEFAULT_GROUP,
             vanillaVersion.version,
             lwjglVersion,
             fabricVersion
-        )
+        ).also { addInstance(it, it.group) }
     }
 
     fun renameInstance(instance: BasicInstance, name: String) {
@@ -63,7 +67,9 @@ object InstanceManager {
             }
             if (instances[key].isNullOrEmpty()) instances.remove(key)
         }
-        instances.getOrPut(group ?: "Default") { arrayListOf() }.add(instance)
+
+        instances.getOrPut(group ?: DEFAULT_GROUP) { arrayListOf() }.add(instance)
+        instance.group = group ?: DEFAULT_GROUP
         save()
         refreshInstanceList()
     }
@@ -79,8 +85,8 @@ object InstanceManager {
         throw IllegalArgumentException("instance is not exist in InstanceManager")
     }
 
-    fun addInstance(instance: BasicInstance, group: String?) {
-        instances.getOrPut(group ?: "Default") { arrayListOf() }.add(instance)
+    private fun addInstance(instance: BasicInstance, group: String?) {
+        instances.getOrPut(group ?: DEFAULT_GROUP) { arrayListOf() }.add(instance)
         instance.onCreate()
         save()
         refreshInstanceList()

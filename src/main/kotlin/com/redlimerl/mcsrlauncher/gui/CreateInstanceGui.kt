@@ -36,9 +36,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
     private fun createInstance() {
         if (instanceNameField.text.isNullOrBlank()) return
 
-        val instance = InstanceManager.createInstance(instanceNameField.text, gameVersionsPanel.getMinecraftVersion(), gameVersionsPanel.getLWJGLVersion(), gameVersionsPanel.getFabricVersion())
-
-        InstanceManager.addInstance(instance, instanceGroupBox.selectedItem?.toString()?.trimEnd())
+        val instance = InstanceManager.createInstance(instanceNameField.text, instanceGroupBox.selectedItem?.toString()?.trimEnd(), gameVersionsPanel.getMinecraftVersion(), gameVersionsPanel.getLWJGLVersion(), gameVersionsPanel.getFabricVersion())
 
         this.dispose()
         val launch = {

@@ -34,6 +34,7 @@ import javax.swing.JDialog
 data class BasicInstance(
     var name: String,
     var displayName: String,
+    var group: String,
     var minecraftVersion: String,
     var lwjglVersion: LWJGLVersionData,
     var fabricVersion: FabricVersionData?,
