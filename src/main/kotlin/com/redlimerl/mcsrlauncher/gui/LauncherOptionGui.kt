@@ -15,6 +15,8 @@ import java.awt.Dimension
 import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JOptionPane
+import javax.swing.SpinnerNumberModel
+import kotlin.math.min
 
 class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
 
@@ -77,6 +79,13 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
         val resolutionSettingsPanel = ResolutionSettingsPanel(MCSRLauncher.options, MCSRLauncher.options::save)
         this.launcherGameResolutionPane.layout = BorderLayout()
         this.launcherGameResolutionPane.add(resolutionSettingsPanel, BorderLayout.CENTER)
+
+        this.concurrentDownloadsSpinner.model = SpinnerNumberModel(MCSRLauncher.options.concurrentDownloads, 1, 32, 1)
+        this.concurrentDownloadsSpinner.addChangeListener {
+            this.concurrentDownloadsSpinner.value = min(this.concurrentDownloadsSpinner.value as Int, 32)
+            MCSRLauncher.options.concurrentDownloads = this.concurrentDownloadsSpinner.value as Int
+            MCSRLauncher.options.save()
+        }
     }
 
     private fun initJavaTab() {

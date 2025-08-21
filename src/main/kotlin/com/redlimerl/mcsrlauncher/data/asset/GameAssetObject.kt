@@ -8,9 +8,12 @@ import com.redlimerl.mcsrlauncher.network.FileDownloader
 import com.redlimerl.mcsrlauncher.util.AssetUtils
 import com.redlimerl.mcsrlauncher.util.HttpUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import org.apache.commons.io.FileUtils
 import org.apache.hc.client5.http.classic.methods.HttpGet
+import java.util.concurrent.atomic.AtomicLong
 
 @Serializable
 data class GameAssetObject(
@@ -35,26 +38,32 @@ data class GameAssetObject(
     }
 
     fun downloadAll(worker: LauncherWorker) {
+        val time = System.currentTimeMillis()
         val beforeSum = GameAssetManager.getChecksum(this.url)
         val assetIndex = this.getAssetIndexes(worker)
         val shouldFastCheck = beforeSum == GameAssetManager.getChecksum(this.url)
 
         worker.setState("Downloading game assets...")
-        var installedSize = 0L
-        var installedFiles = 0
-        for ((name, obj) in assetIndex.objects) {
-//            worker.setState("Downloading game assets... | [ $installedFiles / ${assetIndex.objects.size} ]", false)
+        val installedSize = AtomicLong(0)
+
+        AssetUtils.doConcurrency(assetIndex.objects.entries) { (name, obj) ->
             worker.setSubText("Downloading: $name")
             val hash = obj.hash
             val subDir = hash.substring(0, 2)
             val outFile = GameAssetManager.OBJECTS_PATH.resolve("$subDir/$hash").toFile()
-            if (!outFile.exists() || !(shouldFastCheck || (outFile.length() == obj.size && AssetUtils.compareHash(outFile, obj.hash)))) {
-                FileDownloader.download("https://resources.download.minecraft.net/$subDir/$hash", outFile)
+
+            withContext(Dispatchers.IO) {
+                if (!outFile.exists() || !(shouldFastCheck || (outFile.length() == obj.size && AssetUtils.compareHash(outFile, obj.hash)))) {
+                    FileDownloader.download("https://resources.download.minecraft.net/$subDir/$hash", outFile)
+                }
             }
-            installedSize += obj.size
-            installedFiles++
-            worker.setProgress(installedSize / totalSize.toFloat())
+
+            installedSize.addAndGet(obj.size)
+            worker.setProgress(installedSize.toFloat() / totalSize.toFloat())
         }
+
+        if (MCSRLauncher.options.debug) MCSRLauncher.LOGGER.info("Download Time Takes: ${System.currentTimeMillis() - time}ms")
+
         worker.setSubText(null)
     }
 

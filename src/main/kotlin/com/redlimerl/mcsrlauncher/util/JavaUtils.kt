@@ -7,6 +7,8 @@ import com.redlimerl.mcsrlauncher.exception.IllegalRequestResponseException
 import com.redlimerl.mcsrlauncher.instance.JavaContainer
 import com.redlimerl.mcsrlauncher.launcher.GameAssetManager
 import com.redlimerl.mcsrlauncher.network.FileDownloader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.apache.commons.compress.archivers.ArchiveEntry
 import org.apache.commons.compress.archivers.ArchiveInputStream
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
@@ -179,14 +181,17 @@ object JavaUtils {
         if (!jsonRequest.hasSuccess()) throw IllegalRequestResponseException("Failed to get java manifest: $url")
 
         val manifest = jsonRequest.get<JavaRuntimeManifest>()
-        for ((relativePath, fileEntry) in manifest.files) {
-            if (fileEntry.type != "file") continue
-            val download = fileEntry.downloads["raw"] ?: continue
+        AssetUtils.doConcurrency(manifest.files.entries) { (relativePath, fileEntry) ->
+            if (fileEntry.type != "file") return@doConcurrency
+            val download = fileEntry.downloads["raw"] ?: return@doConcurrency
             val targetFile = targetDir.resolve(relativePath)
 
             worker.setState("Downloading $relativePath...")
-            targetFile.parentFile.mkdirs()
-            FileDownloader.download(download.url, targetFile)
+
+            withContext(Dispatchers.IO) {
+                targetFile.parentFile.mkdirs()
+                FileDownloader.download(download.url, targetFile)
+            }
         }
     }
 

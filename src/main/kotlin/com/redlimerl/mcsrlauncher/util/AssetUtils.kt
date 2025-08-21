@@ -2,6 +2,12 @@ package com.redlimerl.mcsrlauncher.util
 
 import com.google.common.hash.Hashing
 import com.google.common.io.Files
+import com.redlimerl.mcsrlauncher.MCSRLauncher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import java.io.File
 import java.io.InputStream
 import java.nio.file.Path
@@ -83,6 +89,20 @@ object AssetUtils {
                 "$1-$2-$3-$4-$5"
             )
         )
+    }
+
+    fun <T> doConcurrency(list: Collection<T>, concurrent: Int = MCSRLauncher.options.concurrentDownloads, consumer: suspend (T) -> Unit) {
+        runBlocking {
+            val semaphore = Semaphore(concurrent)
+
+            val jobs = list.map { element ->
+                async {
+                    semaphore.withPermit { consumer(element) }
+                }
+            }
+
+            jobs.awaitAll()
+        }
     }
 
 }

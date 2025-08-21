@@ -19,15 +19,20 @@ import com.redlimerl.mcsrlauncher.instance.mod.ModDownloadMethod
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
 import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.network.FileDownloader
+import com.redlimerl.mcsrlauncher.util.AssetUtils
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import io.github.z4kn4fein.semver.toVersion
 import io.github.z4kn4fein.semver.toVersionOrNull
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.apache.commons.io.FileUtils
 import java.net.URL
 import java.nio.file.Path
+import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.JDialog
 
 @Serializable
@@ -170,7 +175,6 @@ data class BasicInstance(
     fun installRecommendedSpeedrunMods(worker: LauncherWorker, modCategory: ModCategory, downloadMethod: ModDownloadMethod, accessibility: Boolean): List<ModData> {
         if (downloadMethod == ModDownloadMethod.UPDATE_EXISTING_MODS) return updateSpeedrunMods(worker)
 
-        val list = arrayListOf<ModData>()
         this.getModsPath().toFile().mkdirs()
         this.fabricVersion ?: throw IllegalStateException("This instance does not have Fabric Loader")
 
@@ -195,16 +199,27 @@ data class BasicInstance(
                     }
         }
 
-        for (mod in availableMods) {
-            val version = mod.versions.find { it.isAvailableVersion(this) }!!
+        val total = availableMods.size
+        val completed = AtomicInteger(0)
+        val modList = Collections.synchronizedList(mutableListOf<ModData>())
 
+        AssetUtils.doConcurrency(availableMods) { mod ->
+            val version = mod.versions.find { it.isAvailableVersion(this@BasicInstance) }!!
             worker.setState("Downloading ${mod.name} v${version.version}...")
-            val file = this.getModsPath().resolve(version.url.split("/").last()).toFile()
-            FileDownloader.download(version.url, file)
+
+            val file = getModsPath().resolve(version.url.split("/").last()).toFile()
+            withContext(Dispatchers.IO) {
+                FileDownloader.download(version.url, file)
+            }
+
             installedMods.find { it.id == mod.modId }?.delete()
-            list.add(ModData.get(file)!!)
+            modList.add(ModData.get(file)!!)
+
+            val done = completed.incrementAndGet()
+            worker.setProgress(done.toFloat() / total.toFloat())
         }
-        return list
+
+        return modList
     }
 
     fun getSpeedRunModUpdates(worker: LauncherWorker): List<Pair<SpeedrunModMeta, SpeedrunModVersion>> {

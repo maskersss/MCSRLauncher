@@ -25,6 +25,7 @@ public class LauncherOptionDialog extends JDialog {
     public JScrollPane tabInterfaceScrollPane;
     public JPanel launcherGameResolutionPane;
     public JPanel logPanel;
+    public JSpinner concurrentDownloadsSpinner;
 
     public LauncherOptionDialog(JFrame parent) {
         super(parent);
@@ -76,7 +77,7 @@ public class LauncherOptionDialog extends JDialog {
         panel4.setLayout(new GridLayoutManager(6, 1, new Insets(10, 10, 10, 10), -1, 15));
         tabLauncherScrollPane.setViewportView(panel4);
         final JPanel panel5 = new JPanel();
-        panel5.setLayout(new GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), -1, -1));
+        panel5.setLayout(new GridLayoutManager(3, 3, new Insets(0, 0, 0, 0), -1, -1));
         panel4.add(panel5, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JLabel label1 = new JLabel();
         label1.setText("text.language");
@@ -88,6 +89,11 @@ public class LauncherOptionDialog extends JDialog {
         final JLabel label2 = new JLabel();
         label2.setText("message.require_restart_setting");
         panel5.add(label2, new GridConstraints(1, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JLabel label3 = new JLabel();
+        label3.setText("text.concurrent_downloads");
+        panel5.add(label3, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        concurrentDownloadsSpinner = new JSpinner();
+        panel5.add(concurrentDownloadsSpinner, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer3 = new Spacer();
         panel4.add(spacer3, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         final JPanel panel6 = new JPanel();
