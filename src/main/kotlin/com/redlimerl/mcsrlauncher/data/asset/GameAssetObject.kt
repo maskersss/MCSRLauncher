@@ -43,18 +43,19 @@ data class GameAssetObject(
         val assetIndex = this.getAssetIndexes(worker)
         val shouldFastCheck = beforeSum == GameAssetManager.getChecksum(this.url)
 
-        worker.setState("Downloading game assets...")
+        worker.setState("Downloading/Checking game assets...")
         val installedSize = AtomicLong(0)
 
         AssetUtils.doConcurrency(assetIndex.objects.entries) { (name, obj) ->
-            worker.setSubText("Downloading: $name")
             val hash = obj.hash
             val subDir = hash.substring(0, 2)
             val outFile = GameAssetManager.OBJECTS_PATH.resolve("$subDir/$hash").toFile()
 
             withContext(Dispatchers.IO) {
                 if (!outFile.exists() || !(shouldFastCheck || (outFile.length() == obj.size && AssetUtils.compareHash(outFile, obj.hash)))) {
+                    worker.setSubText("Downloading: $name")
                     FileDownloader.download("https://resources.download.minecraft.net/$subDir/$hash", outFile)
+                    worker.setSubText(null)
                 }
             }
 
