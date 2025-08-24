@@ -3,6 +3,7 @@ package com.redlimerl.mcsrlauncher
 import com.formdev.flatlaf.FlatDarkLaf
 import com.formdev.flatlaf.FlatLaf
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont
+import com.github.ajalt.clikt.core.main
 import com.redlimerl.mcsrlauncher.data.device.RuntimeOSType
 import com.redlimerl.mcsrlauncher.data.launcher.LauncherOptions
 import com.redlimerl.mcsrlauncher.gui.MainMenuGui
@@ -17,11 +18,17 @@ import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.apache.logging.log4j.core.layout.PatternLayout
+import java.io.IOException
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.net.ServerSocket
+import java.net.Socket
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.JDialog
 import javax.swing.JOptionPane
+import kotlin.concurrent.thread
 import kotlin.io.path.absolute
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
@@ -42,12 +49,23 @@ object MCSRLauncher {
     val APP_VERSION = javaClass.`package`.implementationVersion ?: "dev"
     val GAME_PROCESSES = arrayListOf<InstanceProcess>()
     val JSON = Json { ignoreUnknownKeys = true; prettyPrint = true }
+    private const val ARGS_PORT = 53510
     lateinit var MAIN_FRAME: MainMenuGui private set
     lateinit var options: LauncherOptions private set
 
     @JvmStatic
     fun main(args: Array<String>) {
         LOGGER.info("Starting launcher")
+        val server: ServerSocket
+        try {
+            server = ServerSocket(ARGS_PORT)
+        } catch (e: IOException) {
+            LOGGER.info("port(${ARGS_PORT}) is already opened. send argument to launcher args server instead of setup the launcher.")
+            Socket("localhost", ARGS_PORT).use { socket ->
+                ObjectOutputStream(socket.getOutputStream()).use { outputStream -> outputStream.writeObject(args) }
+            }
+            return
+        }
 
         // Setup Theme
         LOGGER.warn("Loading theme")
@@ -99,8 +117,22 @@ object MCSRLauncher {
                 }
 
                 dialog.dispose()
+
                 LOGGER.warn("Setup gui")
                 MAIN_FRAME = MainMenuGui()
+
+                LOGGER.info("Setup launch arguments")
+                thread {
+                    while (!Thread.interrupted()) {
+                        val client = server.accept()
+                        ObjectInputStream(client.getInputStream()).use { inputStream ->
+                            @Suppress("UNCHECKED_CAST") val receivedArgs = inputStream.readObject() as Array<String>
+                            ArgumentHandler().main(receivedArgs)
+                        }
+                        client.close()
+                    }
+                }
+                ArgumentHandler().main(args)
             }
 
             override fun onError(e: Throwable) {

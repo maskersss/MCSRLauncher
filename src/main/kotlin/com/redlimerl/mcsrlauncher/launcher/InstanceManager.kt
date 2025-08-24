@@ -87,6 +87,17 @@ object InstanceManager {
         throw IllegalArgumentException("instance is not exist in InstanceManager")
     }
 
+    fun getInstance(name: String): BasicInstance? {
+        for (key in instances.keys) {
+            instanceLoop@ for (basicInstance in instances[key]!!) {
+                if (basicInstance.name == name) {
+                    return basicInstance
+                }
+            }
+        }
+        return null
+    }
+
     private fun addInstance(instance: BasicInstance, preload: Boolean = false) {
         instances.getOrPut(instance.group) { arrayListOf() }.add(instance)
         instance.onCreate()

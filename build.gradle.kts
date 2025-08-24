@@ -15,6 +15,7 @@ dependencies {
     implementation("com.jetbrains.intellij.java:java-gui-forms-rt:243.26574.98")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    implementation("com.github.ajalt.clikt:clikt:5.0.3")
 
     implementation("org.apache.logging.log4j:log4j-api:2.24.3")
     implementation("org.apache.logging.log4j:log4j-core:2.24.3")
