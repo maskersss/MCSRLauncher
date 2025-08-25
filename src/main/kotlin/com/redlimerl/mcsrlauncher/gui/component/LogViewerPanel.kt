@@ -65,7 +65,7 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
             focusWord(getFocusedArea(), searchField.text)
         }
 
-        updateLogs()
+        updateLogFiles()
         logFileBox.addActionListener {
             val selected = logFileBox.selectedItem as String
             if (selected == I18n.translate("text.process")) {
@@ -121,10 +121,18 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
     fun syncInstance(instance: BasicInstance) {
         instance.logViewerPanel = this
         instance.getProcess()?.syncLogViewer(this)
+        debugCheckBox.actionListeners.toMutableList().forEach { debugCheckBox.removeActionListener(it) }
+        debugCheckBox.isVisible = false
     }
 
     fun syncLauncher() {
         MCSRLauncher.LOG_APPENDER.syncLogViewer(this)
+        debugCheckBox.actionListeners.toMutableList().forEach { debugCheckBox.removeActionListener(it) }
+        debugCheckBox.addActionListener {
+            liveLogArea.text = ""
+            syncLauncher()
+        }
+        debugCheckBox.isVisible = true
     }
 
     fun onLiveUpdate() {
@@ -168,7 +176,7 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
         searchCount++
     }
 
-    fun updateLogs() {
+    fun updateLogFiles() {
         logFileBox.addItem(I18n.translate("text.process"))
 
         val logsDir = basePath.resolve("logs").toFile()
@@ -201,9 +209,18 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
                 else -> ""
             }
             SwingUtilities.invokeLater {
-                fileLogArea.text = text
+                val stringBuilder = StringBuilder()
+                text.lines().forEach {
+                    if (!it.contains("[DEBUG]") || enabledDebug())
+                        stringBuilder.append(it).append("\n")
+                }
+                fileLogArea.text = stringBuilder.toString()
                 fileLogArea.caretPosition = 0
             }
         }
+    }
+
+    fun enabledDebug(): Boolean {
+        return this.debugCheckBox.isSelected
     }
 }

@@ -49,7 +49,7 @@ interface ModData {
 
                 jarFile.close()
             } catch (e: Throwable) {
-                if (MCSRLauncher.options.debug) MCSRLauncher.LOGGER.error(e)
+                MCSRLauncher.LOGGER.debug(e)
             }
             return null
         }

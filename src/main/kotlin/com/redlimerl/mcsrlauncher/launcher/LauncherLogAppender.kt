@@ -1,11 +1,8 @@
 package com.redlimerl.mcsrlauncher.launcher
 
 import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import org.apache.logging.log4j.core.LogEvent
 import org.apache.logging.log4j.core.appender.AbstractAppender
 import org.apache.logging.log4j.core.config.Property
@@ -19,12 +16,10 @@ class LauncherLogAppender(private val layout: PatternLayout)
     private var logChannel = Channel<String>(Channel.UNLIMITED)
     private var viewerUpdater: Job? = null
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun append(event: LogEvent?) {
         val msg = layout.toSerializable(event) ?: return
-        GlobalScope.launch {
+        runBlocking {
             logChannel.send(msg)
-            print(msg)
         }
     }
 
@@ -34,13 +29,18 @@ class LauncherLogAppender(private val layout: PatternLayout)
 
         viewerUpdater = GlobalScope.launch {
             SwingUtilities.invokeLater {
-                logViewer.liveLogArea.append(logArchive.toString())
+                logArchive.lines().forEach {
+                    if (!it.contains("[DEBUG]") || logViewer.enabledDebug())
+                        logViewer.liveLogArea.append(it + "\n")
+                }
             }
             for (line in logChannel) {
                 SwingUtilities.invokeLater {
-                    logViewer.liveLogArea.append(line)
+                    if (!line.contains("[DEBUG]") || logViewer.enabledDebug()) {
+                        logViewer.liveLogArea.append(line)
+                        logViewer.onLiveUpdate()
+                    }
                     logArchive.append(line)
-                    logViewer.onLiveUpdate()
                 }
             }
         }

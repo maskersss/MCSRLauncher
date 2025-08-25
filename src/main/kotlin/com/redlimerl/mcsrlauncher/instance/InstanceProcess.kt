@@ -144,7 +144,7 @@ class InstanceProcess(val instance: BasicInstance) {
             val libFile = libraryPath.toFile()
             if (!libFile.exists()) throw IllegalStateException("Library: ${libFile.name} is not exist!")
             if (libFile.name.endsWith(".jar") && libFile.name.contains("natives")) {
-                if (MCSRLauncher.options.debug) MCSRLauncher.LOGGER.info("Native extracting: ${libFile.name}")
+                MCSRLauncher.LOGGER.debug("Native extracting: ${libFile.name}")
                 AssetUtils.extractZip(libFile, instance.getNativePath().toFile(), true)
                 nativeLibs.add(libraryPath)
             }
@@ -161,7 +161,7 @@ class InstanceProcess(val instance: BasicInstance) {
         finalizeArgs.add(mainClass)
         finalizeArgs.addAll(gameArgs)
 
-        if (MCSRLauncher.options.debug) MCSRLauncher.LOGGER.info(finalizeArgs)
+        MCSRLauncher.LOGGER.debug(finalizeArgs)
 
         GlobalScope.launch {
             val processBuilder = ProcessBuilder(finalizeArgs)
@@ -201,7 +201,7 @@ class InstanceProcess(val instance: BasicInstance) {
 
         viewerUpdater = GlobalScope.launch {
             SwingUtilities.invokeLater {
-                logViewer.updateLogs()
+                logViewer.updateLogFiles()
                 logViewer.liveLogArea.text = ""
                 logViewer.liveLogArea.append(logArchive.toString())
             }

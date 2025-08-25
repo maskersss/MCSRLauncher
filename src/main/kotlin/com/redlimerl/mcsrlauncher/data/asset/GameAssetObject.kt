@@ -63,7 +63,7 @@ data class GameAssetObject(
             worker.setProgress(installedSize.toFloat() / totalSize.toFloat())
         }
 
-        if (MCSRLauncher.options.debug) MCSRLauncher.LOGGER.info("Download Time Takes: ${System.currentTimeMillis() - time}ms")
+        MCSRLauncher.LOGGER.debug("Download Time Takes: ${System.currentTimeMillis() - time}ms")
 
         worker.setSubText(null)
     }

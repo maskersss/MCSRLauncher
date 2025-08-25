@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Properties>
-        <Property name="layoutPattern">[%d{HH:mm:ss}] [%p] %logger: %msg%n%throwable</Property>
+        <Property name="layoutPattern">[%d{HH:mm:ss}] [%p] %msg%n%throwable</Property>
     </Properties>
 
     <Appenders>
@@ -16,14 +16,13 @@
             </Policies>
             <DefaultRolloverStrategy max="10" fileIndex="min"/>
         </RollingFile>
+        <Filters>
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Filters>
     </Appenders>
 
     <Loggers>
-        <Logger name="com.redlimerl.mcsrlauncher" level="debug" additivity="false" >
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="File_Appender"/>
-        </Logger>
-        <Root level="info">
+        <Root level="debug">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File_Appender"/>
         </Root>

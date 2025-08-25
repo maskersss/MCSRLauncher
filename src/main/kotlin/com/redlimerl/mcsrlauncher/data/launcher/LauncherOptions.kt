@@ -11,7 +11,6 @@ import kotlin.io.path.absolutePathString
 
 @Serializable
 data class LauncherOptions(
-    var debug: Boolean = false,
     var language: LauncherLanguage = LauncherLanguage.ENGLISH,
     var metaUrl: String = "https://mcsrlauncher.github.io/meta/",
     var concurrentDownloads: Int = 6,

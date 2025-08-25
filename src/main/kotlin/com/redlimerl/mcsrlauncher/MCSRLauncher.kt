@@ -17,6 +17,7 @@ import kotlinx.serialization.json.Json
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.layout.PatternLayout
 import java.io.IOException
 import java.io.ObjectInputStream
@@ -40,9 +41,15 @@ object MCSRLauncher {
     val LOG_APPENDER: LauncherLogAppender
     val LOGGER: Logger = LogManager.getLogger(APP_NAME).also {
         val mainLogger = (it as org.apache.logging.log4j.core.Logger)
+        val ctx = LogManager.getContext(false) as LoggerContext
+        val config = ctx.configuration
+        val rootLogger = config.rootLogger
+
         LOG_APPENDER = LauncherLogAppender(mainLogger.appenders.values.first().layout as PatternLayout)
         LOG_APPENDER.start()
-        mainLogger.addAppender(LOG_APPENDER)
+
+        rootLogger.addAppender(LOG_APPENDER, null, null)
+        ctx.updateLoggers()
     }
     val BASE_PATH: Path = Paths.get("").absolute().let { if (it.name != "launcher") it.resolve("launcher") else it }
     val IS_DEV_VERSION = javaClass.`package`.implementationVersion == null
