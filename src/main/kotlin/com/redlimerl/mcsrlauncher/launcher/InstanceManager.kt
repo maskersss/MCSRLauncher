@@ -64,7 +64,7 @@ object InstanceManager {
     }
 
     fun renameInstance(instance: BasicInstance, name: String) {
-        instance.setInstanceName(name)
+        instance.updateName(name)
         instance.save()
         refreshInstanceList()
     }
@@ -146,7 +146,7 @@ object InstanceManager {
         MAIN_FRAME.loadInstanceList()
     }
 
-    fun migrateOldConfig() {
+    private fun migrateOldConfig() {
         if (!oldConfigPath.toFile().exists()) return
 
         val oldConfigs = JSON.decodeFromString<Map<String, ArrayList<BasicInstance>>>(oldConfigPath.toFile().readText())

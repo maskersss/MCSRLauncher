@@ -32,6 +32,8 @@ class InstanceLaunchButton(private val windowParent: Window, val instance: Basic
             putClientProperty("JComponent.outline", "warning")
         }
 
+        toolTipText = "${I18n.translate("text.instance")} ID: ${instance.name}\n${I18n.translate("text.play_time")}: ${I18n.translate("text.play_time.value", instance.playTime / 3600.0)}"
+
         this.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
                 if (e.isPopupTrigger) getPopupMenu().show(e.component, e.x, e.y)

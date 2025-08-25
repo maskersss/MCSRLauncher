@@ -47,11 +47,13 @@ data class BasicInstance(
     var fabricVersion: FabricVersionData?,
     var mcsrRankedType: MCSRRankedPackType? = null,
     val options: InstanceOptions = InstanceOptions(),
-
+    var playTime: Long = 0,
     @Transient
     var logViewerPanel: LogViewerPanel? = null,
     @Transient
-    var optionDialog: InstanceOptionGui? = null
+    var optionDialog: InstanceOptionGui? = null,
+    @Transient
+    var lastLaunch: Long = System.currentTimeMillis()
 ) {
 
     fun getInstancePath(): Path {
@@ -81,6 +83,7 @@ data class BasicInstance(
         InstanceManager.refreshInstanceList()
         logViewerPanel?.let { getProcess()?.syncLogViewer(it) }
         optionDialog?.setLauncherLaunched(true)
+        lastLaunch = System.currentTimeMillis()
     }
 
     fun onProcessExit(code: Int) {
@@ -88,6 +91,8 @@ data class BasicInstance(
         FileUtils.deleteDirectory(this.getNativePath().toFile())
         InstanceManager.refreshInstanceList()
         optionDialog?.setLauncherLaunched(false)
+        playTime += (System.currentTimeMillis() - lastLaunch) / 1000
+        this.save()
     }
 
     fun install(worker: LauncherWorker) {
@@ -163,7 +168,7 @@ data class BasicInstance(
         return MCSRLauncher.GAME_PROCESSES.find { it.instance == this }
     }
 
-    fun setInstanceName(text: String) {
+    fun updateName(text: String) {
         this.displayName = text
         val beforeFile = this.getInstancePath().toFile()
         this.name = InstanceManager.getNewInstanceName(this.displayName)
