@@ -7,7 +7,6 @@ import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.data.instance.FabricVersionData
 import com.redlimerl.mcsrlauncher.data.instance.LWJGLVersionData
 import com.redlimerl.mcsrlauncher.data.instance.mcsrranked.MCSRRankedPackType
-import com.redlimerl.mcsrlauncher.data.meta.MetaVersion
 import java.nio.file.Path
 
 object InstanceManager {
@@ -45,18 +44,18 @@ object InstanceManager {
     }
 
     fun createInstance(
-        text: String,
+        name: String,
         group: String?,
-        vanillaVersion: MetaVersion,
+        minecraftVersion: String,
         lwjglVersion: LWJGLVersionData,
         fabricVersion: FabricVersionData?,
         mcsrRankedPackType: MCSRRankedPackType?
     ): BasicInstance {
         return BasicInstance(
-            getNewInstanceName(text),
-            text,
+            getNewInstanceName(name),
+            name,
             group ?: DEFAULT_GROUP,
-            vanillaVersion.version,
+            minecraftVersion,
             lwjglVersion,
             fabricVersion,
             mcsrRankedPackType

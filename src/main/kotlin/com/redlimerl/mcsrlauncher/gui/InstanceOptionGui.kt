@@ -30,7 +30,7 @@ import javax.swing.table.DefaultTableModel
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
 
-class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceOptionDialog(parent) {
+class InstanceOptionGui(parent: Window, private val instance: BasicInstance) : InstanceOptionDialog(parent) {
 
     var mods: List<ModData> = emptyList()
     private val launchBlockComponents = arrayListOf<Component>()
