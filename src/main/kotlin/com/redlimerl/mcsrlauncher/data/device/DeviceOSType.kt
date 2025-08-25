@@ -10,14 +10,14 @@ enum class DeviceOSType {
 
     @SerialName("windows") WINDOWS,
     @SerialName("linux") LINUX,
-    @SerialName("osx") OSX;
+    @SerialName("osx") MACOS;
 
     companion object {
         val CURRENT_OS = let {
             val osClassifier = when (SystemInfo.getCurrentPlatform()) {
                 PlatformEnum.WINDOWS -> WINDOWS
                 PlatformEnum.LINUX -> LINUX
-                PlatformEnum.MACOS -> OSX
+                PlatformEnum.MACOS -> MACOS
                 else -> throw IllegalArgumentException("Unknown OS: ${SystemInfo.getCurrentPlatform().getName()}")
             }
             osClassifier

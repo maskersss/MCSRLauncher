@@ -80,7 +80,7 @@ class InstanceProcess(val instance: BasicInstance) {
             throw IllegalStateException("Required minimum Java version is ${minCompatibleVersion}, you are at ${javaContainer.majorVersion}")
         }
 
-        if (minecraftMetaFile.traits.contains(LauncherTrait.FIRST_THREAD_MACOS) && DeviceOSType.OSX.isOn()) {
+        if (minecraftMetaFile.traits.contains(LauncherTrait.FIRST_THREAD_MACOS) && DeviceOSType.MACOS.isOn()) {
             arguments.add("-XstartOnFirstThread")
         }
 
