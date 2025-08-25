@@ -32,6 +32,7 @@ data class InstanceCopyOption(
             copyFiles(baseInstance, newInstance) { it.getGamePath().resolve("texturepacks").toFile() }
         }
         if (playTime) newInstance.playTime = baseInstance.playTime
+        newInstance.options = baseInstance.options.copy()
         newInstance.save()
     }
 

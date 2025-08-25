@@ -46,7 +46,7 @@ data class BasicInstance(
     var lwjglVersion: LWJGLVersionData,
     var fabricVersion: FabricVersionData?,
     var mcsrRankedType: MCSRRankedPackType? = null,
-    val options: InstanceOptions = InstanceOptions(),
+    var options: InstanceOptions = InstanceOptions(),
     var playTime: Long = 0,
     @Transient
     var logViewerPanel: LogViewerPanel? = null,
