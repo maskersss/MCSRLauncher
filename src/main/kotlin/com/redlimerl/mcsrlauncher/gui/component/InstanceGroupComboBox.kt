@@ -7,7 +7,8 @@ import javax.swing.JComboBox
 object InstanceGroupComboBox {
 
     fun init(comboBox: JComboBox<String>) {
-        val allItems = InstanceManager.instances.keys.toList()
+        val allItems = InstanceManager.instances.keys.toMutableList()
+        if (!allItems.contains(InstanceManager.DEFAULT_GROUP)) allItems.add(InstanceManager.DEFAULT_GROUP)
 
         comboBox.isEditable = true
         comboBox.setModel(DefaultComboBoxModel(allItems.toTypedArray()))

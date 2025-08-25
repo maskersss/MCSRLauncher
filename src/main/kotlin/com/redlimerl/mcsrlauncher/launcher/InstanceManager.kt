@@ -12,7 +12,7 @@ import java.nio.file.Path
 
 object InstanceManager {
 
-    const val DEFAULT_GROUP = "Default"
+    const val DEFAULT_GROUP = ""
     val INSTANCES_PATH: Path = MCSRLauncher.BASE_PATH.resolve("instances")
 
     private val oldConfigPath: Path = MCSRLauncher.BASE_PATH.resolve("instances.json")
