@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatClientProperties
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.data.instance.FabricVersionData
 import com.redlimerl.mcsrlauncher.data.instance.LWJGLVersionData
+import com.redlimerl.mcsrlauncher.data.instance.mcsrranked.MCSRRankedPackType
 import com.redlimerl.mcsrlauncher.data.meta.IntermediaryType
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.MetaVersion
@@ -16,6 +17,8 @@ import com.redlimerl.mcsrlauncher.util.SpeedrunUtils
 import com.redlimerl.mcsrlauncher.util.SwingUtils
 import io.github.z4kn4fein.semver.toVersion
 import java.awt.BorderLayout
+import java.awt.Desktop
+import java.net.URI
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -34,21 +37,32 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
         initFabricComponents()
         updateFabricVersions()
 
+        initMCSRRankedComponents()
+
         if (instance != null) {
+            val mcsrRanked = instance.mcsrRankedType
             val fabric = instance.fabricVersion
-            if (fabric != null) {
-                gameTabPane.selectedIndex = 0
-                for (i in 0 until fabricVersionTable.rowCount) {
-                    if (fabricVersionTable.getValueAt(i, 1) == instance.minecraftVersion) {
-                        fabricVersionTable.setRowSelectionInterval(i, i)
-                        fabricVersionTable.scrollRectToVisible(fabricVersionTable.getCellRect(i, 0, true))
+            gameTabPane.selectedIndex =
+                if (mcsrRanked != null) 2
+                else if (fabric != null) 0
+                else 0
+
+            if (mcsrRanked != null) {
+                for (i in 0 until mcsrRankedPackTypeBox.itemCount) {
+                    if (mcsrRankedPackTypeBox.getItemAt(i) == mcsrRanked) {
+                        mcsrRankedPackTypeBox.selectedIndex = i
                         break
                     }
                 }
-            } else {
-                gameTabPane.selectedIndex = 1
             }
 
+            for (i in 0 until fabricVersionTable.rowCount) {
+                if (fabricVersionTable.getValueAt(i, 1) == instance.minecraftVersion) {
+                    fabricVersionTable.setRowSelectionInterval(i, i)
+                    fabricVersionTable.scrollRectToVisible(fabricVersionTable.getCellRect(i, 0, true))
+                    break
+                }
+            }
             for (i in 0 until vanillaVersionTable.rowCount) {
                 if (vanillaVersionTable.getValueAt(i, 1) == instance.minecraftVersion) {
                     vanillaVersionTable.setRowSelectionInterval(i, i)
@@ -60,6 +74,9 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
     }
 
     fun getMinecraftVersion(): MetaVersion {
+        // Hardcode for MCSR Ranked Setup
+        if (gameTabPane.selectedIndex == 2) return MetaManager.getVersions(MetaUniqueID.MINECRAFT).find { it.version == "1.16.1" }!!
+
         val isFabric = gameTabPane.selectedIndex == 0
         val currentVersionTable = (if (isFabric) fabricVersionTable else vanillaVersionTable)
         if (currentVersionTable.selectedRow == -1) throw IllegalStateException("Minecraft version has not selected")
@@ -69,6 +86,9 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
     }
 
     fun getLWJGLVersion(): LWJGLVersionData {
+        // Hardcode for MCSR Ranked Setup
+        if (gameTabPane.selectedIndex == 2) return LWJGLVersionData(MetaUniqueID.LWJGL3, "3.3.3")
+
         val vanillaVersion = this.getMinecraftVersion()
         val isFabric = gameTabPane.selectedIndex == 0
         val currentLWJGLComboBox = (if (isFabric) fabricLWJGLComboBox else vanillaLWJGLComboBox)
@@ -79,6 +99,14 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
     }
 
     fun getFabricVersion(): FabricVersionData? {
+        // Hardcode for MCSR Ranked Setup
+        if (gameTabPane.selectedIndex == 2) {
+            val loaderVersion = MetaManager.getVersions(MetaUniqueID.FABRIC_LOADER).find { loader -> loader.recommended } ?: throw IllegalStateException("Couldn't find any recommended Fabric Loader version")
+            val intermediaryVersion = MetaManager.getVersions(MetaUniqueID.FABRIC_INTERMEDIARY).find { it.version == "1.16.1" }!!
+            val intermediaryType = intermediaryVersion.compatibleIntermediaries.find { it == IntermediaryType.FABRIC } ?: throw IllegalStateException("Couldn't find any recommended Fabric Intermediary")
+            return FabricVersionData(loaderVersion.version, intermediaryType, "1.16.1")
+        }
+
         val isFabric = gameTabPane.selectedIndex == 0
         val fabricVersion = (if (isFabric) fabricLoaderVersionComboBox.model.selectedItem?.toString() else null)
             ?.let { MetaManager.getVersions(MetaUniqueID.FABRIC_LOADER).find { loader -> loader.version == it } }
@@ -94,6 +122,11 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
 
     private fun getIntermediaryType(): IntermediaryType? {
         return intermediaryComboBox.selectedItem as IntermediaryType?
+    }
+
+    fun getMCSRRankedPackType(): MCSRRankedPackType? {
+        if (gameTabPane.selectedIndex != 2) return null
+        return mcsrRankedPackTypeBox.getItemAt(mcsrRankedPackTypeBox.selectedIndex)
     }
 
     private fun initVanillaComponents() {
@@ -259,6 +292,19 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
         if (availableLWJGL.none { it.version == instanceLWJGL } || (instance != null && instance.minecraftVersion != minecraftVersion.version)) instanceLWJGL = null
         lwjglComboBox.selectedIndex = availableLWJGL.indexOfFirst {
             it.version == (instanceLWJGL ?: lwjglRequire.suggests)
+        }
+    }
+
+    private fun initMCSRRankedComponents() {
+        mcsrRankedHelpButton.addActionListener {
+            Desktop.getDesktop().browse(URI.create("https://mcsrranked.com/"))
+        }
+
+        MCSRRankedPackType.entries.forEach {
+            mcsrRankedPackTypeBox.addItem(it)
+        }
+        mcsrRankedPackTypeBox.addActionListener {
+            mcsrRankedPackTypeDescription.text = "<html>${(mcsrRankedPackTypeBox.selectedItem as MCSRRankedPackType).getWarningMessage()}</html>"
         }
     }
 

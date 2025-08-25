@@ -19,6 +19,8 @@ import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetDragEvent
 import java.awt.dnd.DropTargetDropEvent
+import java.awt.event.WindowEvent
+import java.awt.event.WindowFocusListener
 import java.io.File
 import java.text.SimpleDateFormat
 import javax.swing.*
@@ -154,9 +156,7 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
         }
         modsTable.model = modTableModel
 
-        SwingUtilities.invokeLater {
-            SwingUtils.autoFitTableColumns(modsTable)
-        }
+        SwingUtils.autoFitTableColumns(modsTable)
         launchBlockComponents.add(changeVersionButton)
     }
 
@@ -285,6 +285,16 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
             updateMods()
         }
 
+        this.addWindowFocusListener(object : WindowFocusListener {
+            override fun windowGainedFocus(e: WindowEvent?) {
+                SwingUtilities.invokeLater {
+                    updateMods()
+                }
+            }
+
+            override fun windowLostFocus(e: WindowEvent?) {}
+        })
+
         launchBlockComponents.add(manageSpeedrunModsButton)
         launchBlockComponents.add(updateSpeedrunModsButton)
     }
@@ -319,6 +329,7 @@ class InstanceOptionGui(parent: Window, val instance: BasicInstance) : InstanceO
     }
 
     fun setLauncherLaunched(launched: Boolean) {
+        SwingUtilities.invokeLater { updateMods() }
         launchBlockComponents.forEach { SwingUtils.setEnabledRecursively(it, !launched) }
     }
 }

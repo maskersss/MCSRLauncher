@@ -2,10 +2,15 @@ package com.redlimerl.mcsrlauncher.gui
 
 import com.redlimerl.mcsrlauncher.gui.component.GameVersionsPanel
 import com.redlimerl.mcsrlauncher.gui.component.InstanceGroupComboBox
+import com.redlimerl.mcsrlauncher.instance.mod.ModCategory
+import com.redlimerl.mcsrlauncher.instance.mod.ModDownloadMethod
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
 import com.redlimerl.mcsrlauncher.util.I18n
+import com.redlimerl.mcsrlauncher.util.LauncherWorker
+import com.redlimerl.mcsrlauncher.util.SpeedrunUtils
 import java.awt.BorderLayout
 import java.awt.Dimension
+import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 
@@ -36,7 +41,8 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
     private fun createInstance() {
         if (instanceNameField.text.isNullOrBlank()) return
 
-        val instance = InstanceManager.createInstance(instanceNameField.text, instanceGroupBox.selectedItem?.toString()?.trimEnd(), gameVersionsPanel.getMinecraftVersion(), gameVersionsPanel.getLWJGLVersion(), gameVersionsPanel.getFabricVersion())
+        val instance = InstanceManager.createInstance(instanceNameField.text, instanceGroupBox.selectedItem?.toString()?.trimEnd(), gameVersionsPanel.getMinecraftVersion(), gameVersionsPanel.getLWJGLVersion(), gameVersionsPanel.getFabricVersion(), gameVersionsPanel.getMCSRRankedPackType())
+        val mcsrRankedPackType = instance.mcsrRankedType
 
         this.dispose()
         val launch = {
@@ -46,7 +52,22 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
             }
         }
 
-        if (instance.fabricVersion != null) {
+        if (mcsrRankedPackType != null) {
+            object : LauncherWorker(this@CreateInstanceGui, I18n.translate("message.loading"), I18n.translate("text.download_assets").plus("...")) {
+                override fun work(dialog: JDialog) {
+                    SpeedrunUtils.getLatestMCSRRankedVersion(this)?.download(instance, this)
+                    instance.installRecommendedSpeedrunMods(this, mcsrRankedPackType.versionName, ModCategory.RANDOM_SEED, ModDownloadMethod.DOWNLOAD_RECOMMENDS, false)
+                    instance.options.autoModUpdates = true
+                    instance.save()
+                    launch()
+                }
+
+                override fun onError(e: Throwable) {
+                    launch()
+                }
+            }.showDialog().start()
+            return
+        } else if (instance.fabricVersion != null) {
             val modInit = JOptionPane.showConfirmDialog(this, I18n.translate("message.speedrun_mods_setup_ask"), I18n.translate("text.manage_speedrun_mods"), JOptionPane.YES_NO_OPTION)
             if (modInit == JOptionPane.YES_OPTION) {
                 ManageSpeedrunModsGui(this, instance, true) {

@@ -26,6 +26,7 @@ class ChangeGameVersionGui(parent: JDialog, val instance: BasicInstance) : Chang
             instance.minecraftVersion = this.gameVersionsPanel.getMinecraftVersion().version
             instance.lwjglVersion = this.gameVersionsPanel.getLWJGLVersion()
             instance.fabricVersion = this.gameVersionsPanel.getFabricVersion()
+            instance.mcsrRankedType = this.gameVersionsPanel.getMCSRRankedPackType()
             instance.save()
             InstanceManager.refreshInstanceList()
             hasChanged = true

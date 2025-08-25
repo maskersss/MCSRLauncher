@@ -1,5 +1,13 @@
 package com.redlimerl.mcsrlauncher.util
 
+import com.redlimerl.mcsrlauncher.MCSRLauncher
+import com.redlimerl.mcsrlauncher.data.instance.mcsrranked.MCSRRankedVersionData
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import org.apache.hc.client5.http.classic.methods.HttpGet
+
 object SpeedrunUtils {
     val MAJOR_SPEEDRUN_VERSIONS = listOf(
         "1.16.1",
@@ -13,4 +21,40 @@ object SpeedrunUtils {
         "1.8",
         "1.7.10"
     )
+
+    fun getLatestMCSRRankedVersion(worker: LauncherWorker): MCSRRankedVersionData? {
+        worker.setState("Checking latest version of MCSR Ranked")
+        val request = HttpUtils.makeJsonRequest(HttpGet("https://api.modrinth.com/v2/project/mcsr-ranked/version?featured=true"), worker)
+        if (!request.hasSuccess()) {
+            MCSRLauncher.LOGGER.error("Failed to parse MCSR Ranked version on Modrinth")
+            return null
+        }
+
+        val json = request.get<JsonArray>().first().jsonObject
+        val file = json["files"]?.jsonArray?.first()?.jsonObject
+        if (file == null) {
+            MCSRLauncher.LOGGER.error("Couldn't find MCSR Ranked version file on Modrinth")
+            return null
+        }
+
+        val version = json["version_number"]?.jsonPrimitive?.content
+        if (version == null) {
+            MCSRLauncher.LOGGER.error("Couldn't find MCSR Ranked version name on Modrinth")
+            return null
+        }
+
+        val hash = file["hashes"]?.jsonObject?.get("sha512")?.jsonPrimitive?.content
+        if (hash == null) {
+            MCSRLauncher.LOGGER.error("Couldn't find MCSR Ranked hash on Modrinth")
+            return null
+        }
+
+        val url = file["url"]?.jsonPrimitive?.content
+        if (url == null) {
+            MCSRLauncher.LOGGER.error("Couldn't find MCSR Ranked hash on Modrinth")
+            return null
+        }
+
+        return MCSRRankedVersionData(version, hash, url)
+    }
 }

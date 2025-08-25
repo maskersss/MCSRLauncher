@@ -1,6 +1,7 @@
 package com.redlimerl.mcsrlauncher.gui
 
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
+import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModMeta
 import com.redlimerl.mcsrlauncher.instance.mod.ModCategory
 import com.redlimerl.mcsrlauncher.instance.mod.ModDownloadMethod
 import com.redlimerl.mcsrlauncher.util.I18n
@@ -33,7 +34,7 @@ class ManageSpeedrunModsGui(parent: JDialog, val instance: BasicInstance, isNew:
         applyButton.addActionListener {
             object : LauncherWorker(this@ManageSpeedrunModsGui, I18n.translate("message.loading"), I18n.translate("text.download_assets").plus("...")) {
                 override fun work(dialog: JDialog) {
-                    instance.installRecommendedSpeedrunMods(this, categoryComboBox.getItemAt(categoryComboBox.selectedIndex), downloadTypeComboBox.getItemAt(downloadTypeComboBox.selectedIndex), accessibilityModsCheckBox.isSelected)
+                    instance.installRecommendedSpeedrunMods(this, SpeedrunModMeta.VERIFIED_MODS, categoryComboBox.getItemAt(categoryComboBox.selectedIndex), downloadTypeComboBox.getItemAt(downloadTypeComboBox.selectedIndex), accessibilityModsCheckBox.isSelected)
                     this@ManageSpeedrunModsGui.dispose()
                     updater()
                 }

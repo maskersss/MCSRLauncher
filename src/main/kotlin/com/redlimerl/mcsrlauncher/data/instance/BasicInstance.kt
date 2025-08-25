@@ -1,6 +1,7 @@
 package com.redlimerl.mcsrlauncher.data.instance
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
+import com.redlimerl.mcsrlauncher.data.instance.mcsrranked.MCSRRankedPackType
 import com.redlimerl.mcsrlauncher.data.meta.LauncherTrait
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.file.MetaVersionFile
@@ -22,6 +23,7 @@ import com.redlimerl.mcsrlauncher.network.FileDownloader
 import com.redlimerl.mcsrlauncher.util.AssetUtils
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
+import com.redlimerl.mcsrlauncher.util.SpeedrunUtils
 import io.github.z4kn4fein.semver.toVersion
 import io.github.z4kn4fein.semver.toVersionOrNull
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +45,7 @@ data class BasicInstance(
     var minecraftVersion: String,
     var lwjglVersion: LWJGLVersionData,
     var fabricVersion: FabricVersionData?,
+    var mcsrRankedType: MCSRRankedPackType? = null,
     val options: InstanceOptions = InstanceOptions(),
 
     @Transient
@@ -111,6 +114,10 @@ data class BasicInstance(
                 ?: throw IllegalStateException("Fabric Intermediary version ${fabric.intermediaryType} for ${fabric.intermediaryVersion} is not exist")).install(worker)
         }
 
+        if (this.mcsrRankedType != null && fabric != null && this.minecraftVersion == "1.16.1") {
+            SpeedrunUtils.getLatestMCSRRankedVersion(worker)?.download(this, worker)
+        }
+
         MCSRLauncher.LOGGER.info("Installed every game files and libraries!")
     }
 
@@ -143,10 +150,9 @@ data class BasicInstance(
     }
 
     fun getIconResource(): URL? {
-        return if (this.fabricVersion != null)
-            javaClass.getResource("/icons/fabric.png")
-        else
-            javaClass.getResource("/icons/minecraft.png")
+        return if (this.mcsrRankedType != null) javaClass.getResource("/icons/mcsrranked.png")
+            else if (this.fabricVersion != null) javaClass.getResource("/icons/fabric.png")
+            else javaClass.getResource("/icons/minecraft.png")
     }
 
     fun isRunning(): Boolean {
@@ -172,13 +178,13 @@ data class BasicInstance(
         return modsDir.listFiles()!!.filter { it.isFile }.mapNotNull { ModData.get(it) }
     }
 
-    fun installRecommendedSpeedrunMods(worker: LauncherWorker, modCategory: ModCategory, downloadMethod: ModDownloadMethod, accessibility: Boolean): List<ModData> {
+    fun installRecommendedSpeedrunMods(worker: LauncherWorker, modListVersion: String, modCategory: ModCategory, downloadMethod: ModDownloadMethod, accessibility: Boolean): List<ModData> {
         if (downloadMethod == ModDownloadMethod.UPDATE_EXISTING_MODS) return updateSpeedrunMods(worker)
 
         this.getModsPath().toFile().mkdirs()
         this.fabricVersion ?: throw IllegalStateException("This instance does not have Fabric Loader")
 
-        val modMeta = MetaManager.getVersionMeta<SpeedrunModsMetaFile>(MetaUniqueID.SPEEDRUN_MODS, SpeedrunModMeta.VERIFIED_MODS, worker) ?: throw IllegalStateException("Speedrun mods meta is not found")
+        val modMeta = MetaManager.getVersionMeta<SpeedrunModsMetaFile>(MetaUniqueID.SPEEDRUN_MODS, modListVersion, worker) ?: throw IllegalStateException("Speedrun mods meta is not found")
 
         val installedMods = this.getMods()
 

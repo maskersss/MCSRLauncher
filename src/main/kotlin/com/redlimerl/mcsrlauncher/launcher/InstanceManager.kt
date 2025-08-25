@@ -6,6 +6,7 @@ import com.redlimerl.mcsrlauncher.MCSRLauncher.MAIN_FRAME
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.data.instance.FabricVersionData
 import com.redlimerl.mcsrlauncher.data.instance.LWJGLVersionData
+import com.redlimerl.mcsrlauncher.data.instance.mcsrranked.MCSRRankedPackType
 import com.redlimerl.mcsrlauncher.data.meta.MetaVersion
 import java.nio.file.Path
 
@@ -42,14 +43,22 @@ object InstanceManager {
         }
     }
 
-    fun createInstance(text: String, group: String?, vanillaVersion: MetaVersion, lwjglVersion: LWJGLVersionData, fabricVersion: FabricVersionData?): BasicInstance {
+    fun createInstance(
+        text: String,
+        group: String?,
+        vanillaVersion: MetaVersion,
+        lwjglVersion: LWJGLVersionData,
+        fabricVersion: FabricVersionData?,
+        mcsrRankedPackType: MCSRRankedPackType?
+    ): BasicInstance {
         return BasicInstance(
             getNewInstanceName(text),
             text,
             group ?: DEFAULT_GROUP,
             vanillaVersion.version,
             lwjglVersion,
-            fabricVersion
+            fabricVersion,
+            mcsrRankedPackType
         ).also { addInstance(it) }
     }
 
