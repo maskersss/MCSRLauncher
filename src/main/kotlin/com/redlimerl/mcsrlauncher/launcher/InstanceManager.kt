@@ -28,6 +28,7 @@ object InstanceManager {
                 if (configFile.exists()) addInstance(JSON.decodeFromString(configFile.readText()), true)
             }
         }
+        updateInstancesSort()
     }
 
     fun getNewInstanceName(string: String): String {
@@ -130,7 +131,18 @@ object InstanceManager {
         refreshInstanceList()
     }
 
+    private fun updateInstancesSort() {
+        instances.forEach { (_, instanceList) ->
+            instanceList.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.displayName })
+        }
+
+        val sorted = instances.toSortedMap(String.CASE_INSENSITIVE_ORDER)
+        instances.clear()
+        instances.putAll(sorted)
+    }
+
     fun refreshInstanceList() {
+        updateInstancesSort()
         MAIN_FRAME.loadInstanceList()
     }
 
