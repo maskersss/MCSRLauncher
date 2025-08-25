@@ -28,8 +28,10 @@ import io.github.z4kn4fein.semver.toVersion
 import io.github.z4kn4fein.semver.toVersionOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.json.JsonNames
 import org.apache.commons.io.FileUtils
 import java.net.URL
 import java.nio.file.Path
@@ -37,9 +39,10 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.JDialog
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class BasicInstance(
-    var name: String,
+    @JsonNames("id", "name") var id: String,
     var displayName: String,
     var group: String = "",
     var minecraftVersion: String,
@@ -57,7 +60,7 @@ data class BasicInstance(
 ) {
 
     fun getInstancePath(): Path {
-        return InstanceManager.INSTANCES_PATH.resolve(name)
+        return InstanceManager.INSTANCES_PATH.resolve(id)
     }
 
     fun getGamePath(): Path {
@@ -79,7 +82,7 @@ data class BasicInstance(
     }
 
     fun onLaunch() {
-        MCSRLauncher.LOGGER.info("Launched instance: $name")
+        MCSRLauncher.LOGGER.info("Launched instance: $id")
         InstanceManager.refreshInstanceList()
         logViewerPanel?.let { getProcess()?.syncLogViewer(it) }
         optionDialog?.setLauncherLaunched(true)
@@ -87,7 +90,7 @@ data class BasicInstance(
     }
 
     fun onProcessExit(code: Int) {
-        MCSRLauncher.LOGGER.info("Exited instance: $name ($code)")
+        MCSRLauncher.LOGGER.info("Exited instance: $id ($code)")
         FileUtils.deleteDirectory(this.getNativePath().toFile())
         InstanceManager.refreshInstanceList()
         optionDialog?.setLauncherLaunched(false)
@@ -171,8 +174,8 @@ data class BasicInstance(
     fun updateName(text: String) {
         this.displayName = text
         val beforeFile = this.getInstancePath().toFile()
-        this.name = InstanceManager.getNewInstanceName(this.displayName)
-        MCSRLauncher.LOGGER.info("Update instance name to $name from ${beforeFile.name}")
+        this.id = InstanceManager.getNewInstanceName(this.displayName)
+        MCSRLauncher.LOGGER.info("Update instance name to $id from ${beforeFile.name}")
         val afterFile = this.getInstancePath().toFile()
         FileUtils.moveDirectory(beforeFile, afterFile)
     }

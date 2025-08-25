@@ -33,12 +33,12 @@ object InstanceManager {
     fun getNewInstanceName(string: String): String {
         val replacedName = string.replace(" ", "_").replace(Regex("[^\\p{L}\\p{N}_.]"), "")
         val allInstances = instances.values.flatten()
-        if (allInstances.find { it.name == replacedName } == null) return replacedName
+        if (allInstances.find { it.id == replacedName } == null) return replacedName
 
         var appendNumber = 2
         while (true) {
             val newName = "${replacedName}${appendNumber}"
-            if (allInstances.find { it.name == newName } == null) return newName
+            if (allInstances.find { it.id == newName } == null) return newName
             appendNumber++
         }
     }
@@ -99,7 +99,7 @@ object InstanceManager {
     fun getInstance(name: String): BasicInstance? {
         for (key in instances.keys) {
             instanceLoop@ for (basicInstance in instances[key]!!) {
-                if (basicInstance.name == name) {
+                if (basicInstance.id == name) {
                     return basicInstance
                 }
             }

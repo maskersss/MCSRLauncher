@@ -51,7 +51,7 @@ class InstanceProcess(val instance: BasicInstance) {
             throw noJavaException
         }
 
-        MCSRLauncher.LOGGER.info("Loading Authentication: ${instance.name}")
+        MCSRLauncher.LOGGER.info("Loading Authentication: ${instance.id}")
         val activeAccount = AccountManager.getActiveAccount() ?: throw IllegalStateException("Active account is none")
         try {
             if (activeAccount.profile.checkTokenValidForLaunch(worker, activeAccount)) AccountManager.save()
@@ -59,7 +59,7 @@ class InstanceProcess(val instance: BasicInstance) {
             throw InvalidAccessTokenException("Authentication Failed. Try remove and add your Minecraft account again.")
         }
 
-        MCSRLauncher.LOGGER.info("Launching instance: ${instance.name}")
+        MCSRLauncher.LOGGER.info("Launching instance: ${instance.id}")
         instance.getGamePath().toFile().mkdirs()
 
         var mainClass: String
@@ -168,7 +168,7 @@ class InstanceProcess(val instance: BasicInstance) {
                 .directory(instance.getGamePath().toFile())
                 .redirectErrorStream(true)
             processBuilder.environment().apply {
-                put("INST_ID", instance.name)
+                put("INST_ID", instance.id)
                 put("INST_NAME", instance.displayName)
                 put("INST_DIR", instance.getInstancePath().absolutePathString())
                 put("INST_MC_DIR", instance.getGamePath().absolutePathString())
