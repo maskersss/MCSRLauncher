@@ -26,7 +26,7 @@ object MetaManager {
             META_PACKAGES = MCSRLauncher.JSON.decodeFromString(FileUtils.readFileToString(PACKAGES_PATH.toFile(), Charsets.UTF_8))
         }
 
-        if (!force && System.currentTimeMillis() - META_PACKAGES.latestUpdate < 1000 * 60 * 60 * 6) return onLoad(worker)
+        if (!force && System.currentTimeMillis() - META_PACKAGES.latestUpdate < 1000 * 60 * 60 * 6 && META_PACKAGES.buildVersion == MCSRLauncher.APP_VERSION) return onLoad(worker)
 
         MCSRLauncher.LOGGER.info("Getting meta packages...")
         val response = HttpUtils.makeJsonRequest(HttpGet(this.getMetaURI()), worker)
@@ -34,6 +34,7 @@ object MetaManager {
 
         META_PACKAGES = response.get<MetaPackageIndexes>()
         META_PACKAGES.latestUpdate = System.currentTimeMillis()
+        META_PACKAGES.buildVersion = MCSRLauncher.APP_VERSION
 
         FileUtils.writeStringToFile(PACKAGES_PATH.toFile(), MCSRLauncher.JSON.encodeToString(META_PACKAGES), Charsets.UTF_8)
         onLoad(worker)

@@ -14,7 +14,8 @@ import java.net.URI
 data class MetaPackageIndexes(
     override val formatVersion: Int = 1,
     val packages: List<MetaPackage> = listOf(),
-    var latestUpdate: Long = 0
+    var latestUpdate: Long = 0,
+    var buildVersion: String = ""
 ) : MetaFormat() {
 
     fun getVersions(metaUniqueID: MetaUniqueID, worker: LauncherWorker): List<MetaVersion> {
@@ -37,7 +38,7 @@ data class MetaPackage(
         return MetaManager.getMetaURI().resolve(this.uid.value)
     }
 
-    fun updateVersions(worker: LauncherWorker): MetaVersionIndexes {
+    private fun updateVersions(worker: LauncherWorker): MetaVersionIndexes {
         worker.setState("Updating ${uid.name}-meta versions...")
         val response = HttpUtils.makeJsonSha256Request(HttpGet(this.getURI()), worker)
         if (!response.hasSuccess()) throw IllegalStateException("Failed to get meta versions")
