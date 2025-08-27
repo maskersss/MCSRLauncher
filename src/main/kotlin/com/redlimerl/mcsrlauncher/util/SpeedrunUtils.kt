@@ -2,10 +2,7 @@ package com.redlimerl.mcsrlauncher.util
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.instance.mcsrranked.MCSRRankedVersionData
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.*
 import org.apache.hc.client5.http.classic.methods.HttpGet
 
 object SpeedrunUtils {
@@ -45,16 +42,22 @@ object SpeedrunUtils {
 
         val hash = file["hashes"]?.jsonObject?.get("sha512")?.jsonPrimitive?.content
         if (hash == null) {
-            MCSRLauncher.LOGGER.error("Couldn't find MCSR Ranked hash on Modrinth")
+            MCSRLauncher.LOGGER.error("Couldn't find MCSR Ranked file hash on Modrinth")
             return null
         }
 
         val url = file["url"]?.jsonPrimitive?.content
         if (url == null) {
-            MCSRLauncher.LOGGER.error("Couldn't find MCSR Ranked hash on Modrinth")
+            MCSRLauncher.LOGGER.error("Couldn't find MCSR Ranked file url on Modrinth")
             return null
         }
 
-        return MCSRRankedVersionData(version, hash, url)
+        val size = file["size"]?.jsonPrimitive?.long
+        if (size == null) {
+            MCSRLauncher.LOGGER.error("Couldn't find MCSR Ranked file size on Modrinth")
+            return null
+        }
+
+        return MCSRRankedVersionData(version, hash, url, size)
     }
 }

@@ -13,7 +13,8 @@ import java.nio.file.StandardCopyOption
 data class MCSRRankedVersionData(
     private val version: String,
     private val sha512: String,
-    private val downloadUrl: String
+    private val downloadUrl: String,
+    val size: Long
 ) {
     fun download(instance: BasicInstance, worker: LauncherWorker) {
         val modFile = instance.getModsPath().resolve(this.downloadUrl.split("/").last() + ".temp").toFile()
@@ -23,7 +24,7 @@ data class MCSRRankedVersionData(
 
         worker.setState("Downloading MCSRRanked v${this.version}...")
         modFile.parentFile.mkdirs()
-        FileDownloader.download(this.downloadUrl, modFile)
+        FileDownloader.download(this.downloadUrl, modFile, worker, this.size)
 
         Files.move(modFile.toPath(), oldMod?.file?.toPath() ?: modFile.toPath().parent.resolve(this.downloadUrl.split("/").last()), StandardCopyOption.REPLACE_EXISTING)
     }

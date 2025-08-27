@@ -206,7 +206,7 @@ object JavaUtils {
 
         MCSRLauncher.LOGGER.info("Downloading: $url")
         val tempFile = Files.createTempFile("java-download-", if (isZip) ".zip" else ".tar.gz").toFile()
-        FileDownloader.download(url, tempFile)
+        FileDownloader.download(url, tempFile, worker)
         tempFile.deleteOnExit()
 
         val rootDirs = getRootDirs(tempFile, isZip)

@@ -272,7 +272,7 @@ data class BasicInstance(
         updates.forEach { (mod, version) ->
             worker.setState("Downloading ${mod.name} v${version.version}...")
             val file = this.getModsPath().resolve(version.url.split("/").last()).toFile()
-            FileDownloader.download(version.url, file)
+            FileDownloader.download(version.url, file, worker)
             installedMods.find { it.id == mod.modId }?.delete()
             list.add(ModData.get(file)!!)
         }
