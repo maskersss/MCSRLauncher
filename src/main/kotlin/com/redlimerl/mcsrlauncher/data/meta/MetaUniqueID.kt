@@ -41,6 +41,9 @@ enum class MetaUniqueID(val value: String) {
     @SerialName("org.mcsr.mods")
     SPEEDRUN_MODS("org.mcsr.mods"),
 
+    @SerialName("org.mcsr.maps.practice")
+    PRACTICE_MAPS("org.mcsr.maps.practice"),
+
     @SerialName("unknown")
     UNKNOWN("unknown");
 

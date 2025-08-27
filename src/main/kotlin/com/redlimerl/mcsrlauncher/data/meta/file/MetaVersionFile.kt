@@ -51,6 +51,7 @@ object MetaVersionFileSerializer : JsonContentPolymorphicSerializer<MetaVersionF
             MetaUniqueID.LWJGL2 -> LWJGLMetaFile.serializer()
             MetaUniqueID.LWJGL3 -> LWJGLMetaFile.serializer()
             MetaUniqueID.SPEEDRUN_MODS -> SpeedrunModsMetaFile.serializer()
+            MetaUniqueID.PRACTICE_MAPS -> MinecraftMapsMetaFile.serializer()
             MetaUniqueID.UNKNOWN -> UnknownMetaFile.serializer()
         }
     }

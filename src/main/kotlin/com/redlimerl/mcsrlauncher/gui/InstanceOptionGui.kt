@@ -2,12 +2,15 @@ package com.redlimerl.mcsrlauncher.gui
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
+import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
+import com.redlimerl.mcsrlauncher.data.meta.file.MinecraftMapsMetaFile
 import com.redlimerl.mcsrlauncher.gui.component.InstanceGroupComboBox
 import com.redlimerl.mcsrlauncher.gui.component.JavaSettingsPanel
 import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
 import com.redlimerl.mcsrlauncher.gui.component.ResolutionSettingsPanel
 import com.redlimerl.mcsrlauncher.instance.mod.ModData
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
+import com.redlimerl.mcsrlauncher.launcher.MetaManager
 import com.redlimerl.mcsrlauncher.util.AssetUtils
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
@@ -49,6 +52,7 @@ class InstanceOptionGui(parent: Window, private val instance: BasicInstance) : I
         initModsTab()
         initJavaTab()
         initLogTab()
+        initToolsTab()
 
         I18n.translateGui(this)
         instance.optionDialog = this
@@ -331,5 +335,17 @@ class InstanceOptionGui(parent: Window, private val instance: BasicInstance) : I
     fun setLauncherLaunched(launched: Boolean) {
         SwingUtilities.invokeLater { updateMods() }
         launchBlockComponents.forEach { SwingUtils.setEnabledRecursively(it, !launched) }
+    }
+
+    private fun initToolsTab() {
+        browsePracticeMapsButton.addActionListener {
+            object : LauncherWorker(this@InstanceOptionGui, I18n.translate("message.loading")) {
+                override fun work(dialog: JDialog) {
+                    val maps = MetaManager.getVersionMeta<MinecraftMapsMetaFile>(MetaUniqueID.PRACTICE_MAPS, "verified", this)!!
+                    dialog.dispose()
+                    MapBrowserGui(this@InstanceOptionGui, I18n.translate("text.download.practice_maps"), maps.maps, instance)
+                }
+            }.showDialog().start()
+        }
     }
 }

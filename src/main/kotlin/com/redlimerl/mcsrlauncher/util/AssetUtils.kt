@@ -3,6 +3,8 @@ package com.redlimerl.mcsrlauncher.util
 import com.google.common.hash.Hashing
 import com.google.common.io.Files
 import com.redlimerl.mcsrlauncher.MCSRLauncher
+import io.github.z4kn4fein.semver.constraints.Constraint
+import io.github.z4kn4fein.semver.toVersionOrNull
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
@@ -104,5 +106,12 @@ object AssetUtils {
             jobs.awaitAll()
         }
     }
+
+    fun isInVersionRange(versionRange: String, version: String): Boolean {
+        if (versionRange == version) return true
+        val v = version.toVersionOrNull(false) ?: return false
+        return versionRange.split(" ").map { Constraint.parse(it).isSatisfiedBy(v) }.all { it }
+    }
+
 
 }

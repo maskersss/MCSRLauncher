@@ -14,7 +14,7 @@ data class InstanceCopyOption(
     fun copyInstance(instanceName: String, instanceGroup: String?, baseInstance: BasicInstance) {
         val newInstance = InstanceManager.createInstance(instanceName, instanceGroup, baseInstance.minecraftVersion, baseInstance.lwjglVersion.copy(), baseInstance.fabricVersion?.copy(), baseInstance.mcsrRankedType)
 
-        if (worlds) copyFiles(baseInstance, newInstance) { it.getGamePath().resolve("saves").toFile() }
+        if (worlds) copyFiles(baseInstance, newInstance) { it.getWorldsPath().toFile() }
         if (gameOptions) {
             val files = listOf("hotbar.nbt", "options.txt", "servers.dat", "servers.dat_old")
             for (file in files) {

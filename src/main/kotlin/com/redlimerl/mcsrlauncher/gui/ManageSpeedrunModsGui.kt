@@ -32,7 +32,7 @@ class ManageSpeedrunModsGui(parent: JDialog, val instance: BasicInstance, isNew:
         }
 
         applyButton.addActionListener {
-            object : LauncherWorker(this@ManageSpeedrunModsGui, I18n.translate("message.loading"), I18n.translate("text.download_assets").plus("...")) {
+            object : LauncherWorker(this@ManageSpeedrunModsGui, I18n.translate("message.loading"), I18n.translate("text.download.assets").plus("...")) {
                 override fun work(dialog: JDialog) {
                     instance.installRecommendedSpeedrunMods(this, SpeedrunModMeta.VERIFIED_MODS, categoryComboBox.getItemAt(categoryComboBox.selectedIndex), downloadTypeComboBox.getItemAt(downloadTypeComboBox.selectedIndex), accessibilityModsCheckBox.isSelected)
                     this@ManageSpeedrunModsGui.dispose()

@@ -71,6 +71,10 @@ data class BasicInstance(
         return this.getGamePath().resolve("mods")
     }
 
+    fun getWorldsPath(): Path {
+        return this.getGamePath().resolve("saves")
+    }
+
     fun getNativePath(): Path {
         return this.getInstancePath().resolve("native")
     }
@@ -143,7 +147,7 @@ data class BasicInstance(
                     val updates = getSpeedRunModUpdates(this)
                     if (updates.isNotEmpty()) updateSpeedrunMods(this)
                 }
-                this.setState(I18n.translate("text.download_assets") + "...")
+                this.setState(I18n.translate("text.download.assets") + "...")
                 install(this)
                 this.setProgress(null)
 

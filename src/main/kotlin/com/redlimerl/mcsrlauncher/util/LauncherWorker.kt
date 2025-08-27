@@ -163,7 +163,11 @@ abstract class LauncherWorker(
         dialog.setLocation(newX, newY)
     }
 
-    fun setProgress(value: Float?): LauncherWorker {
+    fun setProgress(value: Float): LauncherWorker {
+        return this.setProgress(value.toDouble())
+    }
+
+    fun setProgress(value: Double?): LauncherWorker {
         if (value == null) {
             progressBar.isVisible = false
         } else {
@@ -174,7 +178,7 @@ abstract class LauncherWorker(
     }
 
     fun indeterminate(): LauncherWorker {
-        this.setProgress(1f)
+        this.setProgress(1.0)
         progressBar.isIndeterminate = true
         return this
     }
