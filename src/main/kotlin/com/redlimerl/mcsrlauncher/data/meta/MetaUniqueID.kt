@@ -1,9 +1,15 @@
 package com.redlimerl.mcsrlauncher.data.meta
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
-@Serializable
+@Serializable(with = MetaUniqueIDSerializer::class)
 enum class MetaUniqueID(val value: String) {
     @SerialName("net.fabricmc.fabric-loader")
     FABRIC_LOADER("net.fabricmc.fabric-loader"),
@@ -33,7 +39,10 @@ enum class MetaUniqueID(val value: String) {
     LWJGL3("org.lwjgl3"),
 
     @SerialName("org.mcsr.mods")
-    SPEEDRUN_MODS("org.mcsr.mods");
+    SPEEDRUN_MODS("org.mcsr.mods"),
+
+    @SerialName("unknown")
+    UNKNOWN("unknown");
 
     companion object {
         val GAME_METAS = listOf(MINECRAFT, LWJGL2, LWJGL3)
@@ -41,4 +50,18 @@ enum class MetaUniqueID(val value: String) {
         val JAVA_METAS = listOf(MOJANG_JAVA, ADOPTIUM_JAVA, AZUL_JAVA, GRAALVM_JAVA)
     }
 
+}
+
+object MetaUniqueIDSerializer : KSerializer<MetaUniqueID> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("MetaUniqueID", PrimitiveKind.STRING)
+
+    override fun deserialize(decoder: Decoder): MetaUniqueID {
+        val value = decoder.decodeString()
+        return MetaUniqueID.entries.find { it.value == value } ?: MetaUniqueID.UNKNOWN
+    }
+
+    override fun serialize(encoder: Encoder, value: MetaUniqueID) {
+        encoder.encodeString(value.value)
+    }
 }

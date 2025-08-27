@@ -42,6 +42,7 @@ object MetaManager {
     private fun onLoad(worker: LauncherWorker) {
         VERSION_MAP.clear()
         for (metaPackage in META_PACKAGES.packages) {
+            if (metaPackage.uid == MetaUniqueID.UNKNOWN) continue
             VERSION_MAP[metaPackage.uid] = metaPackage.getVersions(worker).versions.map { it.version }.toSet()
         }
     }
