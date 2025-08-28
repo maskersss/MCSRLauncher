@@ -104,7 +104,7 @@ object MCSRLauncher {
                 this.setState("Loading Updater...")
                 UpdaterUtils.setup()
 
-                this.setState("Checking Launcher Update...")
+                this.setState("Checking for Launcher Update...")
                 val latestVersion = UpdaterUtils.checkLatestVersion(this)
                 if (latestVersion != null) {
                     val updateConfirm = JOptionPane.showConfirmDialog(null, I18n.translate("message.new_update_found").plus("\nCurrent: $APP_VERSION\nNew: $latestVersion"), I18n.translate("text.check_update"), JOptionPane.YES_NO_OPTION)

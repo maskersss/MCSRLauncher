@@ -20,7 +20,7 @@ object SpeedrunUtils {
     )
 
     fun getLatestMCSRRankedVersion(worker: LauncherWorker): MCSRRankedVersionData? {
-        worker.setState("Checking latest version of MCSR Ranked")
+        worker.setState("Checking the latest version of MCSR Ranked")
         val request = HttpUtils.makeJsonRequest(HttpGet("https://api.modrinth.com/v2/project/mcsr-ranked/version?featured=true"), worker)
         if (!request.hasSuccess()) {
             MCSRLauncher.LOGGER.error("Failed to parse MCSR Ranked version on Modrinth")

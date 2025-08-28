@@ -106,7 +106,7 @@ data class BasicInstance(
         worker.setState("installing game files and libraries...")
 
         // Minecraft
-        val minecraftMeta = MetaManager.getVersionMeta<MinecraftMetaFile>(MetaUniqueID.MINECRAFT, this.minecraftVersion, worker) ?: throw IllegalStateException("Minecraft version $minecraftVersion is not exist")
+        val minecraftMeta = MetaManager.getVersionMeta<MinecraftMetaFile>(MetaUniqueID.MINECRAFT, this.minecraftVersion, worker) ?: throw IllegalStateException("Minecraft version $minecraftVersion does not exist")
         minecraftMeta.install(worker)
         if (minecraftMeta.traits.contains(LauncherTrait.LEGACY_LAUNCH)) {
             LegacyLaunchFixer.assetFix(minecraftMeta.assetIndex, this.getGamePath().resolve("resources"), worker)
@@ -114,23 +114,23 @@ data class BasicInstance(
 
         // LWJGL
         (MetaManager.getVersionMeta<MetaVersionFile>(this.lwjglVersion.type, this.lwjglVersion.version, worker)
-            ?: throw IllegalStateException("LWJGL version $minecraftVersion is not exist")).install(worker)
+            ?: throw IllegalStateException("LWJGL version $minecraftVersion does not exist")).install(worker)
 
         // Fabric Loader / Intermediary
         val fabric = this.fabricVersion
         if (fabric != null) {
             (MetaManager.getVersionMeta<MetaVersionFile>(MetaUniqueID.FABRIC_LOADER, fabric.loaderVersion, worker)
-                ?: throw IllegalStateException("Fabric Loader version $minecraftVersion is not exist")).install(worker)
+                ?: throw IllegalStateException("Fabric Loader version $minecraftVersion does not exist")).install(worker)
             worker.properties["intermediary-type"] = fabric.intermediaryType.name
             (MetaManager.getVersionMeta<MetaVersionFile>(MetaUniqueID.FABRIC_INTERMEDIARY, fabric.intermediaryVersion, worker)
-                ?: throw IllegalStateException("Fabric Intermediary version ${fabric.intermediaryType} for ${fabric.intermediaryVersion} is not exist")).install(worker)
+                ?: throw IllegalStateException("Fabric Intermediary version ${fabric.intermediaryType} for ${fabric.intermediaryVersion} does not exist")).install(worker)
         }
 
         if (this.mcsrRankedType != null && fabric != null && this.minecraftVersion == "1.16.1") {
             SpeedrunUtils.getLatestMCSRRankedVersion(worker)?.download(this, worker)
         }
 
-        MCSRLauncher.LOGGER.info("Installed every game files and libraries!")
+        MCSRLauncher.LOGGER.info("Installed all game files and libraries!")
     }
 
     fun launchInstance(worker: LauncherWorker) {

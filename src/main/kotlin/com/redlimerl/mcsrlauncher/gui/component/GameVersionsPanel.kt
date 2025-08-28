@@ -79,7 +79,7 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
 
         val isFabric = gameTabPane.selectedIndex == 0
         val currentVersionTable = (if (isFabric) fabricVersionTable else vanillaVersionTable)
-        if (currentVersionTable.selectedRow == -1) throw IllegalStateException("Minecraft version has not selected")
+        if (currentVersionTable.selectedRow == -1) throw IllegalStateException("Minecraft version has not been selected")
 
         val selectedMinecraftVersion = currentVersionTable.let { it.getValueAt(it.selectedRow, 1) }.toString()
         return MetaManager.getVersions(MetaUniqueID.MINECRAFT).find { it.version == selectedMinecraftVersion }!!
@@ -94,7 +94,7 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
         val currentLWJGLComboBox = (if (isFabric) fabricLWJGLComboBox else vanillaLWJGLComboBox)
         val lwjglRequire = vanillaVersion.requires.first()
         val lwjglSelected = currentLWJGLComboBox.selectedItem as? String ?: throw IllegalStateException("LWJGL version is not selected")
-        if (MetaManager.getVersions(lwjglRequire.uid).none { it.version == lwjglSelected }) throw IllegalStateException("$lwjglSelected is not selectable version in ${lwjglRequire.uid}")
+        if (MetaManager.getVersions(lwjglRequire.uid).none { it.version == lwjglSelected }) throw IllegalStateException("$lwjglSelected is not a selectable version in ${lwjglRequire.uid}")
         return LWJGLVersionData(lwjglRequire.uid, currentLWJGLComboBox.selectedItem as? String ?: throw IllegalStateException("LWJGL version is not selected"))
     }
 

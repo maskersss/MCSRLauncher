@@ -18,7 +18,7 @@ object LegacyLaunchFixer {
             val targetFile = path.resolve(name).toFile()
 
             if (!sourceFile.exists()) {
-                MCSRLauncher.LOGGER.error("source file: $name is not exist! skip copying it.")
+                MCSRLauncher.LOGGER.error("source file: $name does not exist! skipping copying it.")
                 continue
             }
             if (targetFile.exists()) continue
