@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.serialization") version "2.1.20"
+    id("com.gradleup.shadow") version "9.0.2"
 }
 
 group = "com.redlimerl.mcsrlauncher"
@@ -73,8 +74,11 @@ tasks.withType<Jar> {
             "Implementation-Version" to version
         )
     }
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(sourceSets.main.get().output)
-    dependsOn(configurations.runtimeClasspath)
-    from(configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) })
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("MCSRLauncher")
+    archiveVersion.set("")
+    archiveClassifier.set("")
+    mergeServiceFiles()
 }
