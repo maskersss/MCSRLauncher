@@ -29,6 +29,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.JDialog
 import javax.swing.JOptionPane
+import javax.swing.SwingUtilities
 import kotlin.concurrent.thread
 import kotlin.io.path.absolute
 import kotlin.io.path.absolutePathString
@@ -107,9 +108,11 @@ object MCSRLauncher {
                 this.setState("Checking Launcher Update...")
                 val latestVersion = UpdaterUtils.checkLatestVersion(this)
                 if (latestVersion != null) {
-                    val updateConfirm = JOptionPane.showConfirmDialog(null, I18n.translate("message.new_update_found").plus("\nCurrent: $APP_VERSION\nNew: $latestVersion"), I18n.translate("text.check_update"), JOptionPane.YES_NO_OPTION)
-                    if (updateConfirm == JOptionPane.YES_OPTION) {
-                        UpdaterUtils.launchUpdater()
+                    SwingUtilities.invokeAndWait {
+                        val updateConfirm = JOptionPane.showConfirmDialog(null, I18n.translate("message.new_update_found").plus("\nCurrent: $APP_VERSION\nNew: $latestVersion"), I18n.translate("text.check_update"), JOptionPane.YES_NO_OPTION)
+                        if (updateConfirm == JOptionPane.YES_OPTION) {
+                            UpdaterUtils.launchUpdater()
+                        }
                     }
                 }
 
@@ -126,7 +129,9 @@ object MCSRLauncher {
                 dialog.dispose()
 
                 LOGGER.warn("Setup gui")
-                MAIN_FRAME = MainMenuGui()
+                SwingUtilities.invokeLater {
+                    MAIN_FRAME = MainMenuGui()
+                }
 
                 LOGGER.info("Setup launch arguments")
                 thread {
