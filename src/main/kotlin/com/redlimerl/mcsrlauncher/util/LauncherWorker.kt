@@ -135,7 +135,7 @@ abstract class LauncherWorker(
     }
 
     fun setSubText(string: String?): LauncherWorker {
-        subLabel.text = string ?: ""
+        subLabel.text = if (string == null) "" else "   $string   "
         if (!subLabel.isVisible && subLabel.text.isNotBlank()) refreshDialogWidth()
         return this
     }
