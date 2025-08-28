@@ -53,9 +53,8 @@ data class GameAssetObject(
 
             withContext(Dispatchers.IO) {
                 if (!outFile.exists() || !(shouldFastCheck || (outFile.length() == obj.size && AssetUtils.compareHash(outFile, obj.hash)))) {
-                    worker.setSubText("Downloading: $name")
                     FileDownloader.download("https://resources.download.minecraft.net/$subDir/$hash", outFile)
-                    worker.setSubText(null)
+                    worker.setSubText("Downloaded: $name")
                 }
             }
 
