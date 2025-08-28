@@ -74,7 +74,7 @@ class AccountListGui(parent: JFrame) : AccountListDialog() {
                 val msToken = try {
                     MSTokenReceiverAuth.create(this, deviceCode)
                 } catch (e: InterruptedException) {
-                    MCSRLauncher.LOGGER.info("Cancelled to add Microsoft account")
+                    MCSRLauncher.LOGGER.info("Cancelled adding Microsoft account")
                     return
                 }
                 openPageButton.isEnabled = false

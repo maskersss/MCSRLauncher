@@ -32,7 +32,7 @@ data class MicrosoftAccount(
 
     fun refreshToken(worker: LauncherWorker, force: Boolean = false): Boolean {
         if (!shouldRefreshToken() && !force) return false
-        worker.setState("Try refresh MSA token...")
+        worker.setState("Try to refresh MSA token...")
 
         val postRequest = HttpPost(MicrosoftAuthentication.TOKEN_ACCESS_URL)
         postRequest.setHeader("Content-Type", "application/x-www-form-urlencoded")

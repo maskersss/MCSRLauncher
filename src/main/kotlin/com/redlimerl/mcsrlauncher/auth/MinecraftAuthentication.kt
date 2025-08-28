@@ -51,7 +51,7 @@ data class MCTokenReceiverAuth(
         val response = HttpUtils.makeJsonRequest(getRequest, worker)
 
         if (!response.hasSuccess()) throw IllegalRequestResponseException("Failed to check game ownership")
-        if (response.result!!.jsonObject["items"]!!.jsonArray.isEmpty()) throw IllegalStateException("You are not owned the game")
+        if (response.result!!.jsonObject["items"]!!.jsonArray.isEmpty()) throw IllegalStateException("This account does not own Minecraft")
     }
 
     fun getProfile(worker: LauncherWorker): MinecraftProfile {

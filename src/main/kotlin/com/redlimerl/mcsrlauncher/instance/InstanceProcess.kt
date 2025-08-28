@@ -41,7 +41,7 @@ class InstanceProcess(val instance: BasicInstance) {
     @OptIn(DelicateCoroutinesApi::class)
     fun start(worker: LauncherWorker) {
         val javaTarget = instance.options.getSharedJavaValue { it.javaPath }
-        val noJavaException = IllegalStateException("Java has not selected. Try change your java path")
+        val noJavaException = IllegalStateException("Java has not been properly selected. Try changing your Java path")
         if (javaTarget.isEmpty()) throw noJavaException
         val javaContainer: JavaContainer
         try {
@@ -52,11 +52,11 @@ class InstanceProcess(val instance: BasicInstance) {
         }
 
         MCSRLauncher.LOGGER.info("Loading Authentication: ${instance.id}")
-        val activeAccount = AccountManager.getActiveAccount() ?: throw IllegalStateException("Active account is none")
+        val activeAccount = AccountManager.getActiveAccount() ?: throw IllegalStateException("No account found, make sure you have added your account.")
         try {
             if (activeAccount.profile.checkTokenValidForLaunch(worker, activeAccount)) AccountManager.save()
         } catch (e: IllegalRequestResponseException) {
-            throw InvalidAccessTokenException("Authentication Failed. Try remove and add your Minecraft account again.")
+            throw InvalidAccessTokenException("Authentication Failed. Try removing and adding your Minecraft account again.")
         }
 
         MCSRLauncher.LOGGER.info("Launching instance: ${instance.id}")
@@ -77,7 +77,7 @@ class InstanceProcess(val instance: BasicInstance) {
             ?: throw IllegalStateException("${MetaUniqueID.MINECRAFT.value} version meta is not found")
         val minCompatibleVersion = minecraftMetaFile.compatibleJavaMajors.min()
         if (minCompatibleVersion > javaContainer.majorVersion) {
-            throw IllegalStateException("Required minimum Java version is ${minCompatibleVersion}, you are at ${javaContainer.majorVersion}")
+            throw IllegalStateException("Required minimum Java version is ${minCompatibleVersion}, while you are using ${javaContainer.majorVersion}")
         }
 
         if (minecraftMetaFile.traits.contains(LauncherTrait.FIRST_THREAD_MACOS) && DeviceOSType.MACOS.isOn()) {
@@ -143,7 +143,7 @@ class InstanceProcess(val instance: BasicInstance) {
         val nativeLibs = arrayListOf<Path>()
         for (libraryPath in libraries) {
             val libFile = libraryPath.toFile()
-            if (!libFile.exists()) throw IllegalStateException("Library: ${libFile.name} is not exist!")
+            if (!libFile.exists()) throw IllegalStateException("Library: ${libFile.name} does not exist!")
             if (libFile.name.endsWith(".jar") && libFile.name.contains("natives")) {
                 MCSRLauncher.LOGGER.debug("Native extracting: ${libFile.name}")
                 AssetUtils.extractZip(libFile, instance.getNativePath().toFile(), true)

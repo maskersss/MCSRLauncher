@@ -93,7 +93,7 @@ object InstanceManager {
                 }
             }
         }
-        throw IllegalArgumentException("instance is not exist in InstanceManager")
+        throw IllegalArgumentException("instance does not exist in InstanceManager")
     }
 
     fun getInstance(name: String): BasicInstance? {

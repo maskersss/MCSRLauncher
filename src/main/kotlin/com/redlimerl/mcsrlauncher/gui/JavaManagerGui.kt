@@ -173,7 +173,7 @@ class JavaManagerGui(parent: JDialog, private val currentJavaPath: String, onSel
         installJavaButton.addActionListener {
             val metaUniqueID = MetaUniqueID.JAVA_METAS.find { MetaManager.getMetaName(it) == javaVendorComboBox.selectedItem!!.toString() }!!
             val majorVersion = javaVersionComboBox.selectedItem as Int
-            val meta = MetaManager.getVersionMeta<JavaMetaFile>(metaUniqueID, "java$majorVersion") ?: throw IllegalStateException("${javaVendorComboBox.selectedItem} JDK $majorVersion is not exist in meta")
+            val meta = MetaManager.getVersionMeta<JavaMetaFile>(metaUniqueID, "java$majorVersion") ?: throw IllegalStateException("${javaVendorComboBox.selectedItem} JDK $majorVersion does not exist in meta")
             val buildVersion = javaBuildComboBox.selectedItem!!.toString()
 
             object : LauncherWorker(this@JavaManagerGui, I18n.translate("text.java.download"), I18n.translate("message.loading") + "...") {
@@ -222,7 +222,7 @@ class JavaManagerGui(parent: JDialog, private val currentJavaPath: String, onSel
 
     private fun updateDownloadJavaBuildList(metaName: String = javaVendorComboBox.selectedItem!!.toString(), majorVersion: Int = javaVersionComboBox.selectedItem as Int) {
         val metaUniqueID = MetaUniqueID.JAVA_METAS.find { MetaManager.getMetaName(it) == metaName }!!
-        val meta = MetaManager.getVersionMeta<JavaMetaFile>(metaUniqueID, "java$majorVersion") ?: throw IllegalStateException("$metaName JDK $majorVersion is not exist in meta")
+        val meta = MetaManager.getVersionMeta<JavaMetaFile>(metaUniqueID, "java$majorVersion") ?: throw IllegalStateException("$metaName JDK $majorVersion does not exist in meta")
 
         javaBuildComboBox.removeAllItems()
         for (runtime in meta.runtimes) {

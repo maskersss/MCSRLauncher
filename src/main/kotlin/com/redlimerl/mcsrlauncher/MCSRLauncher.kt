@@ -105,7 +105,7 @@ object MCSRLauncher {
                 this.setState("Loading Updater...")
                 UpdaterUtils.setup()
 
-                this.setState("Checking Launcher Update...")
+                this.setState("Checking for Launcher Update...")
                 val latestVersion = UpdaterUtils.checkLatestVersion(this)
                 if (latestVersion != null) {
                     SwingUtilities.invokeAndWait {
