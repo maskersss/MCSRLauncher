@@ -99,7 +99,7 @@ object AccountManager {
 
             return ImageIcon(result.getScaledInstance(size, size, Image.SCALE_SMOOTH))
         } catch (e: Exception) {
-            LOGGER.error(e)
+            LOGGER.error("Failed to load player skin head", e)
             return defaultIcon
         }
     }

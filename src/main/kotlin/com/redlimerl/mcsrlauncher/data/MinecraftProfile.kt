@@ -125,7 +125,7 @@ data class MinecraftProfileApiResponse(
 
                 return MinecraftSkin(this.id, Base64.getEncoder().encodeToString(bytes), this.url, this.variant)
             } catch (e: Throwable) {
-                MCSRLauncher.LOGGER.error(e)
+                MCSRLauncher.LOGGER.error("Failed to get player skin", e)
                 return null
             }
         }

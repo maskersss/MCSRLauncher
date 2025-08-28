@@ -41,7 +41,7 @@ class JavaContainer(val path: Path) {
                 possibleVendor = properties.getProperty("IMPLEMENTOR")?.replace("\"", "") ?: "Unknown"
                 possibleVersion = properties.getProperty("JAVA_VERSION")?.replace("\"", "") ?: "Unknown Version"
             } catch (e: Exception) {
-                MCSRLauncher.LOGGER.error(e)
+                MCSRLauncher.LOGGER.error("Failed to find java information", e)
             }
         }
 

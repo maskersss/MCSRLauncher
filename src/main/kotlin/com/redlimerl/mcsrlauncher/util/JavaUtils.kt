@@ -53,7 +53,7 @@ object JavaUtils {
             try {
                 toJavaExecutePath(Paths.get(javaHome))?.let { containers.add(JavaContainer(it)) }
             } catch (e: Exception) {
-                MCSRLauncher.LOGGER.error(e)
+                MCSRLauncher.LOGGER.error("Failed to find executable java", e)
             }
         }
 
@@ -64,7 +64,7 @@ object JavaUtils {
                 try {
                     toJavaExecutePath(Paths.get(dir))?.let { containers.add(JavaContainer(it)) }
                 } catch (e: Exception) {
-                    MCSRLauncher.LOGGER.error(e)
+                    MCSRLauncher.LOGGER.error("Failed to find executable java", e)
                 }
             }
         }
@@ -119,7 +119,7 @@ object JavaUtils {
                         try {
                             if (f.isFile && f.name == "java" && f.canExecute()) result.add(JavaContainer(f.toPath()))
                         } catch (e: Exception) {
-                            MCSRLauncher.LOGGER.error(e)
+                            MCSRLauncher.LOGGER.error("Failed to find executable java", e)
                         }
                     }
             } else if (dir.isFile && dir.name == "java" && dir.canExecute()) {
@@ -159,14 +159,14 @@ object JavaUtils {
                                 try {
                                     result.add(JavaContainer(javaBin.toPath()))
                                 } catch (e: Exception) {
-                                    MCSRLauncher.LOGGER.error(e)
+                                    MCSRLauncher.LOGGER.error("Failed to find executable java", e)
                                 }
                             }
                         }
                     }
                 }
             } catch (e: Exception) {
-                MCSRLauncher.LOGGER.error(e)
+                MCSRLauncher.LOGGER.error("Failed to find executable java", e)
             }
         }
         return result

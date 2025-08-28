@@ -47,7 +47,7 @@ class InstanceProcess(val instance: BasicInstance) {
         try {
             javaContainer = JavaContainer(Paths.get(javaTarget))
         } catch (e: Exception) {
-            MCSRLauncher.LOGGER.error(e)
+            MCSRLauncher.LOGGER.error("Failed to find java with \"${javaTarget}\"", e)
             throw noJavaException
         }
 
