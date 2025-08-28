@@ -89,6 +89,7 @@ class InstanceProcess(val instance: BasicInstance) {
         val mainJar = minecraftMetaFile.mainJar.getPath()
         mainClass = minecraftMetaFile.mainClass
 
+        val accessToken = activeAccount.profile.accessToken
         val gameArgs = minecraftMetaFile.minecraftArguments
             .replace("\${auth_player_name}", activeAccount.profile.nickname)
             .replace("\${version_name}", minecraftMetaFile.version)
@@ -97,8 +98,8 @@ class InstanceProcess(val instance: BasicInstance) {
             .replace("\${game_assets}", instance.getGamePath().resolve("resources").absolutePathString())
             .replace("\${assets_index_name}", minecraftMetaFile.assetIndex.id)
             .replace("\${auth_uuid}", activeAccount.profile.uuid.toString())
-            .replace("\${auth_access_token}", activeAccount.profile.accessToken ?: "")
-            .replace("\${auth_session}", activeAccount.profile.accessToken ?: "")
+            .replace("\${auth_access_token}", accessToken ?: "")
+            .replace("\${auth_session}", accessToken ?: "")
             .replace("\${user_type}", "msa")
             .replace("\${version_type}", minecraftMetaFile.type.toTypeId())
             .replace("\${user_properties}", "{}")
@@ -161,7 +162,9 @@ class InstanceProcess(val instance: BasicInstance) {
         finalizeArgs.add(mainClass)
         finalizeArgs.addAll(gameArgs)
 
-        MCSRLauncher.LOGGER.debug(finalizeArgs)
+        var debugArgs = finalizeArgs.joinToString(" ")
+        if (accessToken != null) debugArgs = debugArgs.replace(accessToken, "[ACCESS TOKEN]")
+        MCSRLauncher.LOGGER.debug(debugArgs)
 
         GlobalScope.launch {
             val processBuilder = ProcessBuilder(finalizeArgs)
