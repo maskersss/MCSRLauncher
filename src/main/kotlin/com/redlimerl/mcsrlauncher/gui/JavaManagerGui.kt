@@ -9,7 +9,7 @@ import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.JavaUtils
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SwingUtils
-import io.github.z4kn4fein.semver.Version
+import io.github.z4kn4fein.semver.toVersionOrNull
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.event.ComponentAdapter
@@ -114,7 +114,9 @@ class JavaManagerGui(parent: JDialog, private val currentJavaPath: String, onSel
 
         val tableModel =
             DefaultTableModel(arrayOf(), arrayOf(I18n.translate("text.version"), I18n.translate("text.vendor"), I18n.translate("text.path")))
-        javaList.sortedByDescending { Version.parse(it.version.split("_").first()) }.forEach { tableModel.addRow(it.dataArray()) }
+        javaList.sortedByDescending {
+            it.version.split("_").first().toVersionOrNull(false)
+        }.forEach { tableModel.addRow(it.dataArray()) }
 
         javaListTable.model = tableModel
         if (javaListTable.rowCount > 0) javaListTable.setRowSelectionInterval(0, 0)
