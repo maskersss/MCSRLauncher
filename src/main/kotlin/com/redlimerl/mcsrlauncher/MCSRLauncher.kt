@@ -56,7 +56,7 @@ object MCSRLauncher {
     val APP_VERSION = javaClass.`package`.implementationVersion ?: "dev"
     val GAME_PROCESSES = arrayListOf<InstanceProcess>()
     val JSON = Json { ignoreUnknownKeys = true; prettyPrint = true }
-    private const val ARGS_PORT = 53510
+    private val ARGS_PORT = if (IS_DEV_VERSION) 53511 else 53510
     lateinit var MAIN_FRAME: MainMenuGui private set
     lateinit var options: LauncherOptions private set
 
