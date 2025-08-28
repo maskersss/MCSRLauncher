@@ -19,7 +19,7 @@ DisableWelcomePage=no
 OutputBaseFilename={#LauncherName}-windows-installer
 PrivilegesRequired=lowest
 SolidCompression=yes
-SetupIconFile=..\icons\icon.ico
+SetupIconFile=..\..\src\main\resources\icon.ico
 UninstallDisplayIcon={app}\launch.exe
 WizardStyle=modern
 
