@@ -75,7 +75,7 @@ public class CopyInstanceDialog extends JDialog {
         panel5.setLayout(new GridLayoutManager(3, 2, new Insets(10, 10, 10, 10), -1, -1));
         panel3.add(panel5, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         copyWorldsCheckBox = new JCheckBox();
-        copyWorldsCheckBox.setSelected(true);
+        copyWorldsCheckBox.setSelected(false);
         copyWorldsCheckBox.setText("text.copy.worlds");
         panel5.add(copyWorldsCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         copyGameOptionsCheckBox = new JCheckBox();

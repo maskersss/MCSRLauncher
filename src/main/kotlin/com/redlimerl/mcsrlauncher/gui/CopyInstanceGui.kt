@@ -32,12 +32,12 @@ class CopyInstanceGui(parent: Window, private val instance: BasicInstance) : Cop
             copyOption.resourcePacks = copyResourcePacksCheckBox.isSelected
             copyOption.playTime = copyPlayTimeCheckBox.isSelected
 
-            object : LauncherWorker(this@CopyInstanceGui, I18n.translate("text.copy.instance"), I18n.translate("message.loading")) {
+            object : LauncherWorker(this@CopyInstanceGui, I18n.translate("text.copy.instance"), I18n.translate("text.copy.instance.progress")) {
                 override fun work(dialog: JDialog) {
-                    this@CopyInstanceGui.dispose()
-                    copyOption.copyInstance(instanceNameField.text, instanceGroupBox.selectedItem?.toString(), instance)
+                    copyOption.copyInstance(instanceNameField.text, instanceGroupBox.selectedItem?.toString(), instance, this)
                     dialog.dispose()
                     JOptionPane.showMessageDialog(this@CopyInstanceGui, I18n.translate("message.copy_instance.success"))
+                    this@CopyInstanceGui.dispose()
                 }
             }.showDialog().start()
         }
