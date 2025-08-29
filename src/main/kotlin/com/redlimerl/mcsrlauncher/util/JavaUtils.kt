@@ -259,6 +259,9 @@ object JavaUtils {
                 else {
                     outFile.parentFile.mkdirs()
                     FileOutputStream(outFile).use { archiveInput.copyTo(it) }
+                    if (outFile.name == javaExecutableName() && !DeviceOSType.WINDOWS.isOn()) {
+                        outFile.setExecutable(true, false)
+                    }
                 }
 
                 entry = archiveInput.nextEntry
