@@ -83,17 +83,20 @@ abstract class LauncherWorker(
     }
 
     fun start(): LauncherWorker {
-        CoroutineScope(Dispatchers.IO).launch {
-            dialog.isModal = true
-            if (shouldShowDialog) dialog.isVisible = true
+        if (shouldShowDialog) {
+            SwingUtilities.invokeLater {
+                dialog.isModal = true
+                dialog.isVisible = true
+            }
         }
+
         currentJob = CoroutineScope(Dispatchers.Default).launch {
             try {
                 work(dialog)
-                if (dialog.isVisible) dialog.dispose()
+                SwingUtilities.invokeLater { if (dialog.isVisible) dialog.dispose() }
             } catch (e: Throwable) {
                 MCSRLauncher.LOGGER.error(e.message, e)
-                if (dialog.isVisible) dialog.dispose()
+                SwingUtilities.invokeLater { if (dialog.isVisible) dialog.dispose() }
                 onError(e)
             }
         }

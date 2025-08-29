@@ -77,13 +77,15 @@ object MCSRLauncher {
 
         // Setup Theme
         LOGGER.warn("Loading theme")
-        FlatRobotoFont.install()
-        FlatLaf.setPreferredFontFamily(FlatRobotoFont.FAMILY)
-        FlatLaf.setPreferredLightFontFamily( FlatRobotoFont.FAMILY_LIGHT )
-        FlatLaf.setPreferredSemiboldFontFamily( FlatRobotoFont.FAMILY_SEMIBOLD )
-        FlatDarkLaf.setup()
+        SwingUtilities.invokeAndWait {
+            FlatRobotoFont.install()
+            FlatLaf.setPreferredFontFamily(FlatRobotoFont.FAMILY)
+            FlatLaf.setPreferredLightFontFamily( FlatRobotoFont.FAMILY_LIGHT )
+            FlatLaf.setPreferredSemiboldFontFamily( FlatRobotoFont.FAMILY_SEMIBOLD )
+            FlatDarkLaf.setup()
+        }
 
-        object : LauncherWorker(null, "Loading...") {
+        object : LauncherWorker(null, "Loading...", "Initializing...") {
             override fun work(dialog: JDialog) {
                 LOGGER.warn("Base Path: {}", BASE_PATH.absolutePathString())
                 LOGGER.warn("OS & Arch: {}", RuntimeOSType.current())
