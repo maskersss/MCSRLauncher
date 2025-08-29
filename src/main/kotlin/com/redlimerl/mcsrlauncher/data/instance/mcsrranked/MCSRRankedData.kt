@@ -31,11 +31,11 @@ data class MCSRRankedVersionData(
 }
 
 @Serializable
-enum class MCSRRankedPackType(val versionName: String, private val recommended: Boolean) {
+enum class MCSRRankedPackType(val versionName: String?, private val recommended: Boolean) {
     BASIC("mcsrranked-basic", true),
     STANDARD_SETTINGS("mcsrranked-standardsettings", false),
     ALL("mcsrranked-all", false),
-    MOD_ONLY("mcsrranked-all", false);
+    MOD_ONLY(null, false);
 
     override fun toString(): String {
         return I18n.translate("text.pack_type.mcsrranked.${name.lowercase()}") + (if (this.recommended) " (${I18n.translate("text.recommended")})" else "")

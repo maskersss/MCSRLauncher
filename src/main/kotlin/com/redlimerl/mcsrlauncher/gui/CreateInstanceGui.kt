@@ -56,7 +56,9 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
             object : LauncherWorker(this@CreateInstanceGui, I18n.translate("message.loading"), I18n.translate("text.download.assets").plus("...")) {
                 override fun work(dialog: JDialog) {
                     SpeedrunUtils.getLatestMCSRRankedVersion(this)?.download(instance, this)
-                    instance.installRecommendedSpeedrunMods(this, mcsrRankedPackType.versionName, ModCategory.RANDOM_SEED, ModDownloadMethod.DOWNLOAD_RECOMMENDS, false)
+                    if (mcsrRankedPackType.versionName != null) {
+                        instance.installRecommendedSpeedrunMods(this, mcsrRankedPackType.versionName, ModCategory.RANDOM_SEED, ModDownloadMethod.DOWNLOAD_RECOMMENDS, false)
+                    }
                     instance.options.autoModUpdates = true
                     instance.save()
                     launch()
