@@ -24,7 +24,7 @@ class MainMenuGui : MainForm() {
         defaultCloseOperation = EXIT_ON_CLOSE
         minimumSize = Dimension(900, 600)
         setLocationRelativeTo(null)
-        javaClass.classLoader.getResource("icon.png")?.let { iconImage = ImageIcon(it).image }
+        javaClass.classLoader.getResource("icons/launcher/icon.png")?.let { iconImage = ImageIcon(it).image }
 
         initLauncherMenu()
         initInstanceList()
