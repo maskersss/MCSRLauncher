@@ -85,11 +85,10 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="c581f" class="javax.swing.JTextArea" binding="liveLogArea">
+              <component id="445f8" class="javax.swing.JTextPane" binding="liveLogPane">
                 <constraints/>
                 <properties>
                   <editable value="false"/>
-                  <lineWrap value="true"/>
                 </properties>
               </component>
             </children>
@@ -101,11 +100,10 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="e4e43" class="javax.swing.JTextArea" binding="fileLogArea">
+              <component id="cf2f6" class="javax.swing.JTextPane" binding="fileLogPane">
                 <constraints/>
                 <properties>
                   <editable value="false"/>
-                  <lineWrap value="true"/>
                 </properties>
               </component>
             </children>

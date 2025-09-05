@@ -205,12 +205,12 @@ class InstanceProcess(val instance: BasicInstance) {
         viewerUpdater = GlobalScope.launch {
             SwingUtilities.invokeLater {
                 logViewer.updateLogFiles()
-                logViewer.liveLogArea.text = ""
-                logViewer.liveLogArea.append(logArchive.toString())
+                logViewer.liveLogPane.text = ""
+                logViewer.appendString(logViewer.liveLogPane, logArchive.toString(), true)
             }
             for (line in logChannel) {
                 SwingUtilities.invokeLater {
-                    logViewer.liveLogArea.append(line)
+                    logViewer.appendString(logViewer.liveLogPane, line)
                     logArchive.append(line)
                     logViewer.onLiveUpdate()
                 }

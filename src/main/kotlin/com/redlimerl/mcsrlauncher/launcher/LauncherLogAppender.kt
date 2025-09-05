@@ -31,13 +31,13 @@ class LauncherLogAppender(private val layout: PatternLayout)
             SwingUtilities.invokeLater {
                 logArchive.lines().forEach {
                     if (!it.contains("[DEBUG]") || logViewer.enabledDebug())
-                        logViewer.liveLogArea.append(it + "\n")
+                        logViewer.appendString(logViewer.liveLogPane, it)
                 }
             }
             for (line in logChannel) {
                 SwingUtilities.invokeLater {
                     if (!line.contains("[DEBUG]") || logViewer.enabledDebug()) {
-                        logViewer.liveLogArea.append(line)
+                        logViewer.appendString(logViewer.liveLogPane, line)
                         logViewer.onLiveUpdate()
                     }
                     logArchive.append(line)

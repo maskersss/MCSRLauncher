@@ -23,12 +23,11 @@ import java.nio.file.Path
 import java.util.zip.GZIPInputStream
 import javax.swing.JDialog
 import javax.swing.JOptionPane
-import javax.swing.JTextArea
+import javax.swing.JTextPane
 import javax.swing.SwingUtilities
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
-import javax.swing.text.DefaultCaret
-import javax.swing.text.DefaultHighlighter
+import javax.swing.text.*
 
 class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
 
@@ -40,13 +39,13 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
         layout = BorderLayout()
         add(this.rootPane, BorderLayout.CENTER)
 
-        (liveLogArea.caret as DefaultCaret).updatePolicy = DefaultCaret.NEVER_UPDATE
+        (liveLogPane.caret as DefaultCaret).updatePolicy = DefaultCaret.NEVER_UPDATE
         liveScrollPane.viewport.addChangeListener {
             val viewport = liveScrollPane.viewport
             val viewEnd = viewport.viewPosition.y + viewport.height
-            val docHeight = liveLogArea.height
+            val docHeight = liveLogPane.height
 
-            autoScrollLive = (viewEnd >= (docHeight - (liveLogArea.font.size * 2)))
+            autoScrollLive = (viewEnd >= (docHeight - (liveLogPane.font.size * 2)))
         }
 
         searchField.document.addDocumentListener(object : DocumentListener {
@@ -129,7 +128,7 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
         MCSRLauncher.LOG_APPENDER.syncLogViewer(this)
         debugCheckBox.actionListeners.toMutableList().forEach { debugCheckBox.removeActionListener(it) }
         debugCheckBox.addActionListener {
-            liveLogArea.text = ""
+            liveLogPane.text = ""
             syncLauncher()
         }
         debugCheckBox.isVisible = true
@@ -137,18 +136,34 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
 
     fun onLiveUpdate() {
         if (autoScrollLive) {
-            liveLogArea.caretPosition = liveLogArea.document.length
+            liveLogPane.caretPosition = liveLogPane.document.length
         }
     }
 
-    private fun getFocusedArea(): JTextArea {
-        return if (displayLiveLog) liveLogArea else fileLogArea
+    fun appendString(textPane: JTextPane, message: String, multipleLines: Boolean = false) {
+        val doc: StyledDocument = textPane.styledDocument
+        val style = SimpleAttributeSet()
+
+        val strings = if (multipleLines) message.lines() else listOf(message)
+        for (string in strings) {
+            if (string.isEmpty()) continue
+            when {
+                string.contains("ERROR", true) -> StyleConstants.setForeground(style, Color(255, 60, 60))
+                string.contains("WARN") -> StyleConstants.setForeground(style, Color(0xCA7733))
+                string.contains("DEBUG") -> StyleConstants.setForeground(style, Color(171, 171, 171))
+            }
+            doc.insertString(doc.length, string + (if (string.endsWith("\n")) "" else "\n"), style)
+        }
     }
 
-    private fun focusWord(textArea: JTextArea, word: String) {
+    private fun getFocusedArea(): JTextPane {
+        return if (displayLiveLog) liveLogPane else fileLogPane
+    }
+
+    private fun focusWord(pane: JTextPane, word: String) {
         if (word.isBlank()) return
 
-        val content = textArea.text
+        val content = pane.text
         val indexes = mutableListOf<Int>()
         var searchIndex = content.indexOf(word)
         while (searchIndex >= 0) {
@@ -163,16 +178,16 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
         if (indexes.isEmpty()) return
 
         val targetIndex = indexes[searchCount]
-        textArea.caretPosition = targetIndex
+        pane.caretPosition = targetIndex
 
-        val highlighter = textArea.highlighter
+        val highlighter = pane.highlighter
         highlighter.removeAllHighlights()
 
         for (index in indexes) {
             highlighter.addHighlight(index, index + word.length, DefaultHighlighter.DefaultHighlightPainter(if (index == targetIndex) Color.ORANGE else Color.ORANGE.darker().darker()))
         }
 
-        textArea.modelToView2D(targetIndex)?.let { textArea.scrollRectToVisible(it.bounds) }
+        pane.modelToView2D(targetIndex)?.let { pane.scrollRectToVisible(it.bounds) }
         searchCount++
     }
 
@@ -199,7 +214,7 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
         val logFile = basePath.resolve(fileName).toFile()
         if (!logFile.exists()) return
 
-        fileLogArea.text = I18n.translate("message.loading") + "..."
+        fileLogPane.text = I18n.translate("message.loading") + "..."
         GlobalScope.launch {
             val text = when (logFile.extension) {
                 "gz" -> GZIPInputStream(FileInputStream(logFile)).use { gzip ->
@@ -209,13 +224,13 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
                 else -> ""
             }
             SwingUtilities.invokeLater {
-                val stringBuilder = StringBuilder()
+                fileLogPane.text = ""
                 text.lines().forEach {
-                    if (!it.contains("[DEBUG]") || enabledDebug())
-                        stringBuilder.append(it).append("\n")
+                    if (!it.contains("[DEBUG]") || enabledDebug()) {
+                        appendString(fileLogPane, it + "\n")
+                    }
                 }
-                fileLogArea.text = stringBuilder.toString()
-                fileLogArea.caretPosition = 0
+                fileLogPane.caretPosition = 0
             }
         }
     }
