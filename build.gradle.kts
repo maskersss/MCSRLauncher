@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.redlimerl.mcsrlauncher"
-version = "0.6.1-beta"
+version = "0.6.2-beta"
 
 repositories {
     mavenCentral()
