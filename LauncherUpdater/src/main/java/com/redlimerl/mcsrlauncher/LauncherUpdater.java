@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class LauncherUpdater {
@@ -17,7 +18,8 @@ public class LauncherUpdater {
     private static final String JAR_NAME = "MCSRLauncher.jar";
 
     public static void main(String[] args) {
-        File launcherFile = Paths.get("").resolve(JAR_NAME).toFile();
+        Path basePath = Paths.get("");
+        File launcherFile = basePath.resolve(JAR_NAME).toFile();
 
         FlatDarkLaf.setup();
         JDialog dialog = new JDialog((Frame) null, "MCSRLauncher Updater", true);
@@ -66,13 +68,13 @@ public class LauncherUpdater {
                 }
 
                 try {
-                    var exeFile = launcherFile.getParentFile().toPath().resolve("launch.exe").toFile();
+                    var exeFile = basePath.resolve("launch.exe").toFile();
                     if (exeFile.exists()) {
-                        new ProcessBuilder(exeFile.getAbsolutePath()).start();
+                        new ProcessBuilder("launch.exe").start();
                     } else {
-                        var shellFile = launcherFile.getParentFile().toPath().resolve("launch.sh").toFile();
+                        var shellFile = basePath.resolve("launch.sh").toFile();
                         if (shellFile.exists()) {
-                            new ProcessBuilder(shellFile.getAbsolutePath()).start();
+                            new ProcessBuilder("launch.sh").start();
                         } else {
                             new ProcessBuilder("java", "-jar", launcherFile.getName()).start();
                         }
