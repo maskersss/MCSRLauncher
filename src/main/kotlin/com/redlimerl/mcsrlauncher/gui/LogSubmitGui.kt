@@ -1,5 +1,6 @@
 package com.redlimerl.mcsrlauncher.gui
 
+import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.util.HttpUtils.makeRawRequest
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
@@ -14,6 +15,7 @@ import java.awt.datatransfer.StringSelection
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import javax.swing.JDialog
+import javax.swing.event.HyperlinkEvent
 
 class LogSubmitGui(window: Window) : LogSubmitDialog(window) {
     var targetUrl: String? = ""
@@ -28,6 +30,16 @@ class LogSubmitGui(window: Window) : LogSubmitDialog(window) {
             targetUrl?.let {
                 Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(it), null)
                 Desktop.getDesktop().browse(URI.create(it))
+            }
+        }
+
+        analyzeContextLabel.addHyperlinkListener {
+            if (it.eventType == HyperlinkEvent.EventType.ACTIVATED) {
+                try {
+                    Desktop.getDesktop().browse(URI(it.url.toString()))
+                } catch (ex: Exception) {
+                    MCSRLauncher.LOGGER.error("Failed to open: ${it.url}", ex)
+                }
             }
         }
 
