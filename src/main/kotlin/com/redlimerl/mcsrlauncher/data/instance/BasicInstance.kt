@@ -65,15 +65,18 @@ data class BasicInstance(
     var mcsrRankedType: MCSRRankedPackType? = null,
     var options: InstanceOptions = InstanceOptions(),
     var playTime: Long = 0,
+) {
     @Transient
-    var logViewerPanel: LogViewerPanel? = null,
+    var optionDialog: InstanceOptionGui? = null
+
     @Transient
-    var optionDialog: InstanceOptionGui? = null,
-    @Transient
-    var lastLaunch: Long = System.currentTimeMillis(),
+    var lastLaunch: Long = System.currentTimeMillis()
+
     @Transient
     var clearingWorlds: Boolean = false
-) {
+
+    @Transient
+    val logViewerPanel: LogViewerPanel = LogViewerPanel(this.getGamePath())
 
     fun getInstancePath(): Path {
         return InstanceManager.INSTANCES_PATH.resolve(id)
@@ -104,7 +107,7 @@ data class BasicInstance(
     fun onLaunch() {
         MCSRLauncher.LOGGER.info("Launched instance: $id")
         InstanceManager.refreshInstanceList()
-        logViewerPanel?.let { getProcess()?.syncLogViewer(it) }
+        logViewerPanel.let { getProcess()?.syncLogViewer(it) }
         optionDialog?.setLauncherLaunched(true)
         lastLaunch = System.currentTimeMillis()
     }
@@ -116,6 +119,10 @@ data class BasicInstance(
         optionDialog?.setLauncherLaunched(false)
         playTime += (System.currentTimeMillis() - lastLaunch) / 1000
         this.save()
+
+        if (code != 0) {
+            openOptionDialog().openTab(4)
+        }
     }
 
     fun install(worker: LauncherWorker) {
@@ -398,10 +405,12 @@ data class BasicInstance(
         return deleteCount.get()
     }
 
-    fun openOptionDialog(window: Window) {
-        if (optionDialog != null) optionDialog?.requestFocus()
-        else {
+    fun openOptionDialog(window: Window = MCSRLauncher.MAIN_FRAME): InstanceOptionGui {
+        if (optionDialog != null) {
+            optionDialog?.requestFocus()
+        } else {
             optionDialog = InstanceOptionGui(window, this)
         }
+        return optionDialog!!
     }
 }

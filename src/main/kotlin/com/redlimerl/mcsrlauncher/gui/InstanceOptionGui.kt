@@ -6,7 +6,6 @@ import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
 import com.redlimerl.mcsrlauncher.data.meta.file.MinecraftMapsMetaFile
 import com.redlimerl.mcsrlauncher.gui.component.InstanceGroupComboBox
 import com.redlimerl.mcsrlauncher.gui.component.JavaSettingsPanel
-import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
 import com.redlimerl.mcsrlauncher.gui.component.ResolutionSettingsPanel
 import com.redlimerl.mcsrlauncher.instance.mod.ModData
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
@@ -62,6 +61,10 @@ class InstanceOptionGui(parent: Window, private val instance: BasicInstance) : I
     override fun dispose() {
         super.dispose()
         instance.optionDialog = null
+    }
+
+    fun openTab(index: Int) {
+        this.optionTab.selectedIndex = index
     }
 
     private fun getUpdatedTitle(): String {
@@ -324,7 +327,7 @@ class InstanceOptionGui(parent: Window, private val instance: BasicInstance) : I
 
     private fun initLogTab() {
         logPanel.layout = BorderLayout()
-        logPanel.add(LogViewerPanel(instance.getGamePath()).also { it.syncInstance(instance) }, BorderLayout.CENTER)
+        logPanel.add(instance.logViewerPanel.also { it.syncInstance(instance) }, BorderLayout.CENTER)
     }
 
     private fun checkInstanceLaunched(): Boolean {

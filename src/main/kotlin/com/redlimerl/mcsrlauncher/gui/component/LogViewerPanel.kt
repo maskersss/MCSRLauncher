@@ -118,7 +118,6 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
     }
 
     fun syncInstance(instance: BasicInstance) {
-        instance.logViewerPanel = this
         instance.getProcess()?.syncLogViewer(this)
         debugCheckBox.actionListeners.toMutableList().forEach { debugCheckBox.removeActionListener(it) }
         debugCheckBox.isVisible = false
