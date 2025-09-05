@@ -2,7 +2,6 @@ package com.redlimerl.mcsrlauncher.gui.component
 
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.gui.CopyInstanceGui
-import com.redlimerl.mcsrlauncher.gui.InstanceOptionGui
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.SwingUtils
@@ -66,7 +65,7 @@ class InstanceLaunchButton(private val windowParent: Window, val instance: Basic
 
         popupMenu.add(JMenuItem(I18n.translate("instance.edit")).apply {
             addActionListener {
-                InstanceOptionGui(windowParent, instance)
+                instance.openOptionDialog(windowParent)
             }
         })
 

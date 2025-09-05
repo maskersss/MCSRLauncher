@@ -42,7 +42,6 @@ public class InstanceOptionDialog extends JDialog {
         super(window);
         $$$setupUI$$$();
         setContentPane(contentPane);
-        setModal(true);
     }
 
     /**

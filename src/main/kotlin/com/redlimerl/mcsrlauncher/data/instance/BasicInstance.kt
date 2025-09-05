@@ -35,6 +35,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonPrimitive
 import org.apache.commons.io.FileUtils
+import java.awt.Window
 import java.io.File
 import java.io.IOException
 import java.net.URL
@@ -395,5 +396,12 @@ data class BasicInstance(
         worker.setProgress(null)
         this.clearingWorlds = false
         return deleteCount.get()
+    }
+
+    fun openOptionDialog(window: Window) {
+        if (optionDialog != null) optionDialog?.requestFocus()
+        else {
+            optionDialog = InstanceOptionGui(window, this)
+        }
     }
 }

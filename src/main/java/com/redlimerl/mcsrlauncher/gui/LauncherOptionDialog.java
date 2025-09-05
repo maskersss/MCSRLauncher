@@ -30,7 +30,6 @@ public class LauncherOptionDialog extends JDialog {
     public LauncherOptionDialog(JFrame parent) {
         super(parent);
         setContentPane(contentPane);
-        setModal(true);
     }
 
     {

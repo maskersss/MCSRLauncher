@@ -55,9 +55,12 @@ class InstanceOptionGui(parent: Window, private val instance: BasicInstance) : I
         initToolsTab()
 
         I18n.translateGui(this)
-        instance.optionDialog = this
         setLauncherLaunched(instance.isRunning())
         isVisible = true
+    }
+
+    override fun dispose() {
+        super.dispose()
         instance.optionDialog = null
     }
 

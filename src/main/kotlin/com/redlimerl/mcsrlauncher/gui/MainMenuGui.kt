@@ -19,6 +19,8 @@ import javax.swing.*
 
 class MainMenuGui : MainForm() {
 
+    private var optionDialog: LauncherOptionDialog? = null
+
     init {
         title = "${MCSRLauncher.APP_NAME} " + if (MCSRLauncher.IS_DEV_VERSION) "Developement Ver." else ("v" + MCSRLauncher.APP_VERSION)
         defaultCloseOperation = EXIT_ON_CLOSE
@@ -65,8 +67,13 @@ class MainMenuGui : MainForm() {
 
         initHeaderButton(settingsButton)
         settingsButton.addActionListener {
-            LauncherOptionGui(this)
-            refreshAccountButtonIcon(AccountManager.getActiveAccount())
+            if (optionDialog != null) {
+                optionDialog!!.requestFocus()
+            } else {
+                optionDialog = LauncherOptionGui(this) {
+                    optionDialog = null
+                }
+            }
         }
 
         initHeaderButton(discordButton)

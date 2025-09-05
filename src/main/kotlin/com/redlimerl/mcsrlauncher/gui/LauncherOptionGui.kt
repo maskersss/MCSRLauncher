@@ -18,7 +18,7 @@ import javax.swing.JOptionPane
 import javax.swing.SpinnerNumberModel
 import kotlin.math.min
 
-class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
+class LauncherOptionGui(parent: JFrame, private val onDispose: () -> Unit) : LauncherOptionDialog(parent) {
 
     init {
         title = I18n.translate("text.settings")
@@ -34,6 +34,11 @@ class LauncherOptionGui(parent: JFrame) : LauncherOptionDialog(parent) {
 
         I18n.translateGui(this)
         isVisible = true
+    }
+
+    override fun dispose() {
+        super.dispose()
+        onDispose()
     }
 
     private fun initLauncherTab() {
