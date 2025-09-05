@@ -16,7 +16,7 @@ public class LauncherUpdater {
     private static final String ENDPOINT = "https://api.github.com/repos/MCSRLauncher/Launcher/releases/latest";
     private static final String JAR_NAME = "MCSRLauncher.jar";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         File launcherFile = Paths.get("").resolve(JAR_NAME).toFile();
 
         FlatDarkLaf.setup();
@@ -62,23 +62,29 @@ public class LauncherUpdater {
                     dialog.setModal(false);
                     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                     e.printStackTrace();
+                    return;
+                }
+
+                try {
+                    var exeFile = launcherFile.getParentFile().toPath().resolve("launch.exe").toFile();
+                    if (exeFile.exists()) {
+                        new ProcessBuilder(exeFile.getAbsolutePath()).start();
+                    } else {
+                        var shellFile = launcherFile.getParentFile().toPath().resolve("launch.sh").toFile();
+                        if (shellFile.exists()) {
+                            new ProcessBuilder(shellFile.getAbsolutePath()).start();
+                        } else {
+                            new ProcessBuilder("java", "-jar", launcherFile.getName()).start();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(null, e.getMessage());
                 }
             }
         }.execute();
 
         dialog.setVisible(true);
-
-        var exeFile = launcherFile.getParentFile().toPath().resolve("MCSRLauncher.exe").toFile();
-        if (exeFile.exists()) {
-            new ProcessBuilder(exeFile.getAbsolutePath()).start();
-        } else {
-            var shellFile = launcherFile.getParentFile().toPath().resolve("launch.sh").toFile();
-            if (shellFile.exists()) {
-                new ProcessBuilder(shellFile.getAbsolutePath()).start();
-            } else {
-                new ProcessBuilder("java", "-jar", launcherFile.getName()).start();
-            }
-        }
     }
 
     private static void downloadUpdate(File jarFile, JProgressBar progressBar) throws IOException {
