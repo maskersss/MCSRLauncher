@@ -23,6 +23,7 @@ class LauncherOptionGui(parent: JFrame, private val onDispose: () -> Unit) : Lau
     init {
         title = I18n.translate("text.settings")
         minimumSize = Dimension(700, 500)
+        defaultCloseOperation = DISPOSE_ON_CLOSE
         setLocationRelativeTo(parent)
 
         this.cancelButton.addActionListener { this.dispose() }

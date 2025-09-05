@@ -40,6 +40,7 @@ class InstanceOptionGui(parent: Window, private val instance: BasicInstance) : I
     init {
         title = getUpdatedTitle()
         minimumSize = Dimension(800, 500)
+        defaultCloseOperation = DISPOSE_ON_CLOSE
         setLocationRelativeTo(parent)
 
         this.cancelButton.addActionListener { this.dispose() }
