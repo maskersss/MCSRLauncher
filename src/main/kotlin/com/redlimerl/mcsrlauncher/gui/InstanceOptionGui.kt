@@ -298,6 +298,7 @@ class InstanceOptionGui(parent: Window, private val instance: BasicInstance) : I
 
         this.addWindowFocusListener(object : WindowFocusListener {
             override fun windowGainedFocus(e: WindowEvent?) {
+                if (!instance.logViewerPanel.displayLiveLog) instance.logViewerPanel.updateLogFiles()
                 SwingUtilities.invokeLater {
                     updateMods()
                 }

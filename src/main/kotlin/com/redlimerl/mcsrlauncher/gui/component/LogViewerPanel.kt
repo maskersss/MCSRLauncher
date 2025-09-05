@@ -2,6 +2,7 @@ package com.redlimerl.mcsrlauncher.gui.component
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
+import com.redlimerl.mcsrlauncher.gui.LogSubmitGui
 import com.redlimerl.mcsrlauncher.gui.components.AbstractLogViewerPanel
 import com.redlimerl.mcsrlauncher.util.HttpUtils.makeJsonRequest
 import com.redlimerl.mcsrlauncher.util.I18n
@@ -14,11 +15,14 @@ import kotlinx.serialization.json.jsonPrimitive
 import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity
 import org.apache.hc.core5.http.message.BasicNameValuePair
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.CardLayout
+import java.awt.Color
+import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.io.FileInputStream
 import java.io.InputStreamReader
-import java.net.URI
+import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.util.zip.GZIPInputStream
 import javax.swing.JDialog
@@ -31,9 +35,11 @@ import javax.swing.text.*
 
 class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
 
-    private var displayLiveLog = true
+    var displayLiveLog = true
     private var autoScrollLive = true
     private var searchCount = 0
+    private var instanceMode = false
+    private var lastLogName = ""
 
     init {
         layout = BorderLayout()
@@ -66,7 +72,7 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
 
         updateLogFiles()
         logFileBox.addActionListener {
-            val selected = logFileBox.selectedItem as String
+            val selected = logFileBox.selectedItem as? String
             if (selected == I18n.translate("text.process")) {
                 (logCardPanel.layout as CardLayout).show(logCardPanel, "live")
                 displayLiveLog = true
@@ -94,25 +100,22 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
             val result = JOptionPane.showConfirmDialog(this@LogViewerPanel, I18n.translate("message.upload_log_ask", selected), I18n.translate("text.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)
             if (result == JOptionPane.YES_OPTION) {
                 val post = HttpPost("https://api.mclo.gs/1/log")
-                post.entity = UrlEncodedFormEntity(listOf(BasicNameValuePair("content", text)))
+                post.entity = UrlEncodedFormEntity(listOf(BasicNameValuePair("content", text)), StandardCharsets.UTF_8)
 
+                val submitDialog = LogSubmitGui(SwingUtilities.getWindowAncestor(uploadButton))
                 object : LauncherWorker() {
                     override fun work(dialog: JDialog) {
                         val request = makeJsonRequest(post, this)
                         if (request.hasSuccess()) {
                             val json = request.get<JsonObject>()
                             val url = json["url"]?.jsonPrimitive?.content ?: throw IllegalStateException("Unknown response: $json")
-                            val arrayOption = arrayOf(I18n.translate("text.open.link"), I18n.translate("text.close"))
-                            val openResult = JOptionPane.showOptionDialog(parent, I18n.translate("message.upload_log_success"), I18n.translate("text.upload"), JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, arrayOption, arrayOption[0])
-                            if (openResult == 0) {
-                                Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(url), null)
-                                Desktop.getDesktop().browse(URI.create(url))
-                            }
+                            submitDialog.updateUrl(url, instanceMode)
                         } else {
-                            JOptionPane.showMessageDialog(this@LogViewerPanel, I18n.translate("message.upload_log_fail"), I18n.translate("text.error"), JOptionPane.ERROR_MESSAGE)
+                            submitDialog.statusLabel.text = I18n.translate("message.upload_log_fail")
                         }
                     }
                 }.start()
+                submitDialog.isVisible = true
             }
         }
     }
@@ -121,6 +124,7 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
         instance.getProcess()?.syncLogViewer(this)
         debugCheckBox.actionListeners.toMutableList().forEach { debugCheckBox.removeActionListener(it) }
         debugCheckBox.isVisible = false
+        this.instanceMode = true
     }
 
     fun syncLauncher() {
@@ -131,6 +135,7 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
             syncLauncher()
         }
         debugCheckBox.isVisible = true
+        this.instanceMode = false
     }
 
     fun onLiveUpdate() {
@@ -191,6 +196,8 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
     }
 
     fun updateLogFiles() {
+        val selected = logFileBox.selectedItem as? String
+        logFileBox.removeAllItems()
         logFileBox.addItem(I18n.translate("text.process"))
 
         val logsDir = basePath.resolve("logs").toFile()
@@ -206,10 +213,19 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
                 logFileBox.addItem("crash-reports/" + file.name)
             }
         }
+
+        for (i in 0 until logFileBox.itemCount) {
+            if (logFileBox.getItemAt(i) == selected) {
+                logFileBox.selectedIndex = i
+                break
+            }
+        }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun updateLogFile(fileName: String) {
+    fun updateLogFile(fileName: String?) {
+        if (fileName == null || fileName == lastLogName) return
+
         val logFile = basePath.resolve(fileName).toFile()
         if (!logFile.exists()) return
 
@@ -231,6 +247,7 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
                 }
                 fileLogPane.caretPosition = 0
             }
+            lastLogName = fileName
         }
     }
 

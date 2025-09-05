@@ -1,16 +1,31 @@
 package com.redlimerl.mcsrlauncher.util
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher.LOGGER
-import com.redlimerl.mcsrlauncher.network.JsonHttpClientResponseHandler
-import com.redlimerl.mcsrlauncher.network.JsonResponseResult
-import com.redlimerl.mcsrlauncher.network.JsonSha256HttpClientResponseHandler
-import com.redlimerl.mcsrlauncher.network.JsonSha256ResponseResult
+import com.redlimerl.mcsrlauncher.network.*
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.core5.http.ClassicHttpRequest
+import org.apache.hc.core5.http.io.entity.EntityUtils
 
 object HttpUtils {
     private val HTTP_CLIENT: CloseableHttpClient = HttpClientBuilder.create().build()
+
+    fun makeRawRequest(request: ClassicHttpRequest, worker: LauncherWorker): RawResponseResult {
+        LOGGER.debug("Requesting JSON to: " + request.uri.toString())
+        return HTTP_CLIENT.execute(request) {
+            val code = it.code
+            val entity = it.entity
+            if (entity != null) {
+                val stringEntity = EntityUtils.toString(it.entity)
+                if (code !in 200..299) {
+                    LOGGER.error("JSON request failed ($code): \"$stringEntity\"")
+                }
+                return@execute RawResponseResult(code, stringEntity)
+            }
+            LOGGER.error("JSON request failed ($code): Missing request result")
+            return@execute RawResponseResult(code, null)
+        }
+    }
 
     fun makeJsonRequest(request: ClassicHttpRequest, worker: LauncherWorker): JsonResponseResult {
         LOGGER.debug("Requesting JSON to: " + request.uri.toString())
