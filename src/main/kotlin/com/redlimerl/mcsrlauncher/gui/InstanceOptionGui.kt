@@ -347,5 +347,25 @@ class InstanceOptionGui(parent: Window, private val instance: BasicInstance) : I
                 }
             }.showDialog().start()
         }
+
+        worldClearButton.addActionListener {
+            object : LauncherWorker(this@InstanceOptionGui, I18n.translate("text.clear_worlds"), I18n.translate("message.loading") + "...") {
+                override fun work(dialog: JDialog) {
+                    worldClearButton.isEnabled = false
+                    val deletedCount = instance.clearWorlds(this)
+                    worldClearButton.isEnabled = true
+                    dialog.dispose()
+                    if (deletedCount != null) {
+                        JOptionPane.showMessageDialog(this@InstanceOptionGui, I18n.translate("message.clear_worlds.success", deletedCount))
+                    }
+                }
+            }.showDialog().start()
+        }
+
+        autoWorldClearComboBox.isSelected = instance.options.clearBeforeLaunch
+        autoWorldClearComboBox.addActionListener {
+            instance.options.clearBeforeLaunch = autoWorldClearComboBox.isSelected
+            instance.save()
+        }
     }
 }

@@ -9,6 +9,7 @@ data class InstanceOptions(
     var useLauncherJavaOption: Boolean = true,
     var useLauncherResolutionOption: Boolean = true,
     var autoModUpdates: Boolean = false,
+    var clearBeforeLaunch: Boolean = false,
     override var minMemory: Int = 512,
     override var maxMemory: Int = 2048,
     override var javaPath: String = "",

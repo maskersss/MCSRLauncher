@@ -26,18 +26,31 @@ import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SpeedrunUtils
 import io.github.z4kn4fein.semver.toVersion
 import io.github.z4kn4fein.semver.toVersionOrNull
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.jsonPrimitive
 import org.apache.commons.io.FileUtils
+import java.io.File
+import java.io.IOException
 import java.net.URL
+import java.nio.file.FileVisitResult
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.SimpleFileVisitor
+import java.nio.file.attribute.BasicFileAttributeView
+import java.nio.file.attribute.BasicFileAttributes
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.JDialog
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readText
+
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
@@ -56,7 +69,9 @@ data class BasicInstance(
     @Transient
     var optionDialog: InstanceOptionGui? = null,
     @Transient
-    var lastLaunch: Long = System.currentTimeMillis()
+    var lastLaunch: Long = System.currentTimeMillis(),
+    @Transient
+    var clearingWorlds: Boolean = false
 ) {
 
     fun getInstancePath(): Path {
@@ -150,6 +165,11 @@ data class BasicInstance(
                 this.setState(I18n.translate("text.download.assets") + "...")
                 install(this)
                 this.setProgress(null)
+
+                if (options.clearBeforeLaunch) {
+                    this.setState(I18n.translate("text.clear_worlds") + "...")
+                    clearWorlds(this)
+                }
 
                 this.setState(I18n.translate("instance.launching") + "...")
                 launchInstance(this)
@@ -283,5 +303,97 @@ data class BasicInstance(
     fun save() {
         val configJson = this.getInstancePath().resolve("instance.json")
         configJson.toFile().writeText(MCSRLauncher.JSON.encodeToString(this))
+    }
+
+    /**
+     * Original source: https://github.com/DuncanRuns/Jingle/blob/main/src/main/java/xyz/duncanruns/jingle/bopping/Bopping.java
+     */
+    fun clearWorlds(worker: LauncherWorker): Int? {
+        if (this.clearingWorlds) return null
+        this.clearingWorlds = true
+        this.getWorldsPath().toFile().mkdirs()
+
+        fun shouldDelete(file: File, creationTime: Long): Boolean {
+            val path = file.toPath()
+            if (System.currentTimeMillis() - creationTime < 1000 * 60 * 60 * 48) {
+                try {
+                    val recordPath = path.resolve("speedrunigt").resolve("record.json")
+                    if (recordPath.isRegularFile()) {
+                        val recordJson = MCSRLauncher.JSON.decodeFromString<JsonObject>(recordPath.readText())
+                        if (recordJson.containsKey("is_completed") && recordJson["is_completed"]!!.jsonPrimitive.boolean) {
+                            return false
+                        }
+                    }
+                } catch (e: Exception) {
+                    MCSRLauncher.LOGGER.error("Failed to read record.json for ${file.absolutePath}", e)
+                }
+            }
+
+            if (!file.isDirectory || path.resolve("Reset Safe.txt").exists()) return false
+
+            val name = file.nameWithoutExtension
+            if (name.startsWith("Benchmark Reset #")) return true
+
+            if (!path.resolve("level.dat").isRegularFile()) return false
+            if (name.startsWith("_")) return false
+
+            return name.startsWith("New World") || name.contains("Speedrun #") || name.contains("Practice Seed") || name.contains("Seed Paster")
+        }
+
+        val worlds = this.getWorldsPath().toFile().listFiles()
+            ?.mapNotNull {
+                try {
+                    val creationTime = Files.getFileAttributeView(it.toPath(), BasicFileAttributeView::class.java)
+                        .readAttributes().creationTime().toMillis()
+                    it to creationTime
+                } catch (e: Exception) {
+                    MCSRLauncher.LOGGER.debug("Failed to parse creation time", e)
+                    null
+                }
+            }
+            ?.filter { (f, t) -> shouldDelete(f, t) }
+            ?.sortedByDescending { it.second }
+            ?.drop(36)
+            ?: emptyList()
+
+        val deleteCount = AtomicInteger()
+        worker.setSubText("Deleting Worlds: 0/${worlds.size}")
+        worker.setProgress(0.0)
+
+        runBlocking {
+            worlds.map { (file, _) ->
+                async(Dispatchers.IO) {
+                    try {
+                        if (file.exists()) {
+                            Files.walkFileTree(file.toPath(), object : SimpleFileVisitor<Path>() {
+                                override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+                                    Files.delete(file)
+                                    return FileVisitResult.CONTINUE
+                                }
+
+                                override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
+                                    Files.delete(dir)
+                                    return FileVisitResult.CONTINUE
+                                }
+
+                                override fun visitFileFailed(file: Path, exc: IOException): FileVisitResult {
+                                    MCSRLauncher.LOGGER.error("Failed to delete $file", exc)
+                                    return FileVisitResult.CONTINUE
+                                }
+                            })
+                            worker.setSubText("Deleting Worlds: ${deleteCount.incrementAndGet()}/${worlds.size}")
+                            worker.setProgress(deleteCount.get() / worlds.size.toDouble())
+                        }
+                    } catch (e: Exception) {
+                        MCSRLauncher.LOGGER.error("Failed to delete ${file.absolutePath}", e)
+                    }
+                }
+            }.awaitAll()
+        }
+
+        worker.setSubText(null)
+        worker.setProgress(null)
+        this.clearingWorlds = false
+        return deleteCount.get()
     }
 }
