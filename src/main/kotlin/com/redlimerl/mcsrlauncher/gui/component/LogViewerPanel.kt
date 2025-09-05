@@ -155,6 +155,7 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
                 string.contains("ERROR", true) -> StyleConstants.setForeground(style, Color(255, 60, 60))
                 string.contains("WARN") -> StyleConstants.setForeground(style, Color(0xCA7733))
                 string.contains("DEBUG") -> StyleConstants.setForeground(style, Color(171, 171, 171))
+                else -> StyleConstants.setForeground(style, Color.WHITE)
             }
             doc.insertString(doc.length, string + (if (string.endsWith("\n")) "" else "\n"), style)
         }
