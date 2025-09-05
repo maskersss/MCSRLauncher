@@ -24,7 +24,6 @@ import com.redlimerl.mcsrlauncher.util.AssetUtils
 import com.redlimerl.mcsrlauncher.util.I18n
 import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SpeedrunUtils
-import io.github.z4kn4fein.semver.toVersion
 import io.github.z4kn4fein.semver.toVersionOrNull
 import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -284,7 +283,9 @@ data class BasicInstance(
                         if (it.version.toVersionOrNull(false) == null) {
                             it.version != version.version
                         } else {
-                            it.version.toVersion(false) < version.version.toVersion(false)
+                            val modVersion = it.version.toVersionOrNull(false)
+                            val newVersion = version.version.toVersionOrNull(false)
+                            if (modVersion == null || newVersion == null) false else modVersion < newVersion
                         }
             }
             if (canUpdate) list.add(mod to version)
