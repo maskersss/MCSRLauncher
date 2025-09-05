@@ -17,7 +17,7 @@ public class LauncherUpdater {
     private static final String JAR_NAME = "MCSRLauncher.jar";
 
     public static void main(String[] args) throws IOException {
-        File jarFile = Paths.get("").resolve(JAR_NAME).toFile();
+        File launcherFile = Paths.get("").resolve(JAR_NAME).toFile();
 
         FlatDarkLaf.setup();
         JDialog dialog = new JDialog((Frame) null, "MCSRLauncher Updater", true);
@@ -36,10 +36,16 @@ public class LauncherUpdater {
         dialog.setSize(400, 120);
         dialog.setLocationRelativeTo(null);
 
+        if (!launcherFile.exists()) {
+            statusLabel.setText("Error! \"" + launcherFile.getName() + "\" file is not exists in launcher directory.");
+            dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            return;
+        }
+
         new SwingWorker<Void, Integer>() {
             @Override
             protected Void doInBackground() throws Exception {
-                downloadUpdate(jarFile, progressBar);
+                downloadUpdate(launcherFile, progressBar);
                 return null;
             }
 
@@ -62,7 +68,17 @@ public class LauncherUpdater {
 
         dialog.setVisible(true);
 
-        new ProcessBuilder("java", "-jar", jarFile.getName()).start();
+        var exeFile = launcherFile.getParentFile().toPath().resolve("MCSRLauncher.exe").toFile();
+        if (exeFile.exists()) {
+            new ProcessBuilder(exeFile.getAbsolutePath()).start();
+        } else {
+            var shellFile = launcherFile.getParentFile().toPath().resolve("launch.sh").toFile();
+            if (shellFile.exists()) {
+                new ProcessBuilder(shellFile.getAbsolutePath()).start();
+            } else {
+                new ProcessBuilder("java", "-jar", launcherFile.getName()).start();
+            }
+        }
     }
 
     private static void downloadUpdate(File jarFile, JProgressBar progressBar) throws IOException {
