@@ -4,6 +4,7 @@ import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.gui.CopyInstanceGui
 import com.redlimerl.mcsrlauncher.launcher.InstanceManager
 import com.redlimerl.mcsrlauncher.util.I18n
+import com.redlimerl.mcsrlauncher.util.LauncherWorker
 import com.redlimerl.mcsrlauncher.util.SwingUtils
 import java.awt.*
 import java.awt.event.MouseAdapter
@@ -17,7 +18,11 @@ class InstanceLaunchButton(private val windowParent: Window, val instance: Basic
         horizontalAlignment = SwingConstants.CENTER
         horizontalTextPosition = SwingConstants.CENTER
         verticalTextPosition = SwingConstants.BOTTOM
-        icon = ImageIcon(ImageIcon(instance.getIconResource()).image.getScaledInstance(60, 60, Image.SCALE_SMOOTH))
+        object : LauncherWorker() {
+            override fun work(dialog: JDialog) {
+                icon = ImageIcon(ImageIcon(instance.getIconResource()).image.getScaledInstance(60, 60, Image.SCALE_SMOOTH))
+            }
+        }.start()
         iconTextGap = 6
         margin = Insets(5, 10, 5, 10)
         isOpaque = false
