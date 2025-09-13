@@ -91,19 +91,20 @@ class InstanceProcess(val instance: BasicInstance) {
 
         val accessToken = activeAccount.profile.accessToken
         val gameArgs = minecraftMetaFile.minecraftArguments
-            .replace("\${auth_player_name}", activeAccount.profile.nickname)
-            .replace("\${version_name}", minecraftMetaFile.version)
-            .replace("\${game_directory}", instance.getGamePath().absolutePathString())
-            .replace("\${assets_root}", GameAssetManager.ASSETS_PATH.absolutePathString())
-            .replace("\${game_assets}", instance.getGamePath().resolve("resources").absolutePathString())
-            .replace("\${assets_index_name}", minecraftMetaFile.assetIndex.id)
-            .replace("\${auth_uuid}", activeAccount.profile.uuid.toString())
-            .replace("\${auth_access_token}", accessToken ?: "")
-            .replace("\${auth_session}", accessToken ?: "")
-            .replace("\${user_type}", "msa")
-            .replace("\${version_type}", minecraftMetaFile.type.toTypeId())
-            .replace("\${user_properties}", "{}")
-            .split(" ").toMutableList()
+            .split(" ").map {
+                it.replace("\${auth_player_name}", activeAccount.profile.nickname)
+                    .replace("\${version_name}", minecraftMetaFile.version)
+                    .replace("\${game_directory}", instance.getGamePath().absolutePathString())
+                    .replace("\${assets_root}", GameAssetManager.ASSETS_PATH.absolutePathString())
+                    .replace("\${game_assets}", instance.getGamePath().resolve("resources").absolutePathString())
+                    .replace("\${assets_index_name}", minecraftMetaFile.assetIndex.id)
+                    .replace("\${auth_uuid}", activeAccount.profile.uuid.toString())
+                    .replace("\${auth_access_token}", accessToken ?: "")
+                    .replace("\${auth_session}", accessToken ?: "")
+                    .replace("\${user_type}", "msa")
+                    .replace("\${version_type}", minecraftMetaFile.type.toTypeId())
+                    .replace("\${user_properties}", "{}")
+            }.toMutableList()
 
         if (!minecraftMetaFile.traits.contains(LauncherTrait.LEGACY_LAUNCH)) {
             if (instance.options.getSharedJavaValue { it.maximumResolution }) {
