@@ -68,4 +68,8 @@ object MetaManager {
         return getVersions(uid, worker).find { it.version == version }?.getOrLoadMetaVersionFile<T>(uid, worker)
     }
 
+    fun hasLoadedPackages(): Boolean {
+        return META_PACKAGES.packages.isNotEmpty()
+    }
+
 }

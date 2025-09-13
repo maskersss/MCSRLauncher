@@ -133,7 +133,16 @@ object MCSRLauncher {
 
                 this.setState("Loading Meta...")
                 GameAssetManager.init()
-                MetaManager.load(this)
+                try {
+                    MetaManager.load(this)
+                } catch (e: Exception) {
+                    LOGGER.error("Failed to load meta info", e)
+                    if (!MetaManager.hasLoadedPackages()) {
+                        dialog.dispose()
+                        JOptionPane.showMessageDialog(null, I18n.translate("message.meta_load_fail"), I18n.translate("text.error"), JOptionPane.OK_OPTION)
+                        return
+                    }
+                }
 
                 dialog.dispose()
 
