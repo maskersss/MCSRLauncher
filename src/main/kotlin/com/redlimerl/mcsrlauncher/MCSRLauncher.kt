@@ -70,7 +70,7 @@ object MCSRLauncher {
             ctx.updateLoggers()
         }
 
-        LOGGER.info("Starting launcher - Version: $APP_VERSION")
+        LOGGER.info("Starting launcher - Version: $APP_VERSION, Java: ${System.getProperty("java.version")}")
         val server: ServerSocket
         try {
             server = ServerSocket(ARGS_PORT)
