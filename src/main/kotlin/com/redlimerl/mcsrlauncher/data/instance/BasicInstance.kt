@@ -94,7 +94,7 @@ data class BasicInstance(
     }
 
     fun getNativePath(): Path {
-        return this.getInstancePath().resolve("native")
+        return this.getInstancePath().resolve("natives")
     }
 
     fun onCreate() {
