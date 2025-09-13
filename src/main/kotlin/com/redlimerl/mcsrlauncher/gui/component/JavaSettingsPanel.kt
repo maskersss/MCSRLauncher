@@ -3,6 +3,7 @@ package com.redlimerl.mcsrlauncher.gui.component
 import com.redlimerl.mcsrlauncher.data.launcher.LauncherSharedOptions
 import com.redlimerl.mcsrlauncher.gui.JavaManagerGui
 import com.redlimerl.mcsrlauncher.gui.components.AbstractJavaSettingsPanel
+import com.redlimerl.mcsrlauncher.util.OSUtils
 import java.awt.BorderLayout
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
@@ -10,6 +11,7 @@ import javax.swing.JDialog
 import javax.swing.SpinnerNumberModel
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 class JavaSettingsPanel(parent: JDialog, val options: LauncherSharedOptions, private val onUpdate: () -> Unit) : AbstractJavaSettingsPanel() {
 
@@ -43,11 +45,17 @@ class JavaSettingsPanel(parent: JDialog, val options: LauncherSharedOptions, pri
             }
         }
 
-
+        val recommendedMax = (OSUtils.systemInfo.hardware.memory.total / (1024.0 * 1024.0) * 0.75).roundToInt()
+        this.javaMinMemorySpinner.model = SpinnerNumberModel(options.minMemory, 512, recommendedMax, 512).also {
+            this.javaMinMemorySlider.minimum = it.minimum as Int
+            this.javaMinMemorySlider.maximum = it.maximum as Int
+        }
         this.javaMinMemorySlider.value = options.minMemory
-        this.javaMinMemorySpinner.model = SpinnerNumberModel(options.minMemory, 512, 8096 * 2 + 1, 512)
+        this.javaMaxMemorySpinner.model = SpinnerNumberModel(options.maxMemory, 512, recommendedMax, 512).also {
+            this.javaMaxMemorySlider.minimum = it.minimum as Int
+            this.javaMaxMemorySlider.maximum = it.maximum as Int
+        }
         this.javaMaxMemorySlider.value = options.maxMemory
-        this.javaMaxMemorySpinner.model = SpinnerNumberModel(options.maxMemory, 512, 8096 * 2 + 1, 512)
         this.javaMinMemorySlider.addChangeListener {
             this.javaMinMemorySlider.value = min(this.javaMinMemorySlider.value, options.maxMemory)
             options.minMemory = this.javaMinMemorySlider.value
