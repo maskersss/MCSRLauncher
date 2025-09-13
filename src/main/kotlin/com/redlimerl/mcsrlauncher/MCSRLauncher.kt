@@ -19,6 +19,7 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.layout.PatternLayout
+import java.io.File
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -31,7 +32,6 @@ import javax.swing.JDialog
 import javax.swing.JOptionPane
 import javax.swing.SwingUtilities
 import kotlin.concurrent.thread
-import kotlin.io.path.absolute
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
 import kotlin.system.exitProcess
@@ -39,20 +39,9 @@ import kotlin.system.exitProcess
 object MCSRLauncher {
 
     val APP_NAME: String = javaClass.simpleName
-    val LOG_APPENDER: LauncherLogAppender
-    val LOGGER: Logger = LogManager.getLogger(APP_NAME).also {
-        val mainLogger = (it as org.apache.logging.log4j.core.Logger)
-        val ctx = LogManager.getContext(false) as LoggerContext
-        val config = ctx.configuration
-        val rootLogger = config.rootLogger
-
-        LOG_APPENDER = LauncherLogAppender(mainLogger.appenders.values.first().layout as PatternLayout)
-        LOG_APPENDER.start()
-
-        rootLogger.addAppender(LOG_APPENDER, null, null)
-        ctx.updateLoggers()
-    }
-    val BASE_PATH: Path = Paths.get("").absolute().let { if (it.name != "launcher") it.resolve("launcher") else it }
+    lateinit var LOG_APPENDER: LauncherLogAppender private set
+    lateinit var LOGGER: Logger private set
+    val BASE_PATH: Path = Paths.get("").resolve("launcher")
     val IS_DEV_VERSION = javaClass.`package`.implementationVersion == null
     val APP_VERSION = javaClass.`package`.implementationVersion ?: "dev"
     val GAME_PROCESSES = arrayListOf<InstanceProcess>()
@@ -63,6 +52,24 @@ object MCSRLauncher {
 
     @JvmStatic
     fun main(args: Array<String>) {
+        if (!LauncherOptions.path.toFile().exists() && !checkPathIsEmpty()) {
+            val updateConfirm = JOptionPane.showConfirmDialog(null, "This directory contains files that are not related to the launcher.\nRunning the launcher here may create additional files in this folder, which could cause unexpected issues.\nDo you still want to continue?", "Warning!", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)
+            if (updateConfirm != JOptionPane.YES_OPTION) return
+        }
+
+        LOGGER = LogManager.getLogger(APP_NAME).also {
+            val mainLogger = (it as org.apache.logging.log4j.core.Logger)
+            val ctx = LogManager.getContext(false) as LoggerContext
+            val config = ctx.configuration
+            val rootLogger = config.rootLogger
+
+            LOG_APPENDER = LauncherLogAppender(mainLogger.appenders.values.first().layout as PatternLayout)
+            LOG_APPENDER.start()
+
+            rootLogger.addAppender(LOG_APPENDER, null, null)
+            ctx.updateLoggers()
+        }
+
         LOGGER.info("Starting launcher")
         val server: ServerSocket
         try {
@@ -96,7 +103,7 @@ object MCSRLauncher {
                 this.setState("Loading Launcher Options...")
                 options = try {
                     JSON.decodeFromString<LauncherOptions>(FileUtils.readFileToString(LauncherOptions.path.toFile(), Charsets.UTF_8))
-                } catch (e: NoSuchFileException)  {
+                } catch (e: NoSuchFileException) {
                     LOGGER.warn("{} not found. creating new one", LauncherOptions.path.name)
                     LauncherOptions().also { it.save() }
                 } catch (e: Exception) {
@@ -154,5 +161,26 @@ object MCSRLauncher {
                 exitProcess(1)
             }
         }.indeterminate().showDialog().start()
+    }
+
+    private fun checkPathIsEmpty(): Boolean {
+        val exeExecute = System.getProperty("launch4j.exefile")
+
+        if (exeExecute != null) return true
+
+        val jarPath = File(object {}.javaClass.protectionDomain.codeSource.location.toURI().path)
+
+        if (jarPath.isFile && jarPath.extension == "jar") {
+            val jarDir = jarPath.parentFile
+
+            for (file in jarDir.listFiles()!!) {
+                if (file.name.contains(APP_NAME, true)) continue
+                if (file.name.contains(jarPath.nameWithoutExtension, true)) continue
+                if (file.name == "logs" && file.isDirectory) continue
+                if (file.name == "launcher" && file.isDirectory) continue
+                return false
+            }
+        }
+        return true
     }
 }

@@ -16,5 +16,6 @@
     <requiresJdk>false</requiresJdk>
     <requires64Bit>true</requires64Bit>
     <minVersion>17</minVersion>
+    <opt>-Dlaunch4j.exefile="%EXEFILE%"</opt>
   </jre>
 </launch4jConfig>
