@@ -2,6 +2,7 @@ package com.redlimerl.mcsrlauncher.data.instance
 
 import com.redlimerl.mcsrlauncher.MCSRLauncher
 import com.redlimerl.mcsrlauncher.data.launcher.LauncherSharedOptions
+import com.redlimerl.mcsrlauncher.util.OSUtils
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,8 +11,8 @@ data class InstanceOptions(
     var useLauncherResolutionOption: Boolean = true,
     var autoModUpdates: Boolean = false,
     var clearBeforeLaunch: Boolean = false,
-    override var minMemory: Int = 512,
-    override var maxMemory: Int = 2048,
+    override var minMemory: Int = 1024,
+    override var maxMemory: Int = if (OSUtils.getTotalMemoryGB() > 15) 4096 else 2048,
     override var javaPath: String = "",
     override var jvmArguments: String = "",
     override var maximumResolution: Boolean = false,

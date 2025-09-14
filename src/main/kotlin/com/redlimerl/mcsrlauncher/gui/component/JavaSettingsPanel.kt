@@ -45,7 +45,7 @@ class JavaSettingsPanel(parent: JDialog, val options: LauncherSharedOptions, pri
             }
         }
 
-        val recommendedMax = (OSUtils.systemInfo.hardware.memory.total / (1024.0 * 1024.0) * 0.75).roundToInt()
+        val recommendedMax = (OSUtils.getTotalMemoryGB() * 0.75 * 1024).roundToInt()
         this.javaMinMemorySpinner.model = SpinnerNumberModel(options.minMemory, 512, recommendedMax, 512).also {
             this.javaMinMemorySlider.minimum = it.minimum as Int
             this.javaMinMemorySlider.maximum = it.maximum as Int

@@ -32,4 +32,8 @@ object OSUtils {
         }
     }
 
+    fun getTotalMemoryGB(): Double {
+        return systemInfo.hardware.memory.total / (1024.0 * 1024 * 1024)
+    }
+
 }
