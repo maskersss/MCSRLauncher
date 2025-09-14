@@ -225,15 +225,17 @@ data class BasicInstance(
 
         val modMeta = MetaManager.getVersionMeta<SpeedrunModsMetaFile>(MetaUniqueID.SPEEDRUN_MODS, modListVersion, worker) ?: throw IllegalStateException("Speedrun mods meta is not found")
 
-        val installedMods = this.getMods()
+        val installedMods = this.getMods().toMutableList()
 
         if (downloadMethod == ModDownloadMethod.DELETE_ALL_DOWNLOAD) {
             installedMods.forEach { it.delete() }
+            installedMods.clear()
         }
 
-        val availableMods = modMeta.mods.filter {
+        val availableMods = arrayListOf<SpeedrunModMeta>()
+        modMeta.mods.filter {
             it.recommended &&
-                    it.isAvailable(this) &&
+                    it.canDownload(this) &&
                     it.traits.all { trait ->
                         when (trait) {
                             SpeedrunModTrait.RSG -> modCategory == ModCategory.RANDOM_SEED
@@ -242,6 +244,9 @@ data class BasicInstance(
                             else -> true
                         }
                     }
+        }.sortedByDescending { it.priority }.forEach {
+            if (it.incompatibilities.none { inc -> availableMods.map { mod -> mod.modId }.contains(inc) })
+                availableMods.add(it)
         }
 
         val total = availableMods.size
@@ -252,16 +257,16 @@ data class BasicInstance(
             val version = mod.versions.find { it.isAvailableVersion(this@BasicInstance) }!!
             worker.setState("Downloading ${mod.name} v${version.version}...")
 
-            val file = getModsPath().resolve(version.url.split("/").last()).toFile()
+            val file = getModsPath().resolve(version.filename).toFile()
             withContext(Dispatchers.IO) {
                 FileDownloader.download(version.url, file)
+
+                installedMods.find { it.id == mod.modId && it.version != version.version }?.delete()
+                modList.add(ModData.get(file)!!)
+
+                val done = completed.incrementAndGet()
+                worker.setProgress(done.toFloat() / total.toFloat())
             }
-
-            installedMods.find { it.id == mod.modId }?.delete()
-            modList.add(ModData.get(file)!!)
-
-            val done = completed.incrementAndGet()
-            worker.setProgress(done.toFloat() / total.toFloat())
         }
 
         return modList
@@ -275,7 +280,7 @@ data class BasicInstance(
         val modMeta = MetaManager.getVersionMeta<SpeedrunModsMetaFile>(MetaUniqueID.SPEEDRUN_MODS, SpeedrunModMeta.VERIFIED_MODS, worker) ?: throw IllegalStateException("Speedrun mods meta is not found")
 
         val installedMods = this.getMods()
-        for (mod in modMeta.mods.filter { it.isAvailable(this) }) {
+        for (mod in modMeta.mods.filter { it.canDownload(this) }) {
             val version = mod.versions.find { it.isAvailableVersion(this) }!!
 
             val canUpdate = installedMods.any {

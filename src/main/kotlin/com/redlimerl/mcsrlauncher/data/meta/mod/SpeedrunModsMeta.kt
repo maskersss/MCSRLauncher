@@ -16,13 +16,14 @@ data class SpeedrunModMeta(
     val traits: List<SpeedrunModTrait> = listOf(),
     val incompatibilities: List<String> = listOf(),
     val recommended: Boolean = true,
-    val obsolete: Boolean = false
+    val obsolete: Boolean = false,
+    val priority: Int = 0
 ) {
     companion object {
         const val VERIFIED_MODS = "verified"
     }
 
-    fun isAvailable(instance: BasicInstance, checkObsolete: Boolean = true): Boolean {
+    fun canDownload(instance: BasicInstance, checkObsolete: Boolean = true): Boolean {
         return !this.obsolete && this.traits.all { trait ->
             when (trait) {
                 SpeedrunModTrait.MAC -> RuntimeOSType.MAC_OS.isOn()
@@ -38,11 +39,13 @@ data class SpeedrunModVersion(
     val version: String,
     val url: String,
     val hash: String,
+    val filename: String,
     val intermediary: List<IntermediaryType>,
     val obsolete: Boolean = false
 ) {
     fun isAvailableVersion(instance: BasicInstance, checkObsolete: Boolean = true): Boolean {
         val fabric = instance.fabricVersion ?: return false
-        return this.intermediary.contains(fabric.intermediaryType) && this.gameVersions.contains(instance.minecraftVersion) && (!checkObsolete || !obsolete)
+        return (this.intermediary.isEmpty() || this.intermediary.contains(fabric.intermediaryType))
+                && this.gameVersions.contains(instance.minecraftVersion) && (!checkObsolete || !obsolete)
     }
 }

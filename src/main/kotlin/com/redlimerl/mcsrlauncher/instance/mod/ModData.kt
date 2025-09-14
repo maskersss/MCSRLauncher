@@ -21,7 +21,7 @@ interface ModData {
         }
 
     fun delete() {
-        file.delete()
+        if (file.exists()) file.delete()
     }
 
     companion object {
@@ -49,7 +49,7 @@ interface ModData {
 
                 jarFile.close()
             } catch (e: Throwable) {
-                MCSRLauncher.LOGGER.debug(e)
+                MCSRLauncher.LOGGER.debug("Failed to parse mod file", e)
             }
             return null
         }

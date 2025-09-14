@@ -1,8 +1,11 @@
 package com.redlimerl.mcsrlauncher.launcher
 
 import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import org.apache.logging.log4j.core.LogEvent
 import org.apache.logging.log4j.core.appender.AbstractAppender
 import org.apache.logging.log4j.core.config.Property
@@ -18,9 +21,7 @@ class LauncherLogAppender(private val layout: PatternLayout)
 
     override fun append(event: LogEvent?) {
         val msg = layout.toSerializable(event) ?: return
-        runBlocking {
-            logChannel.send(msg)
-        }
+        logChannel.trySend(msg)
     }
 
     @OptIn(DelicateCoroutinesApi::class)
