@@ -19,12 +19,10 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.layout.PatternLayout
-import java.io.File
-import java.io.IOException
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
+import java.io.*
 import java.net.ServerSocket
 import java.net.Socket
+import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -46,9 +44,11 @@ object MCSRLauncher {
     val APP_VERSION = javaClass.`package`.implementationVersion ?: "dev"
     val GAME_PROCESSES = arrayListOf<InstanceProcess>()
     val JSON = Json { ignoreUnknownKeys = true; prettyPrint = true }
-    private val ARGS_PORT = if (IS_DEV_VERSION) 53511 else 53510
     lateinit var MAIN_FRAME: MainMenuGui private set
     lateinit var options: LauncherOptions private set
+
+    private val LOCK_FILE = BASE_PATH.resolve("_app.lock").toFile()
+    private val PORT_FILE = BASE_PATH.resolve("_app.port").toFile()
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -71,15 +71,48 @@ object MCSRLauncher {
         }
 
         LOGGER.info("Starting launcher - Version: $APP_VERSION, Java: ${System.getProperty("java.version")}")
-        val server: ServerSocket
-        try {
-            server = ServerSocket(ARGS_PORT)
-        } catch (e: IOException) {
-            LOGGER.info("port(${ARGS_PORT}) is already opened. send argument to launcher args server instead of setup the launcher.")
-            Socket("localhost", ARGS_PORT).use { socket ->
-                ObjectOutputStream(socket.getOutputStream()).use { outputStream -> outputStream.writeObject(args) }
+
+        var shouldCheckLock = true
+        if (!LOCK_FILE.exists()) {
+            try {
+                LOCK_FILE.parentFile.mkdirs()
+                Files.createFile(LOCK_FILE.toPath())
+            } catch (e: IOException) {
+                LOGGER.error("Failed to create lock file", e)
+                shouldCheckLock = false
             }
-            return
+        }
+
+
+        var server: ServerSocket? = null
+        if (shouldCheckLock) {
+            val lockChannel = RandomAccessFile(LOCK_FILE, "rw").channel
+            val lock = lockChannel.tryLock()
+            Runtime.getRuntime().addShutdownHook(Thread {
+                try {
+                    lock.release()
+                    lockChannel.close()
+                } catch (ignored: Exception) {}
+            })
+
+            if (lock == null) {
+                try {
+                    val port = PORT_FILE.readText().trim().toInt()
+                    LOGGER.info("port($port) is already opened. send arguments to executed launcher instead of setup the launcher.")
+                    Socket("localhost", port).use { socket ->
+                        ObjectOutputStream(socket.getOutputStream()).use { outputStream -> outputStream.writeObject(args) }
+                    }
+                    exitProcess(0)
+                } catch (e: Exception) {
+                    LOGGER.error("Lock file doesn't have port info. Skipped send arguments", e)
+                }
+            } else {
+                server = ServerSocket(0)
+                val assignedPort = server.localPort
+                PORT_FILE.writeText(assignedPort.toString())
+                LOCK_FILE.deleteOnExit()
+                PORT_FILE.deleteOnExit()
+            }
         }
 
         // Setup Theme
@@ -150,17 +183,18 @@ object MCSRLauncher {
                 SwingUtilities.invokeLater {
                     MAIN_FRAME = MainMenuGui()
                     ArgumentHandler().main(args)
-                }
 
-                LOGGER.info("Setup launch arguments")
-                thread {
-                    while (!Thread.interrupted()) {
-                        val client = server.accept()
-                        ObjectInputStream(client.getInputStream()).use { inputStream ->
-                            @Suppress("UNCHECKED_CAST") val receivedArgs = inputStream.readObject() as Array<String>
-                            ArgumentHandler().main(receivedArgs)
+                    LOGGER.info("Setup launch arguments")
+                    thread {
+                        while (!Thread.interrupted()) {
+                            val client = server?.accept() ?: break
+                            ObjectInputStream(client.getInputStream()).use { inputStream ->
+                                @Suppress("UNCHECKED_CAST") val receivedArgs = inputStream.readObject() as Array<String>
+                                LOGGER.debug("Argument received: {}", receivedArgs)
+                                ArgumentHandler().main(receivedArgs)
+                            }
+                            client.close()
                         }
-                        client.close()
                     }
                 }
             }
