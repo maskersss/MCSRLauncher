@@ -36,7 +36,7 @@ import kotlin.system.exitProcess
 
 object MCSRLauncher {
 
-    val APP_NAME: String = javaClass.simpleName
+    const val APP_NAME: String = "MCSR Launcher"
     lateinit var LOG_APPENDER: LauncherLogAppender private set
     lateinit var LOGGER: Logger private set
     val BASE_PATH: Path = Paths.get("").resolve("launcher")
