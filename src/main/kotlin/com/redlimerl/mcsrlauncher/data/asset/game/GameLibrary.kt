@@ -38,7 +38,7 @@ data class GameLibrary(
             }
         }
 
-        val classifierKey = this.natives[this.natives.keys.findLast { it.isOn() }]
+        val classifierKey = this.natives[this.natives.keys.filter { it.isOn() }.maxByOrNull { it.getLevel() }!!]
         if (classifierKey != null) {
             val nativeLibrary = this.downloads.classifiers[classifierKey.replace("\${arch}", DeviceArchitectureType.CURRENT_ARCHITECTURE.bit.toString())]!!
             val nativeLibFile = nativeLibrary.getPathFrom(this).toFile()
