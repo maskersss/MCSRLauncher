@@ -149,6 +149,7 @@ object MCSRLauncher {
                 LOGGER.warn("Setup gui")
                 SwingUtilities.invokeLater {
                     MAIN_FRAME = MainMenuGui()
+                    ArgumentHandler().main(args)
                 }
 
                 LOGGER.info("Setup launch arguments")
@@ -162,7 +163,6 @@ object MCSRLauncher {
                         client.close()
                     }
                 }
-                ArgumentHandler().main(args)
             }
 
             override fun onError(e: Throwable) {
