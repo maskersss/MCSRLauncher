@@ -10,6 +10,7 @@ import com.redlimerl.mcsrlauncher.data.meta.file.SpeedrunModsMetaFile
 import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModMeta
 import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModTrait
 import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModVersion
+import com.redlimerl.mcsrlauncher.gui.InstanceCrashLogGui
 import com.redlimerl.mcsrlauncher.gui.InstanceOptionGui
 import com.redlimerl.mcsrlauncher.gui.component.LogViewerPanel
 import com.redlimerl.mcsrlauncher.instance.InstanceProcess
@@ -47,6 +48,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.JDialog
+import javax.swing.JOptionPane
 import kotlin.io.path.exists
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
@@ -111,7 +113,7 @@ data class BasicInstance(
         lastLaunch = System.currentTimeMillis()
     }
 
-    fun onProcessExit(code: Int) {
+    fun onProcessExit(code: Int, exitByUser: Boolean) {
         MCSRLauncher.LOGGER.info("Exited instance: $id ($code)")
         FileUtils.deleteDirectory(this.getNativePath().toFile())
         InstanceManager.refreshInstanceList()
@@ -120,7 +122,16 @@ data class BasicInstance(
         this.save()
 
         if (code != 0) {
-            openOptionDialog().openTab(4)
+            val optionDialog = openOptionDialog()
+            optionDialog.openTab(4)
+            if (!exitByUser) {
+                val result = JOptionPane.showConfirmDialog(optionDialog, I18n.translate("message.upload_crash_log"), I18n.translate("text.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)
+                if (result == JOptionPane.YES_OPTION) {
+                    val log = getGamePath().resolve("logs/latest.log").readText()
+                    val crashLogDialog = InstanceCrashLogGui(null, log)
+                    crashLogDialog.isVisible = true
+                }
+            }
         }
     }
 
