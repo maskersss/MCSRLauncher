@@ -46,7 +46,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
 
         this.dispose()
         val launch = {
-            val launchConfirm = JOptionPane.showConfirmDialog(this, I18n.translate("message.download_success") + "\n" + I18n.translate("message.instance_launch_ask"), I18n.translate("instance.launch"), JOptionPane.YES_NO_OPTION)
+            val launchConfirm = JOptionPane.showConfirmDialog(this, I18n.translate("message.instance_launch_ask"), I18n.translate("instance.launch"), JOptionPane.YES_NO_OPTION)
             if (launchConfirm == JOptionPane.YES_OPTION) {
                 instance.launchWithDialog()
             }
