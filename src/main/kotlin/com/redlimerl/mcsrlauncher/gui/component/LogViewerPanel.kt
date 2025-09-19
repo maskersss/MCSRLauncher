@@ -150,7 +150,7 @@ class LogViewerPanel(private val basePath: Path) : AbstractLogViewerPanel() {
 
         val strings = if (multipleLines) message.lines() else listOf(message)
         for (string in strings) {
-            if (string.isEmpty()) continue
+            // if (string.isEmpty()) continue
             when {
                 string.contains("ERROR", true) -> StyleConstants.setForeground(style, Color(255, 60, 60))
                 string.contains("WARN") -> StyleConstants.setForeground(style, Color(0xCA7733))

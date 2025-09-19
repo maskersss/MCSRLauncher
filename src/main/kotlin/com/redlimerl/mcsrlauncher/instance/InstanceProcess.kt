@@ -198,19 +198,20 @@ class InstanceProcess(val instance: BasicInstance) {
 
             val javaArch = if (javaContainer.arch.contains("64")) "x64" else "x86"
 
-            logChannel.send("MCSR Launcher version: ${MCSRLauncher.APP_VERSION}\n")
-            logChannel.send("Minecraft folder: ${instance.getGamePath().absolutePathString()}\n")
-            logChannel.send("Java path: ${javaContainer.path}\n")
-            logChannel.send("Java version is: ${javaContainer.version} using $javaArch architecture from ${javaContainer.vendor}\n")
-            logChannel.send("Java arguments are: ${arguments.joinToString(" ")}\n")
-            logChannel.send("Main Class is: $mainClass\n")
+            logChannel.send("MCSR Launcher version: ${MCSRLauncher.APP_VERSION}\n\n\n")
+            logChannel.send("Minecraft folder is:\n${instance.getGamePath().absolutePathString()}\n\n\n")
+            logChannel.send("Java path is:\n${javaContainer.path}\n\n\n")
+            logChannel.send("Java is version ${javaContainer.version}, using $javaArch architecture from ${javaContainer.vendor}.\n\n\n")
+            logChannel.send("Java arguments are:\n${arguments.joinToString(" ")}\n\n\n")
+            logChannel.send("Main Class:\n$mainClass\n\n\n")
             logChannel.send("Mods:\n")
             for (mod in instance.getMods()) {
                 val status = if (mod.isEnabled) "✅" else "❌"
                 val message = "   [$status] ${mod.file.name}${if (!mod.isEnabled) " (disabled)" else ""}"
                 logChannel.send(message + "\n")
             }
-
+            logChannel.send("\n")
+            
             val exitCode = process!!.waitFor()
             logChannel.send("\nProcess exited with exit code $exitCode")
             Thread.sleep(2000L)
