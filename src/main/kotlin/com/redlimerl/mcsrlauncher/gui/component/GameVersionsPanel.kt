@@ -47,6 +47,7 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
         updateFabricVersions()
 
         initMCSRRankedComponents()
+        initDraftoutComponents()
 
         initMigrateLauncherComponents()
 
@@ -56,7 +57,8 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
             val mcsrRanked = instance.mcsrRankedType
             val fabric = instance.fabricVersion
             gameTabPane.selectedIndex =
-                if (mcsrRanked != null) 2
+                if (instance.draftoutFormat != null) 3
+                else if (mcsrRanked != null) 2
                 else if (fabric != null) 0
                 else 0
 
@@ -89,6 +91,9 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
     }
 
     fun getMinecraftVersion(): MetaVersion {
+        // Hardcode for Draftout Setup
+        if (gameTabPane.selectedIndex == 3) return MetaManager.getVersions(MetaUniqueID.MINECRAFT).find { it.version == SpeedrunUtils.DRAFTOUT_MC_VERSION }!!
+
         // Hardcode for MCSR Ranked Setup
         if (gameTabPane.selectedIndex == 2) return MetaManager.getVersions(MetaUniqueID.MINECRAFT).find { it.version == "1.16.1" }!!
 
@@ -101,6 +106,16 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
     }
 
     fun getLWJGLVersion(): LWJGLVersionData {
+        // Hardcode for Draftout Setup
+        if (gameTabPane.selectedIndex == 3) {
+            val minecraftVersion = this.getMinecraftVersion()
+            val lwjglRequire = minecraftVersion.requires.first()
+            val availableLWJGL = MetaManager.getVersions(lwjglRequire.uid)
+                .filter { it.version.toVersion(false) >= lwjglRequire.suggests?.toVersion(false )!! }
+                .sortedByDescending { it.version.toVersion(false) }
+                .first()
+            return LWJGLVersionData(lwjglRequire.uid, availableLWJGL.version)
+        }
         // Hardcode for MCSR Ranked Setup
         if (gameTabPane.selectedIndex == 2) return LWJGLVersionData(MetaUniqueID.LWJGL3, "3.3.3")
 
@@ -114,6 +129,14 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
     }
 
     fun getFabricVersion(): FabricVersionData? {
+        // Hardcode for Draftout Setup
+        if (gameTabPane.selectedIndex == 3) {
+            val loaderVersion = MetaManager.getVersions(MetaUniqueID.FABRIC_LOADER).find { loader -> loader.recommended } ?: throw IllegalStateException("Couldn't find any recommended Fabric Loader version")
+            val intermediaryVersion = MetaManager.getVersions(MetaUniqueID.FABRIC_INTERMEDIARY).find { it.version == SpeedrunUtils.DRAFTOUT_MC_VERSION }!!
+            val intermediaryType = intermediaryVersion.compatibleIntermediaries.find { it == IntermediaryType.FABRIC } ?: throw IllegalStateException("Couldn't find any recommended Fabric Intermediary")
+            return FabricVersionData(loaderVersion.version, intermediaryType, SpeedrunUtils.DRAFTOUT_MC_VERSION)
+        }
+
         // Hardcode for MCSR Ranked Setup
         if (gameTabPane.selectedIndex == 2) {
             val loaderVersion = MetaManager.getVersions(MetaUniqueID.FABRIC_LOADER).find { loader -> loader.recommended } ?: throw IllegalStateException("Couldn't find any recommended Fabric Loader version")
@@ -142,6 +165,11 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
     fun getMCSRRankedPackType(): MCSRRankedPackType? {
         if (gameTabPane.selectedIndex != 2) return null
         return mcsrRankedPackTypeBox.getItemAt(mcsrRankedPackTypeBox.selectedIndex)
+    }
+
+    fun getDraftoutVersion(): Int? {
+        if (gameTabPane.selectedIndex != 3) return null
+        return 1
     }
 
     private fun initVanillaComponents() {
@@ -320,6 +348,12 @@ class GameVersionsPanel(private val parentWindow: JDialog, val instance: BasicIn
         }
         mcsrRankedPackTypeBox.addActionListener {
             mcsrRankedPackTypeDescription.text = "<html>${(mcsrRankedPackTypeBox.selectedItem as MCSRRankedPackType).getWarningMessage()}</html>"
+        }
+    }
+
+    private fun initDraftoutComponents() {
+        draftoutHelpButton.addActionListener {
+            OSUtils.openURI(URI.create("https://draftoutmc.com/"))
         }
     }
 

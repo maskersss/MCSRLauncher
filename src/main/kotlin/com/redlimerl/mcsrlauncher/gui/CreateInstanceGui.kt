@@ -4,6 +4,7 @@ import com.redlimerl.mcsrlauncher.data.device.DeviceOSType
 import com.redlimerl.mcsrlauncher.data.instance.BasicInstance
 import com.redlimerl.mcsrlauncher.data.instance.LWJGLVersionData
 import com.redlimerl.mcsrlauncher.data.meta.MetaUniqueID
+import com.redlimerl.mcsrlauncher.data.meta.mod.SpeedrunModMeta
 import com.redlimerl.mcsrlauncher.gui.component.GameVersionsPanel
 import com.redlimerl.mcsrlauncher.gui.component.InstanceGroupComboBox
 import com.redlimerl.mcsrlauncher.instance.mod.ModCategory
@@ -42,13 +43,13 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
         versionsPanel.add(this.gameVersionsPanel, BorderLayout.CENTER)
 
         this.gameVersionsPanel.gameTabPane.addChangeListener {
-            if (this.gameVersionsPanel.gameTabPane.selectedIndex == 3) {
+            if (this.gameVersionsPanel.gameTabPane.selectedIndex == 4) {
                 createInstanceButton.text = "Migrate Instance(s)"
                 for (listener in createInstanceButton.actionListeners) createInstanceButton.removeActionListener(
                     listener
                 )
                 createInstanceButton.addActionListener { this.migrateInstance(this.gameVersionsPanel.launcherTabPane.selectedIndex) }
-            } else if (this.gameVersionsPanel.gameTabPane.selectedIndex == 4) {
+            } else if (this.gameVersionsPanel.gameTabPane.selectedIndex == 5) {
                 createInstanceButton.text = "Import Instance"
                 for (listener in createInstanceButton.actionListeners) createInstanceButton.removeActionListener(
                     listener
@@ -68,7 +69,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
     private fun createInstance() {
         if (instanceNameField.text.isNullOrBlank()) return
 
-        val instance = InstanceManager.createInstance(instanceNameField.text, instanceGroupBox.selectedItem?.toString()?.trimEnd(), gameVersionsPanel.getMinecraftVersion().version, gameVersionsPanel.getLWJGLVersion(), gameVersionsPanel.getFabricVersion(), gameVersionsPanel.getMCSRRankedPackType())
+        val instance = InstanceManager.createInstance(instanceNameField.text, instanceGroupBox.selectedItem?.toString()?.trimEnd(), gameVersionsPanel.getMinecraftVersion().version, gameVersionsPanel.getLWJGLVersion(), gameVersionsPanel.getFabricVersion(), gameVersionsPanel.getMCSRRankedPackType(), gameVersionsPanel.getDraftoutVersion())
         val mcsrRankedPackType = instance.mcsrRankedType
 
         this.dispose()
@@ -87,6 +88,22 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
                         instance.installRecommendedSpeedrunMods(this, mcsrRankedPackType.versionName, ModCategory.RANDOM_SEED, ModDownloadMethod.DOWNLOAD_RECOMMENDS, false)
                     }
                     instance.options.autoModUpdates = true
+                    instance.save()
+                    launch()
+                }
+
+                override fun onError(e: Throwable) {
+                    launch()
+                }
+            }.showDialog().start()
+            return
+        } else if (instance.draftoutFormat != null) {
+            object : LauncherWorker(this@CreateInstanceGui, I18n.translate("message.loading"), I18n.translate("text.download.assets").plus("...")) {
+                override fun work(dialog: JDialog) {
+                    SpeedrunUtils.getLatestDraftoutVersion(this)?.download(instance, this)
+                    instance.installRecommendedSpeedrunMods(this, SpeedrunModMeta.VERIFIED_MODS, ModCategory.RANDOM_SEED, ModDownloadMethod.DOWNLOAD_RECOMMENDS, false)
+                    instance.options.autoModUpdates = true
+                    instance.options.jvmArguments = "-XX:CompileCommand=exclude,io/netty/util/internal/ReferenceCountUpdater,retryRelease0"
                     instance.save()
                     launch()
                 }
@@ -160,6 +177,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
                         MigrationUtils.getMinecraftVersion(mmcPack),
                         lwjglVerData,
                         fabricVerData,
+                        null,
                         null
                     )
 
@@ -207,6 +225,7 @@ class CreateInstanceGui(parent: JFrame) : CreateInstanceDialog(parent) {
                     MigrationUtils.getMinecraftVersion(mmcPack),
                     lwjglVerData,
                     fabricVerData,
+                    null,
                     null
                 )
 

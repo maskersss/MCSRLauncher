@@ -66,6 +66,7 @@ data class BasicInstance(
     var lwjglVersion: LWJGLVersionData,
     var fabricVersion: FabricVersionData?,
     var mcsrRankedType: MCSRRankedPackType? = null,
+    var draftoutFormat: Int? = null,
     var options: InstanceOptions = InstanceOptions(),
     var playTime: Long = 0,
 ) {
@@ -186,6 +187,10 @@ data class BasicInstance(
             SpeedrunUtils.getLatestMCSRRankedVersion(worker)?.download(this, worker)
         }
 
+        if (this.draftoutFormat != null && fabric != null) {
+            SpeedrunUtils.getLatestDraftoutVersion(worker)?.download(this, worker)
+        }
+
         MCSRLauncher.LOGGER.info("Installed all game files and libraries!")
 
         if (options.enableToolscreen && (options.selectToolscreenVersion.isNotBlank() || options.autoToolscreenUpdates)) {
@@ -243,7 +248,8 @@ data class BasicInstance(
     }
 
     fun getIconResource(): URL? {
-        return if (this.mcsrRankedType != null) javaClass.getResource("/icons/mcsrranked.png")
+        return if (this.draftoutFormat != null) javaClass.getResource("/icons/draftout.png")
+            else if (this.mcsrRankedType != null) javaClass.getResource("/icons/mcsrranked.png")
             else if (this.fabricVersion != null) javaClass.getResource("/icons/fabric.png")
             else javaClass.getResource("/icons/minecraft.png")
     }
@@ -576,6 +582,7 @@ data class BasicInstance(
                 lwjglVersion,
                 fabricVersion,
                 mcsrRankedType,
+                null,
                 options,
                 playTime = 0,
             )

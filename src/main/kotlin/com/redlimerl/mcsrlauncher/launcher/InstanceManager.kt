@@ -112,7 +112,8 @@ object InstanceManager {
         minecraftVersion: String,
         lwjglVersion: LWJGLVersionData,
         fabricVersion: FabricVersionData?,
-        mcsrRankedPackType: MCSRRankedPackType?
+        mcsrRankedPackType: MCSRRankedPackType?,
+        draftoutFormat: Int?,
     ): BasicInstance {
         return BasicInstance(
             getNewInstanceName(name),
@@ -121,7 +122,8 @@ object InstanceManager {
             minecraftVersion,
             lwjglVersion,
             fabricVersion,
-            mcsrRankedPackType
+            mcsrRankedPackType,
+            draftoutFormat
         ).also { addInstance(it) }
     }
 
